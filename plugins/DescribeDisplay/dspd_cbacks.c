@@ -134,14 +134,14 @@ describe_sticky_labels (FILE *fp, GGobiData *d, cpaneld *cpanel, ggobid *gg)
   gtmp =  (iscr.x * PRECISION1) / (sp->iscale.x);
   planarx = gtmp + sp->pmid.x
 */
-static gdouble
-scale_convert (splotd *sp, gint ival, gint max, gdouble mid, gint scale)
+static greal
+scale_convert (splotd *sp, gint ival, gint max, greal mid, gint scale)
 {
   gint itmp;
 
   ival -= (max / 2);
   itmp = (ival * PRECISION1) / (scale);
-  return ((gdouble) itmp + mid);
+  return ((greal) itmp + mid);
 }
 
 /*
@@ -194,7 +194,7 @@ describe_scatterplot_plot (FILE *fp, ggobid *gg, displayd *display,
   icoords scr;
   fcoords tfmin, tfmax;
   fcoords pmin, pmax;
-  gdouble ftmp;
+  float ftmp;
   gint counter;
 
   OPEN_LIST(fp);  /* plot; unlabelled */

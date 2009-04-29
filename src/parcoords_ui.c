@@ -28,7 +28,7 @@ ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   cpanel->p1d.nASHes = (gint)
-    ((gdouble) cpanel->p1d.nbins * (adj->value / 2.0));
+    ((gfloat) cpanel->p1d.nbins * (adj->value / 2.0));
 
   display_tailpipe (gg->current_display, FULL, gg);
 }

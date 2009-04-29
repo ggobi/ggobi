@@ -24,6 +24,14 @@ typedef struct {
   gchar *name;
 } modepaneld;
 
+/*
+ * greal is at several steps in the pipeline, in particular
+ * for world, jitdata, and planar, as we eliminate the conversion
+ * to longs.  Defining 'greal' allows us to compare the behavior
+ * of floats and doubles for speed and storage.
+*/
+typedef gfloat greal;
+
 typedef enum {Sprocess_data, xml_data, mysql_data, url_data, csv_data, unknown_data, num_data_modes} DataMode;
 
 typedef enum {NONE, EXPOSE, QUICK, BINNED, FULL, FULL_1PIXMAP} RedrawStyle;
@@ -50,16 +58,16 @@ typedef struct {
   glong x, y;
 } lcoords;
 typedef struct {
-  gdouble x, y;
+  greal x, y;
 } gcoords;
 typedef struct {
   gint x, y;
 } icoords;
 typedef struct {
-  gdouble x, y;
+  gfloat x, y;
 } fcoords;
 typedef struct {
-  gdouble min, max;
+  gfloat min, max;
 } lims;
 typedef struct {
   gint a, b;
@@ -97,7 +105,7 @@ typedef struct {
 } array_d;
 /*-- floating point: for gg.raw_data, tform1, tform2 --*/
 typedef struct {
-  gdouble **vals;
+  gfloat **vals;
   guint nrows, ncols;
 } array_f;
 /*-- short: for gg.missing --*/
@@ -112,7 +120,7 @@ typedef struct {
 } array_l;
 /*-- real: for the new world, jitdata --*/
 typedef struct {
-  gdouble **vals;
+  greal **vals;
   guint nrows, ncols;
 } array_g;
 
@@ -122,7 +130,7 @@ typedef struct {
   guint nels;
 } vector_d;
 typedef struct {
-  gdouble *els;
+  gfloat *els;
   guint nels;
 } vector_f;
 typedef struct {
@@ -143,7 +151,7 @@ typedef struct {
 } vector_g;
 
 typedef struct {  /*-- used for obtaining ranks --*/
-  gdouble f;
+  gfloat f;
   gint indx;
 } paird;
 
@@ -151,10 +159,10 @@ typedef struct {  /*-- used for obtaining ranks --*/
 /*-- used to keep track of history in moving points --*/
 typedef struct {
   gint i, j;
-  gdouble val;
+  gfloat val;
 } celld;
 
-typedef gint (*Tour_PPIndex_f)(array_d *pd, void *params, gdouble *val, gpointer userData);
+typedef gint (*Tour_PPIndex_f)(array_f *pd, void *params, gfloat *val, gpointer userData);
 
 typedef struct {
     gchar *ppIndexName;   /* a string that can be used in the GUI to describe this PP index. */
@@ -184,12 +192,12 @@ typedef struct {
   /* */
   array_d Fa, Fz, F, Ga, Gz, G, Va, Vz, tv;
   vector_f lambda, tau, tinc;
-  gdouble dist_az, delta, tang;
+  gfloat dist_az, delta, tang;
   gint target_selection_method;
   gint idled;
   gboolean get_new_target;
   gint index; /* this is for counting planes passed */
-  gdouble ppval, oppval; /* for projection pursuit */
+  gfloat ppval, oppval; /* for projection pursuit */
 
 } tour;
 
@@ -203,9 +211,9 @@ typedef struct {
 } pp_param;
 
 typedef struct
-{ gdouble temp_start, temp_end, cooling, heating, temp, index_best;
+{ gfloat temp_start, temp_end, cooling, heating, temp, index_best;
   gint restart, maxproj, success;
-  array_d proj_best, data, pdata;
+  array_f proj_best, data, pdata;
 } optimize0_param; 
 
 /*
@@ -256,13 +264,13 @@ typedef struct
  gint maxbincounts;
  gbind  *bins;
  gbind  **cbins;
- gdouble *breaks;
+ gfloat *breaks;
 
  GdkPoint anchor_rgn[4];
  GdkPoint offset_rgn[4];
  gboolean anchor_drag;
  gboolean width_drag;
- gdouble offset;
+ gfloat offset;
 
 /* whenever points in histograms "overflow" to the left or right of the first or last bin, they need a place to stay */
  gboolean high_pts_missing;

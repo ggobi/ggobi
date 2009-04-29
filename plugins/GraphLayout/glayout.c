@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #include "plugin.h"
-#include "glayout.h"  // defines HAVE_LIBGVC
+#include "glayout.h"  # defines HAVE_LIBGVC
 
 #include "GGStructSizes.c"
 

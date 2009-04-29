@@ -71,20 +71,20 @@ p1d_activate (gint state, displayd * display, ggobid * gg)
 
 
 void
-p1d_spread_var (displayd * display, gdouble * yy, splotd * sp, GGobiData * d,
+p1d_spread_var (displayd * display, gfloat * yy, splotd * sp, GGobiData * d,
                 ggobid * gg)
 {
 /*
  * Set up the next dot plot.
 */
   gint i;
-  gdouble del = 1.;
+  gfloat del = 1.;
   gint option = 1, stages = 3;
-  gdouble min, max, mean;
+  gfloat min, max, mean;
   cpaneld *cpanel = &display->cpanel;
 
   if (sp->p1d.spread_data.nels != d->nrows)
-    vectord_realloc (&sp->p1d.spread_data, d->nrows);
+    vectorf_realloc (&sp->p1d.spread_data, d->nrows);
 
   switch (cpanel->p1d.type) {
   case TEXTURE:
@@ -120,7 +120,7 @@ p1d_spread_var (displayd * display, gdouble * yy, splotd * sp, GGobiData * d,
 }
 
 void
-p1d_reproject (splotd * sp, gdouble ** world_data, GGobiData * d, ggobid * gg)
+p1d_reproject (splotd * sp, greal ** world_data, GGobiData * d, ggobid * gg)
 {
 /*
  * Project the y variable down from the ncols-dimensional world_data[]
@@ -128,15 +128,15 @@ p1d_reproject (splotd * sp, gdouble ** world_data, GGobiData * d, ggobid * gg)
  * from p1d.spread_data[].
 */
   gint i, m, jvar = 0;
-  gdouble rdiff, ftmp;
-  gdouble precis = PRECISION1;
+  gfloat rdiff, ftmp;
+  gfloat precis = PRECISION1;
   displayd *display = (displayd *) sp->displayptr;
-  gdouble *yy;
+  gfloat *yy;
 
   if (sp == NULL)
     return;
 
-  yy = (gdouble *) g_malloc (d->nrows_in_plot * sizeof (gdouble));
+  yy = (gfloat *) g_malloc (d->nrows_in_plot * sizeof (gfloat));
   jvar = sp->p1dvar;
 
   /*
@@ -211,8 +211,8 @@ p1d_varsel (splotd * sp, gint jvar, gint * jprev, gint toggle, gint mouse)
 void
 ash_baseline_set (icoords * baseline, splotd * sp)
 {
-  gdouble ftmp, precis = (gdouble) PRECISION1;
-  gdouble pl, gtmp;
+  greal ftmp, precis = (greal) PRECISION1;
+  greal pl, gtmp;
   gint iscr;
 
 /*
@@ -220,7 +220,7 @@ ash_baseline_set (icoords * baseline, splotd * sp)
                     (sp->p1d.lim.max - sp->p1d.lim.min);
 */
   ftmp = -1 /* and the rest of the usual expression is 0 now */ ;
-  pl = (gdouble) (precis * ftmp);
+  pl = (greal) (precis * ftmp);
 
 /*-- HORIZONTAL --*/
   gtmp = pl - sp->pmid.y;

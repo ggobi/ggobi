@@ -184,7 +184,7 @@ void
 printminmax (gchar *cmt, ggvisd *ggv)
 {
   gint i, j;
-  gdouble min, max;
+  gfloat min, max;
   max = min = ggv->pos.vals[0][0];
   for (i=0; i<ggv->pos.nrows; i++) {
     for (j=0; j<ggv->pos.ncols; j++) {

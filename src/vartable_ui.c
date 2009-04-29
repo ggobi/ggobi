@@ -80,7 +80,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   gint ncols = selected_cols_get (cols, d, gg);
   gint j, k;
   gchar *val_str;
-  gdouble min_val = 0, max_val = 0; // compiler pacification
+  gfloat min_val = 0, max_val = 0; // compiler pacification
   gboolean min_p = false, max_p = false;
   vartabled *vt;
 
@@ -99,7 +99,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   val_str = gtk_editable_get_chars (GTK_EDITABLE (umin_entry),
     0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
-    min_val = (gdouble) atof (val_str);
+    min_val = (gfloat) atof (val_str);
     g_free (val_str);
     min_p = true;
   }
@@ -108,7 +108,7 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   val_str = gtk_editable_get_chars (GTK_EDITABLE (umax_entry),
     0, -1);
   if (val_str != NULL && strlen (val_str) > 0) {
-    max_val = (gdouble) atof (val_str);
+    max_val = (gfloat) atof (val_str);
     g_free (val_str);
     max_p = true;
   }

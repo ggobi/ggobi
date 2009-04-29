@@ -26,11 +26,11 @@ typedef struct _Tour2DCPanel {
    gboolean local_scan;
    gboolean stepping;
    gboolean backtracking;
-   gdouble step; 
+   gfloat step; 
    gint ls_dir;
-   gdouble path_len;
+   gfloat path_len;
    gint pp_indx;
-   gdouble slidepos;
+   gfloat slidepos;
    gint manip_mode;
 
    TourPPIndex ppindex;
@@ -110,35 +110,35 @@ typedef struct {
  /*-- rotation control pane --*/
  struct _Tour2D3CPanel {
    gboolean paused;
-   gdouble step; 
-   gdouble slidepos;
+   gfloat step; 
+   gfloat slidepos;
    gint manip_mode;
  } t2d3;
 
  /*-- 1d tour control panel --*/
  struct _Tour1DCpanel {
    gboolean paused;
-   gdouble step; 
+   gfloat step; 
    gint nbins, nASHes;
    gboolean vert;
    gint pp_indx;
-   gdouble slidepos;
-   gdouble ASH_smooth;
-   gdouble ASH_add_lines_p;
+   gfloat slidepos;
+   gfloat ASH_smooth;
+   gfloat ASH_add_lines_p;
  } t1d;
 
  /*-- corr tour control panel --*/
  struct _TourCorrCpanel {
-   gdouble slidepos;
+   gfloat slidepos;
    gint manip_mode;
  } tcorr;
  struct _TourCorr1Cpanel {
    gboolean paused;
-   gdouble step; 
+   gfloat step; 
  } tcorr1;
  struct _TourCorr2Cpanel {
    gboolean paused;
-   gdouble step; 
+   gfloat step; 
  } tcorr2;
 
 /* tour variables are in display.h */

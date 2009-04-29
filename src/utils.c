@@ -59,8 +59,8 @@ gint
 fcompare (const void *x1, const void *x2)
 {
   gint val = 0;
-  const gdouble *f1 = (const gdouble *) x1;
-  const gdouble *f2 = (const gdouble *) x2;
+  const gfloat *f1 = (const gfloat *) x1;
+  const gfloat *f2 = (const gfloat *) x2;
 
   if (*f1 < *f2)
     val = -1;
@@ -118,13 +118,13 @@ pcompare (const void *val1, const void *val2)
 
 /* Not used anywhere yet ... */
 void
-fshuffle (gdouble * x, gint n)
+fshuffle (gfloat * x, gint n)
 {
 /*
  * Knuth, Seminumerical Algorithms, Vol2; Algorithm P.
 */
   gint i, k;
-  gdouble f;
+  gfloat f;
 
   for (i = 0; i < n; i++) {
     k = (gint) (randvalue () * (gdouble) i);
@@ -346,7 +346,7 @@ address_check (GGobiData * d, ggobid * gg)
 {
   g_printerr ("::: vars.h :::\n");
   g_printerr ("data_mode %d world %g nedges %d rowlab %s jitfac %f\n",
-              gg->input->mode, (gdouble) d->world.vals[0][0], d->edge.n,
+              gg->input->mode, (gfloat) d->world.vals[0][0], d->edge.n,
               g_array_index (d->rowlab, gchar *, 0), d->jitter.factor);
 
   return 1;

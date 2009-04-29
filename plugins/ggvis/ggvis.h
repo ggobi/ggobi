@@ -179,7 +179,7 @@ void ggv_Dtarget_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_lnorm_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_weight_power_cb (GtkAdjustment *adj, PluginInstance *inst);
 void ggv_center_scale_pos (ggvisd *ggv);
-gdouble ggv_randvalue (gint type);
+greal ggv_randvalue (gint type);
 void update_stress (ggvisd *ggv, ggobid *gg);
 void ggv_compute_Dtarget (gint selected_var, ggvisd *ggv);
 void ggv_init_Dtarget (gint, ggvisd *ggv);

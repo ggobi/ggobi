@@ -32,23 +32,23 @@ typedef struct {
   gint criticalvalue;   /*-- if diverging, where's the center? --*/
 
   gint n;               /*-- n <= MAXNCOLORS --*/
-  gdouble **data;        /*-- the data in the colortable, in its
+  gfloat **data;        /*-- the data in the colortable, in its
                              original system and dimensions --*/
   GdkColor *rgb;         /*-- the data converted to rgb, of length n --*/
   GArray *colorNames;   /*-- in case we have them --*/
 
-  gdouble *bg;           /*-- high-contrast background color, rgb --*/
+  gfloat *bg;           /*-- high-contrast background color, rgb --*/
   GdkColor rgb_bg;     /*-- high-contrast background color, rgb --*/
 
   GdkColor rgb_hidden;  /*-- for hidden points and edges, close to bg --*/
 
-  gdouble *accent;       /*-- high-contrast accent color, rgb --*/
+  gfloat *accent;       /*-- high-contrast accent color, rgb --*/
   GdkColor rgb_accent; /*-- high-contrast accent color, rgb --*/
 } colorschemed;
 
 colorschemed *findColorSchemeByName(GList * schemes, const gchar * name);
 
-gint getColor(xmlNodePtr node, xmlDocPtr doc, gdouble ** original,
+gint getColor(xmlNodePtr node, xmlDocPtr doc, gfloat ** original,
               GdkColor * col);
 
 colorschemed *read_colorscheme(char *fileName, GList **);

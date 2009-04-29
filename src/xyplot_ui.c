@@ -223,7 +223,7 @@ cpanel_xyplot_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 
     /*-- Cycling speed --*/
     gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->xyplot.cycle_delay_adj),
-      -1 * (gdouble) cpanel->xyplot.cycle_delay);
+      -1 * (gfloat) cpanel->xyplot.cycle_delay);
 
     /*-- Cycling axis --*/
     w = widget_find_by_name (pnl, "XYPLOT:cycle_axis");

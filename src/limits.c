@@ -34,7 +34,7 @@
  *
  */
 void
-limits_adjust (gdouble * min, gdouble * max)
+limits_adjust (gfloat * min, gfloat * max)
 {
   if (*max - *min == 0) {
     if (*min == 0.0) {
@@ -48,7 +48,7 @@ limits_adjust (gdouble * min, gdouble * max)
   }
 
   if (*max < *min) {
-    gdouble ftmp = *max;
+    gfloat ftmp = *max;
     *max = *min;
     *min = ftmp;
   }
@@ -60,7 +60,7 @@ limits_adjust (gdouble * min, gdouble * max)
 void
 limits_set_from_vartable (vartabled * vt)
 {
-  gdouble min, max;
+  gfloat min, max;
 
   if (vt->lim_specified_p) {
     min = vt->lim_specified_tform.min;
@@ -84,10 +84,10 @@ limits_raw_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
   gint i, m;
   vartabled *vt = vartable_element_get (j, d);
-  gdouble min, max;
+  greal min, max;
 
-  min = G_MAXDOUBLE;
-  max = -G_MAXDOUBLE;
+  min = G_MAXFLOAT;
+  max = -G_MAXFLOAT;
 
   if (visible_only) {  /*-- if using visible cases only --*/
     for (m = 0; m < d->nrows_in_plot; m++) {
@@ -140,10 +140,10 @@ limits_tform_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
   gint i, m;
   vartabled *vt = vartable_element_get (j, d);
-  gdouble min, max;
+  greal min, max;
 
-  min = G_MAXDOUBLE;
-  max = -G_MAXDOUBLE;
+  min = G_MAXFLOAT;
+  max = -G_MAXFLOAT;
 
   if (visible_only) {
     for (m = 0; m < d->nrows_in_plot; m++) {
@@ -176,13 +176,13 @@ void
 limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
 {
   gint i, m, np = 0;
-  gdouble sum = 0.0;
-  gdouble *x = (gdouble *) g_malloc (d->nrows * sizeof (gdouble));
+  gfloat sum = 0.0;
+  gfloat *x = (gfloat *) g_malloc (d->nrows * sizeof (gfloat));
   vartabled *vt = vartable_element_get (j, d);
-  gdouble min, max;
+  greal min, max;
 
-  min = G_MAXDOUBLE;
-  max = -G_MAXDOUBLE;
+  min = G_MAXFLOAT;
+  max = -G_MAXFLOAT;
 
   if (visible_only) {
 
@@ -226,7 +226,7 @@ limits_display_set_by_var (GGobiData * d, gint j, gboolean visible_only)
   vt->mean = sum / np;
 
   /*-- median: sort the temporary vector, and find its center --*/
-  qsort ((void *) x, np, sizeof (gdouble), fcompare);
+  qsort ((void *) x, np, sizeof (gfloat), fcompare);
   vt->median =
     ((np % 2) != 0) ? x[(np - 1) / 2] : (x[np / 2 - 1] + x[np / 2]) / 2.;
 

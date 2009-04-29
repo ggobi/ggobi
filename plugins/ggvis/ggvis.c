@@ -447,7 +447,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
     (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
     1, 1);
 
-  adj = gtk_adjustment_new ((gdouble)ggv->dim, 1.0, 10.0, 1.0, 1.0, 1.0);
+  adj = gtk_adjustment_new ((gfloat)ggv->dim, 1.0, 10.0, 1.0, 1.0, 1.0);
   g_signal_connect (G_OBJECT (adj), "value_changed",
     G_CALLBACK (ggv_dims_cb), inst);
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));

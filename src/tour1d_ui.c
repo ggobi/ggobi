@@ -130,7 +130,7 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
   splotd *sp = gg->current_splot;
 
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
-  cpanel->t1d.nASHes = (gint) ((gdouble) cpanel->t1d.nbins * (adj->value / 2.0));
+  cpanel->t1d.nASHes = (gint) ((gfloat) cpanel->t1d.nbins * (adj->value / 2.0));
   cpanel->t1d.ASH_smooth = adj->value;
 
   display_tailpipe (gg->current_display, FULL, gg);

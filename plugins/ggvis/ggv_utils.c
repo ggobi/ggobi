@@ -8,7 +8,7 @@
 #include "defines.h"
 #include "ggvis.h"
 
-gdouble
+greal
 ggv_randvalue (gint type)
 {
 /*
@@ -29,7 +29,7 @@ ggv_randvalue (gint type)
   } else if (type == NORMAL) {
 
     gboolean check = true;
-    gdouble d, dfac;
+    greal d, dfac;
 
     if (isave) {
       isave = false;

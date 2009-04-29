@@ -106,7 +106,7 @@ show_missings_cb (GtkToggleButton * button, ggobid * gg)
 }
 
 static gboolean
-impute_fixed_cb (ImputeType impute_type, gdouble * val, ggobid * gg)
+impute_fixed_cb (ImputeType impute_type, gfloat * val, ggobid * gg)
 {
   GtkWidget *w;
   gchar *val_str;
@@ -133,7 +133,7 @@ impute_fixed_cb (ImputeType impute_type, gdouble * val, ggobid * gg)
       return ok;
     }
 
-    *val = (gdouble) atof (val_str);
+    *val = (gfloat) atof (val_str);
     g_free (val_str);
     if (*val < 0 || *val > 100) {
       gchar *message =
@@ -156,7 +156,7 @@ impute_fixed_cb (ImputeType impute_type, gdouble * val, ggobid * gg)
       return ok;
     }
     else {
-      *val = (gdouble) atof (val_str);
+      *val = (gfloat) atof (val_str);
       g_free (val_str);
     }
   }
@@ -174,7 +174,7 @@ impute_cb (GtkWidget * w, ggobid * gg)
     (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
   gint *vars; // = (gint *) g_malloc (d->ncols * sizeof(gint));
   gint nvars;
-  gdouble val = 0.0;  // compiler pacification
+  gfloat val = 0.0;  // compiler pacification
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
 

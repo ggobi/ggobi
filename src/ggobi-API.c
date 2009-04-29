@@ -237,7 +237,7 @@ GGOBI (setData) (gdouble * values, gchar ** rownames, gchar ** colnames,
   vectori_init_null (&d->rows_in_plot);
   d->nrows_in_plot = d->nrows;  /*-- for now --*/
 
-  arrayd_alloc (&d->raw, nr, nc);
+  arrayf_alloc (&d->raw, nr, nc);
 
   if (ids) {
     datad_record_ids_set (d, ids, duplicate);
@@ -456,18 +456,18 @@ const gchar *GGOBI (getViewTypeName) (displayd * dpy)
   Pointer to the raw data managed by GGobi.
   Don't touch this.
  */
-const gdouble **GGOBI (getRawData) (GGobiData * d, ggobid * gg)
+const gfloat **GGOBI (getRawData) (GGobiData * d, ggobid * gg)
 {
-  return ((const gdouble **) d->raw.vals);
+  return ((const gfloat **) d->raw.vals);
 }
 
 /*
   Pointer to the second transformation of the data managed by GGobi.
   Don't touch this.
  */
-const gdouble **GGOBI (getTFormData) (GGobiData * d, ggobid * gg)
+const gfloat **GGOBI (getTFormData) (GGobiData * d, ggobid * gg)
 {
-  return ((const gdouble **) d->tform.vals);
+  return ((const gfloat **) d->tform.vals);
 }
 
 
@@ -1285,8 +1285,8 @@ GGOBI (setPlotRange) (double *x, double *y, int plotNum, displayd * display,
      tfmax.y = y[1];
 
      if (GTK_WIDGET_VISIBLE (display->hrule)) {
-     if (((gdouble) GTK_RULER (display->hrule)->lower != tfmin.x) ||
-     ((gdouble) GTK_RULER (display->hrule)->upper != tfmax.x))
+     if (((gfloat) GTK_RULER (display->hrule)->lower != tfmin.x) ||
+     ((gfloat) GTK_RULER (display->hrule)->upper != tfmax.x))
      {
      GTK_RULER_set_range (GTK_RULER (display->hrule),
      (gdouble) tfmin.x, (gdouble) tfmax.x);
@@ -1294,8 +1294,8 @@ GGOBI (setPlotRange) (double *x, double *y, int plotNum, displayd * display,
      }
 
      if (GTK_WIDGET_VISIBLE (display->vrule)) {
-     if (((gdouble) GTK_RULER (display->vrule)->upper != tfmin.y) ||
-     ((gdouble) GTK_RULER (display->vrule)->lower != tfmax.y))
+     if (((gfloat) GTK_RULER (display->vrule)->upper != tfmin.y) ||
+     ((gfloat) GTK_RULER (display->vrule)->lower != tfmax.y))
      {
      GTK_RULER_set_range (GTK_RULER (display->vrule),
      (gdouble) tfmax.y, (gdouble) tfmin.y);

@@ -27,24 +27,24 @@
 void
 pan_by_drag (splotd * sp, ggobid * gg)
 {
-  gdouble dx, dy;
-  gdouble scale_x, scale_y;
-  gdouble precis = (gdouble) PRECISION1;
+  greal dx, dy;
+  greal scale_x, scale_y;
+  greal precis = (greal) PRECISION1;
 
-  dx = (gdouble) (sp->mousepos.x - sp->mousepos_o.x);
-  dy = (gdouble) (sp->mousepos.y - sp->mousepos_o.y);
+  dx = (greal) (sp->mousepos.x - sp->mousepos_o.x);
+  dy = (greal) (sp->mousepos.y - sp->mousepos_o.y);
 
-  scale_x = (gdouble) sp->scale.x;
-  scale_y = (gdouble) sp->scale.y;
+  scale_x = (greal) sp->scale.x;
+  scale_y = (greal) sp->scale.y;
 
 /*
  * This section is a bit puzzling, because I don't know what
  * would change this -- maybe resizing the plot window?
 */
   scale_x /= 2;
-  sp->iscale.x = (gdouble) sp->max.x * scale_x;
+  sp->iscale.x = (greal) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = -1 * (gdouble) sp->max.y * scale_y;
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
   sp->pmid.x -= (dx * precis / sp->iscale.x);
   sp->pmid.y -= (dy * precis / sp->iscale.y);
@@ -59,8 +59,8 @@ pan_by_drag (splotd * sp, ggobid * gg)
 void
 zoom_by_drag (splotd * sp, ggobid * gg)
 {
-  gdouble *scale_x = &sp->scale.x;
-  gdouble *scale_y = &sp->scale.y;
+  gfloat *scale_x = &sp->scale.x;
+  gfloat *scale_y = &sp->scale.y;
   gint npix = 20;  /*-- number of pixels from the crosshair required --*/
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
@@ -76,13 +76,13 @@ zoom_by_drag (splotd * sp, ggobid * gg)
       (ABS (sp->mousepos.y - mid.y) >= npix)) {
     /*-- making the behavior identical to click zooming --*/
     scalefac.x =
-      (gdouble) (sp->mousepos.x - mid.x) / (gdouble) (sp->mousepos_o.x - mid.x);
+      (gfloat) (sp->mousepos.x - mid.x) / (gfloat) (sp->mousepos_o.x - mid.x);
     scalefac.y =
-      (gdouble) (sp->mousepos.y - mid.y) / (gdouble) (sp->mousepos_o.y - mid.y);
+      (gfloat) (sp->mousepos.y - mid.y) / (gfloat) (sp->mousepos_o.y - mid.y);
 
 
     if (cpanel->scale.fixAspect_p) {
-      gdouble fac = MAX (scalefac.x, scalefac.y);
+      greal fac = MAX (scalefac.x, scalefac.y);
       *scale_x = *scale_x * fac;
       *scale_y = *scale_y * fac;
 

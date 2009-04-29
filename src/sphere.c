@@ -31,13 +31,13 @@ sphere_init (GGobiData * d)
 {
   vectori_init_null (&d->sphere.vars);
   vectori_init_null (&d->sphere.pcvars);
-  vectord_init_null (&d->sphere.eigenval);
+  vectorf_init_null (&d->sphere.eigenval);
 
   arrayd_init_null (&d->sphere.eigenvec);
-  arrayd_init_null (&d->sphere.vc);
+  arrayf_init_null (&d->sphere.vc);
 
-  vectord_init_null (&d->sphere.tform_mean);
-  vectord_init_null (&d->sphere.tform_stddev);
+  vectorf_init_null (&d->sphere.tform_mean);
+  vectorf_init_null (&d->sphere.tform_stddev);
 
   d->sphere.vars_stdized = TRUE;
 }
@@ -48,13 +48,13 @@ sphere_free (GGobiData * d)
   /*-- don't free d->sphere.pcvars, because I need it to check history --*/
 
   vectori_free (&d->sphere.vars);
-  vectord_free (&d->sphere.eigenval);
+  vectorf_free (&d->sphere.eigenval);
 
   arrayd_free (&d->sphere.eigenvec, 0, 0);
-  arrayd_free (&d->sphere.vc, 0, 0);
+  arrayf_free (&d->sphere.vc, 0, 0);
 
-  vectord_free (&d->sphere.tform_mean);
-  vectord_free (&d->sphere.tform_stddev);
+  vectorf_free (&d->sphere.tform_mean);
+  vectorf_free (&d->sphere.tform_stddev);
 }
 
 void
@@ -65,13 +65,13 @@ sphere_malloc (gint nc, GGobiData * d, ggobid * gg)
 
   if (nc > 0) {
     vectori_alloc_zero (&d->sphere.vars, nc);
-    vectord_alloc_zero (&d->sphere.eigenval, nc);
+    vectorf_alloc_zero (&d->sphere.eigenval, nc);
 
     arrayd_alloc_zero (&d->sphere.eigenvec, nc, nc);
-    arrayd_alloc_zero (&d->sphere.vc, nc, nc);
+    arrayf_alloc_zero (&d->sphere.vc, nc, nc);
 
-    vectord_alloc_zero (&d->sphere.tform_mean, nc);
-    vectord_alloc_zero (&d->sphere.tform_stddev, nc);
+    vectorf_alloc_zero (&d->sphere.tform_mean, nc);
+    vectorf_alloc_zero (&d->sphere.tform_stddev, nc);
   }
 }
 
@@ -235,8 +235,8 @@ pca_diagnostics_set (GGobiData * d, ggobid * gg)
  * of the principal components analysis
 */
   gint j;
-  gdouble ftmp1 = 0.0, ftmp2 = 0.0;
-  gdouble firstpc, lastpc;
+  gfloat ftmp1 = 0.0, ftmp2 = 0.0;
+  gfloat firstpc, lastpc;
 
   if (d == NULL || d->sphere.npcs <= 0
       || d->sphere.eigenval.nels < d->sphere.npcs)
@@ -342,7 +342,7 @@ spherevars_set (ggobid * gg)
 /*-------------------------------------------------------------------------*/
 
 void
-eigenvals_get (gdouble * els, GGobiData * d)
+eigenvals_get (gfloat * els, GGobiData * d)
 {
   gint j;
   for (j = 0; j < d->sphere.vars.nels; j++)
@@ -352,7 +352,7 @@ eigenvals_get (gdouble * els, GGobiData * d)
 void
 eigenval_zero (GGobiData * d)
 {
-  vectord_zero (&d->sphere.eigenval);
+  vectorf_zero (&d->sphere.eigenval);
 }
 
 void
@@ -373,7 +373,7 @@ eigenvec_set (GGobiData * d, ggobid * gg)
   gint i, j;
   gint nels = d->sphere.vars.nels;
   gdouble **eigenvec = d->sphere.eigenvec.vals;
-  gdouble **vc = d->sphere.vc.vals;
+  gfloat **vc = d->sphere.vc.vals;
 
   for (i = 0; i < nels; i++)
     for (j = 0; j < nels; j++)
@@ -390,10 +390,10 @@ void
 sphere_varcovar_set (GGobiData * d, ggobid * gg)
 {
   gint i, j, k, m, var;
-  gdouble tmpf = 0.;
+  gfloat tmpf = 0.;
   gint n = d->nrows_in_plot;
-  gdouble *tform_mean = d->sphere.tform_mean.els;
-  gdouble *tform_stddev = d->sphere.tform_stddev.els;
+  gfloat *tform_mean = d->sphere.tform_mean.els;
+  gfloat *tform_stddev = d->sphere.tform_stddev.els;
 
   for (k = 0; k < d->sphere.vars.nels; k++) {
     var = d->sphere.vars.els[k];
@@ -409,7 +409,7 @@ sphere_varcovar_set (GGobiData * d, ggobid * gg)
     tmpf = 0.;
     for (i = 0; i < n; i++)
       tmpf += d->tform.vals[d->rows_in_plot.els[i]][var];
-    tform_mean[k] = tmpf / ((gdouble) n);
+    tform_mean[k] = tmpf / ((gfloat) n);
   }
 
   for (k = 0; k < d->sphere.vc.ncols; k++) {
@@ -421,10 +421,10 @@ sphere_varcovar_set (GGobiData * d, ggobid * gg)
           (d->tform.vals[i][d->sphere.vars.els[k]] - tform_mean[k]) *
           (d->tform.vals[i][d->sphere.vars.els[j]] - tform_mean[j]);
       }
-      tmpf /= ((gdouble) (n - 1));
+      tmpf /= ((gfloat) (n - 1));
       d->sphere.vc.vals[j][k] = tmpf;
       if (j == k)
-        tform_stddev[k] = (gdouble) sqrt ((gdouble) tmpf);
+        tform_stddev[k] = (gfloat) sqrt ((gdouble) tmpf);
     }
   }
 
@@ -445,7 +445,7 @@ vc_identity_p (gdouble ** matrx, gint n)
 {
   gint i, j;
   gboolean retn_val = true;
-  gdouble tol = 0.001;
+  gfloat tol = 0.001;
 
   for (i = 0; i < n; i++) {
     for (j = 0; j < n; j++) {
@@ -476,13 +476,13 @@ sphere_svd (GGobiData * d, ggobid * gg)
   gint i, j, k, rank;
   gint nels = d->sphere.vars.nels;
   gdouble **eigenvec = d->sphere.eigenvec.vals;
-  /*  gdouble **eigenvec = d->sphere.vc.vals; */
-  gdouble *eigenval = d->sphere.eigenval.els;
+  /*  gfloat **eigenvec = d->sphere.vc.vals; */
+  gfloat *eigenval = d->sphere.eigenval.els;
 
   gboolean vc_equals_I = vc_identity_p (eigenvec, nels);
   paird *pairs = (paird *) g_malloc (nels * sizeof (paird));
   /*-- scratch vector and array --*/
-  gdouble *e = (gdouble *) g_malloc (nels * sizeof (gdouble));
+  gfloat *e = (gfloat *) g_malloc (nels * sizeof (gfloat));
   gdouble **b = (gdouble **) g_malloc (nels * sizeof (gdouble *));
 
   for (j = 0; j < nels; j++)
@@ -492,13 +492,13 @@ sphere_svd (GGobiData * d, ggobid * gg)
     eigenval_zero (d);  /*-- zero out the vector of eigenvalues --*/
     dsvd (eigenvec, nels, nels, d->sphere.eigenval.els, b);
     for (j = 0; j < nels; j++) {
-      eigenval[j] = (gdouble) sqrt ((gdouble) eigenval[j]);
+      eigenval[j] = (gfloat) sqrt ((gdouble) eigenval[j]);
     }
   }
 
   /*-- obtain ranks to use in sorting eigenvals and eigenvec --*/
   for (i = 0; i < d->sphere.vars.nels; i++) {
-    pairs[i].f = (gdouble) eigenval[i];
+    pairs[i].f = (gfloat) eigenval[i];
     pairs[i].indx = i;
   }
   qsort ((gchar *) pairs, nels, sizeof (paird), pcompare);
@@ -540,13 +540,13 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiData * d,
                ggobid * gg)
 {
   gint i, j, k, m;
-  gdouble tmpf;
-  gdouble *b = (gdouble *) g_malloc (svars->nels * sizeof (gdouble));
+  gfloat tmpf;
+  gfloat *b = (gfloat *) g_malloc (svars->nels * sizeof (gfloat));
 
-  gdouble *tform_mean = d->sphere.tform_mean.els;
-  gdouble *tform_stddev = d->sphere.tform_stddev.els;
+  gfloat *tform_mean = d->sphere.tform_mean.els;
+  gfloat *tform_stddev = d->sphere.tform_stddev.els;
   gdouble **eigenvec = d->sphere.eigenvec.vals;
-  gdouble *eigenval = d->sphere.eigenval.els;
+  gfloat *eigenval = d->sphere.eigenval.els;
 
   for (m = 0; m < d->nrows_in_plot; m++) {
     i = d->rows_in_plot.els[m];
@@ -555,12 +555,12 @@ spherize_data (vector_i * svars, vector_i * pcvars, GGobiData * d,
       tmpf = 0.;
       for (k = 0; k < svars->nels; k++) {
         if (d->sphere.vars_stdized) {
-          tmpf = tmpf + (gdouble) eigenvec[k][j] *
+          tmpf = tmpf + (gfloat) eigenvec[k][j] *
             (d->tform.vals[i][svars->els[k]] -
              tform_mean[k]) / tform_stddev[k];
         }
         else {
-          tmpf = tmpf + (gdouble) eigenvec[k][j] *
+          tmpf = tmpf + (gfloat) eigenvec[k][j] *
             (d->tform.vals[i][svars->els[k]] - tform_mean[k]);
         }
       }

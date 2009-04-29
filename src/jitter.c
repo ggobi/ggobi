@@ -26,7 +26,7 @@
 #include "vars.h"
 #include "externs.h"
 
-gdouble
+gfloat
 jitter_randval (gint type)
 {
 /*
@@ -75,7 +75,7 @@ jitter_randval (gint type)
      */
     drand = (drand / 3.0);
   }
-  return ((gdouble) drand);
+  return ((gfloat) drand);
 }
 
 void
@@ -83,8 +83,8 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
           ggobid * gg)
 {
   gint i, j, k, m;
-  gdouble frand, fworld, fjit;
-  gdouble precis = (gdouble) PRECISION1;
+  greal frand, fworld, fjit;
+  greal precis = (gfloat) PRECISION1;
   vartabled *vt;
 
   g_assert (d->jitdata.nrows == d->nrows);
@@ -98,7 +98,7 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
       m = d->rows_in_plot.els[i];
       /*-- jitter_one_value (m, k); --*/
 
-      frand = (gdouble) jitter_randval (d->jitter.type) * precis;
+      frand = (greal) jitter_randval (d->jitter.type) * precis;
 
       /*
        * The world.vals used here is already jittered:
@@ -106,7 +106,7 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
        */
       if (d->jitter.convex) {
         fworld = d->world.vals[m][k] - d->jitdata.vals[m][k];
-        fjit = (gdouble) vt->jitter_factor * (frand - fworld);
+        fjit = (greal) vt->jitter_factor * (frand - fworld);
       }
       else
         fjit = vt->jitter_factor * frand;
@@ -120,7 +120,7 @@ rejitter (gint * selected_cols, gint nselected_cols, GGobiData * d,
 
 
 void
-jitter_value_set (gdouble value, GGobiData * d, ggobid * gg)
+jitter_value_set (gfloat value, GGobiData * d, ggobid * gg)
 {
   GtkWidget *tree_view =
     get_tree_view_from_object (G_OBJECT (gg->jitter_ui.window));

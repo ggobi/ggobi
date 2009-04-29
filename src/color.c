@@ -87,7 +87,7 @@ colorscheme_init (colorschemed * scheme)
  * neighbors in the GraphAction plugin
 */
   {
-    gdouble red, green, blue;
+    gfloat red, green, blue;
     if (scheme->bg[0] + scheme->bg[1] + scheme->bg[2] > 1.5) {
       red = MAX (0.0, scheme->bg[0] - .3);
       green = MAX (0.0, scheme->bg[1] - .3);
@@ -131,7 +131,7 @@ default_scheme_init ()
    * difficulties reading the colorscheme xml file.
    */
 #ifdef SPECTRUM7
-  static gdouble data[7][3] = {
+  static gfloat data[7][3] = {
     {0.890, 0.196, 0.122},
     {1.000, 0.549, 0.000},
     {0.988, 0.839, 0.051},
@@ -143,8 +143,8 @@ default_scheme_init ()
   static gchar *colorNames[7] = {
     "Red", "Orange", "Gold", "Yellow", "Green Yellow", "Teal", "Blue"
   };
-  static gdouble bg[] = { 0.000, 0.000, 0.000 };
-  static gdouble accent[] = { 1.000, 1.000, 1.000 };
+  static gfloat bg[] = { 0.000, 0.000, 0.000 };
+  static gfloat accent[] = { 1.000, 1.000, 1.000 };
   colorschemed *scheme = (colorschemed *) g_malloc (sizeof (colorschemed));
 
   scheme->name = g_strdup ("Spectrum 7");
@@ -156,7 +156,7 @@ default_scheme_init ()
   scheme->criticalvalue = 0;  /*-- unused --*/
 #endif
 
-  static gdouble data[][3] = {
+  static gfloat data[][3] = {
     {1.0000, 1.0000, 0.2000},
     {0.8941, 0.1020, 0.1098},
     {0.2157, 0.4941, 0.7216},
@@ -171,8 +171,8 @@ default_scheme_init ()
     "Yellow", "Orange", "Blue", "Green", "Orange", "Brown",
     "Pink", "Gray", "Purple"
   };
-  static gdouble bg[] = { 0.000, 0.000, 0.000 };
-  static gdouble accent[] = { 1.000, 1.000, 1.000 };
+  static gfloat bg[] = { 0.000, 0.000, 0.000 };
+  static gfloat accent[] = { 1.000, 1.000, 1.000 };
   colorschemed *scheme = (colorschemed *) g_malloc (sizeof (colorschemed));
 
   scheme->name = g_strdup ("Set1 9");
@@ -191,18 +191,18 @@ default_scheme_init ()
     g_array_append_val (scheme->colorNames, colorNames[i]);
 
   /*-- allocate and populate data, bg, and accent --*/
-  scheme->data = (gdouble **) g_malloc (scheme->n * sizeof (gdouble *));
+  scheme->data = (gfloat **) g_malloc (scheme->n * sizeof (gfloat *));
   for (k = 0; k < scheme->n; k++) {
-    scheme->data[k] = (gdouble *) g_malloc (3 * sizeof (gdouble));
+    scheme->data[k] = (gfloat *) g_malloc (3 * sizeof (gfloat));
     for (i = 0; i < 3; i++)
       scheme->data[k][i] = data[k][i];
   }
 
-  scheme->bg = (gdouble *) g_malloc (3 * sizeof (gdouble));
+  scheme->bg = (gfloat *) g_malloc (3 * sizeof (gfloat));
   for (i = 0; i < 3; i++)
     scheme->bg[i] = bg[i];
 
-  scheme->accent = (gdouble *) g_malloc (3 * sizeof (gdouble));
+  scheme->accent = (gfloat *) g_malloc (3 * sizeof (gfloat));
   for (i = 0; i < 3; i++)
     scheme->accent[i] = accent[i];
 

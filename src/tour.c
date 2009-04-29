@@ -283,20 +283,20 @@ eigen_clear (array_d Ga, array_d Gz, vector_f lambda, vector_f tau,
  */
 gint tour_path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim, 
   array_d Ga, array_d Gz, array_d G, vector_f lambda, array_d tv, 
-  array_d Va, array_d Vz, vector_f tau, vector_f tinc, gdouble *pdist_az, 
-  gdouble *ptang) 
+  array_d Va, array_d Vz, vector_f tau, vector_f tinc, gfloat *pdist_az, 
+  gfloat *ptang) 
 {
   gint i, j, k;
   gdouble tol = 0.01;
   gdouble tmpd1 = 0.0, tmpd2 = 0.0, tmpd =0.0;
   gboolean doit = true;
   paird *pairs = (paird *) g_malloc (projdim * sizeof (paird));
-  gdouble *e = (gdouble *) g_malloc (projdim * sizeof (gdouble));
+  gfloat *e = (gfloat *) g_malloc (projdim * sizeof (gfloat));
   gint dI; /* dimension of intersection of base pair */
-  gdouble **ptinc = (gdouble **) g_malloc (2 * sizeof (gdouble *));
+  gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
-  gdouble dist_az = *pdist_az;
-  gdouble tang = *ptang;
+  gfloat dist_az = *pdist_az;
+  gfloat tang = *ptang;
 
   zero_tau(tau, projdim);
   zero_tinc(tinc, projdim);
@@ -315,7 +315,7 @@ gint tour_path(array_d Fa, array_d Fz, array_d F, gint datadim, gint projdim,
   /* 2 is hard-wired because it relates to cos, sin
                          and nothing else. */
   for (i=0; i<2; i++) 
-    ptinc[i] = (gdouble *) g_malloc (projdim * sizeof (gdouble));
+    ptinc[i] = (gfloat *) g_malloc (projdim * sizeof (gfloat));
     
   /* Check that Fa and Fz are both orthonormal. */
   if (!checkcolson(Fa.vals, datadim, projdim)) {
@@ -385,7 +385,7 @@ g_printerr ("\n");*/
 
       /*  Compute principal angles */
       for (i=0; i<projdim; i++) {
-        tau.els[i] = (gdouble) acos((gdouble) lambda.els[i]);
+        tau.els[i] = (gfloat) acos((gdouble) lambda.els[i]);
       }
 
       /*  Calculate principal directions */
@@ -467,8 +467,8 @@ g_printerr ("\n");*/
       for (i=0; i<projdim; i++)
         tinc.els[i]=0.0;
       for (i=0; i<projdim; i++) {
-        ptinc[0][i] = (gdouble) cos((gdouble) tinc.els[i]);
-        ptinc[1][i] = (gdouble) sin((gdouble) tinc.els[i]);
+        ptinc[0][i] = (gfloat) cos((gdouble) tinc.els[i]);
+        ptinc[1][i] = (gfloat) sin((gdouble) tinc.els[i]);
       }
 
       for (i=0; i<projdim; i++) {
@@ -500,7 +500,7 @@ g_printerr ("\n");*/
       tmpd = 0.0;
       for (i=0; i<projdim; i++)
         tmpd += ((gdouble)tau.els[i]*(gdouble)tau.els[i]);
-      dist_az = (gdouble)sqrt(tmpd);
+      dist_az = (gfloat)sqrt(tmpd);
 
       if (dist_az < 0.0001) {
       /*        printf("returning before standardizing tau's\n");
@@ -566,14 +566,14 @@ void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz,
 {
   gint i, j, k;
   gdouble tmpd1, tmpd2, tmpd;
-  gdouble **ptinc = (gdouble **) g_malloc (2 * sizeof (gdouble *));
+  gfloat **ptinc = (gfloat **) g_malloc (2 * sizeof (gfloat *));
 
   for (i=0; i<2; i++)
-    ptinc[i] = (gdouble *) g_malloc (projdim * sizeof (gdouble));
+    ptinc[i] = (gfloat *) g_malloc (projdim * sizeof (gfloat));
 
   for (i=0; i<projdim; i++) {
-    ptinc[0][i] = (gdouble) cos((gdouble) tinc.els[i]);
-    ptinc[1][i] = (gdouble) sin((gdouble) tinc.els[i]);
+    ptinc[0][i] = (gfloat) cos((gdouble) tinc.els[i]);
+    ptinc[1][i] = (gfloat) sin((gdouble) tinc.els[i]);
   }
 
   for (i=0; i<projdim; i++) {
@@ -610,11 +610,11 @@ void tour_reproject(vector_f tinc, array_d G, array_d Ga, array_d Gz,
 /* this routine increments the interpolation */
 void
 increment_tour(vector_f tinc, vector_f tau, 
-  gdouble dist_az, gdouble delta, gdouble *ptang, gint projdim)
+  gfloat dist_az, gfloat delta, gfloat *ptang, gint projdim)
 {
   int i;
   gboolean attheend = false;
-  gdouble tang = *ptang;
+  gfloat tang = *ptang;
 
   /*  time_t bt;
   struct tm *nowtm;
@@ -638,8 +638,8 @@ increment_tour(vector_f tinc, vector_f tau,
 }
 
 gboolean
-reached_target(gdouble tang, gdouble dist_az, gint basmeth, 
-  gdouble *indxval, gdouble *oindxval) 
+reached_target(gfloat tang, gfloat dist_az, gint basmeth, 
+  gfloat *indxval, gfloat *oindxval) 
 {
   gboolean arewethereyet = false;
 
@@ -670,10 +670,10 @@ reached_target(gdouble tang, gdouble dist_az, gint basmeth,
 
 gboolean
 reached_target2(vector_f tinc, vector_f tau, gint basmeth, 
-  gdouble *indxval, gdouble *oindxval, gint projdim) 
+  gfloat *indxval, gfloat *oindxval, gint projdim) 
 {
   gboolean arewethereyet = false;
-  gdouble tol=0.01;
+  gfloat tol=0.01;
   gint i;
 
   if (basmeth == 1) {
@@ -695,7 +695,7 @@ reached_target2(vector_f tinc, vector_f tau, gint basmeth,
 }
 
 void
-do_last_increment(vector_f tinc, vector_f tau, gdouble dist_az, gint projdim)
+do_last_increment(vector_f tinc, vector_f tau, gfloat dist_az, gint projdim)
 {
   int j;
 
@@ -704,10 +704,10 @@ do_last_increment(vector_f tinc, vector_f tau, gdouble dist_az, gint projdim)
 
 }
 
-void speed_set (gdouble slidepos, gdouble *st, gdouble *dlt) 
+void speed_set (gfloat slidepos, gfloat *st, gfloat *dlt) 
 {
-  gdouble step = *st;
-  gdouble delta = *dlt;
+  gfloat step = *st;
+  gfloat delta = *dlt;
 
   if (slidepos < 5.)
   {
@@ -717,16 +717,16 @@ void speed_set (gdouble slidepos, gdouble *st, gdouble *dlt)
   else
   {
     /*    if (slidepos < 50)
-      step = ((gdouble) slidepos - 5.) / 2000.;
+      step = ((gfloat) slidepos - 5.) / 2000.;
     else if ((slidepos >= 50))
-      step = (gdouble) pow((double)(slidepos-50)/100.,(gdouble)1.5) + 0.0225;
+      step = (gfloat) pow((double)(slidepos-50)/100.,(gdouble)1.5) + 0.0225;
     */
     if (slidepos < 30.)
       step = (slidepos - 5.)/2000.;
     else if (slidepos >= 30. && slidepos < 90.) 
-      step = (gdouble) pow((double)(slidepos-30.)/100.,(gdouble)1.5) + 0.0125;
+      step = (gfloat) pow((double)(slidepos-30.)/100.,(gdouble)1.5) + 0.0125;
     else 
-      step = (gdouble) pow((double)(slidepos)/100.,(gdouble)2.0) - 0.81 + 0.477;
+      step = (gfloat) pow((double)(slidepos)/100.,(gdouble)2.0) - 0.81 + 0.477;
 
     delta = (step*M_PI_2)/(10.0);
 

@@ -23,7 +23,7 @@
 void
 subset_init (GGobiData *d, ggobid *gg)
 {
-  gdouble fnr = (gdouble) d->nrows;
+  gfloat fnr = (gfloat) d->nrows;
 
   d->subset.random_n = d->nrows;
 
@@ -106,7 +106,7 @@ gboolean
 subset_random (gint n, GGobiData *d, ggobid *gg) {
   gint t, m;
   gboolean doneit = false;
-  gdouble rrand;
+  gfloat rrand;
 
   gint top = d->nrows;
 
@@ -115,7 +115,7 @@ subset_random (gint n, GGobiData *d, ggobid *gg) {
   if (n > 0 && n < top) {
 
     for (t=0, m=0; t<top && m<n; t++) {
-      rrand = (gdouble) randvalue ();
+      rrand = (gfloat) randvalue ();
       if (((top - t) * rrand) < (n - m)) {
         if (add_to_subset (t, d, gg))
           m++;

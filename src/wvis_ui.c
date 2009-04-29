@@ -130,9 +130,9 @@ static void
 bin_counts_reset (gint jvar, GGobiData *d, ggobid *gg)
 {
   gint i, k, m;
-  gdouble val;
+  gfloat val;
   vartabled *vt;
-  gdouble min, max;
+  gfloat min, max;
   colorschemed *scheme = gg->activeColorScheme;
 
   if (jvar == -1)
@@ -164,7 +164,7 @@ record_colors_reset (gint selected_var, GGobiData *d, ggobid *gg)
   gint i, k, m;
   gint nd = g_slist_length(gg->d);
   vartabled *vt;
-  gdouble min, max, val;
+  gfloat min, max, val;
   colorschemed *scheme = gg->activeColorScheme;
 
   if (selected_var < 0)
@@ -210,7 +210,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
   GdkModifierType state;
   icoords pos;
   gboolean rval = false;
-  gdouble val;
+  gfloat val;
 
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
   GGobiData *d = NULL;
@@ -227,8 +227,8 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
   gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
 
   if (pos.x != mousepos->x) {
-    val = (gdouble) (pos.x - xmargin) /
-          (gdouble) (w->allocation.width - 2*xmargin);
+    val = (gfloat) (pos.x - xmargin) /
+          (gfloat) (w->allocation.width - 2*xmargin);
 
     /*-- don't allow it to cross its neighbors' boundaries --*/
     if ((color == 0 && val <= gg->wvis.pct[color+1] && val >= 0) ||
@@ -267,7 +267,7 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
               w->allocation.height*w->allocation.height;
   colorschemed *scheme = gg->activeColorScheme;
 
-  gdouble *pct = gg->wvis.pct;
+  gfloat *pct = gg->wvis.pct;
   gint *nearest_color = &gg->wvis.nearest_color;
   gint hgt;
 
@@ -354,12 +354,12 @@ bin_boundaries_set (gint selected_var, GGobiData *d, ggobid *gg)
      * By default, they start at .1 and end at 1.0.
     */
     for (k=0; k<gg->wvis.npct; k++) {
-      gg->wvis.pct[k] = (gdouble) (k+1) /  (gdouble) gg->wvis.npct;
+      gg->wvis.pct[k] = (gfloat) (k+1) /  (gfloat) gg->wvis.npct;
       gg->wvis.n[k] = 0;
     }
   } else if (gg->wvis.binning_method == WVIS_EQUAL_COUNT_BINS) {
     gint i, m;
-    gdouble min, max, range, midpt;
+    gfloat min, max, range, midpt;
     vartabled *vt = vartable_element_get (selected_var, d);
     gint ngroups = gg->wvis.npct;
     gint groupsize = (gint) (d->nrows_in_plot / ngroups);
@@ -430,8 +430,8 @@ static void alloc_pct (ggobid *gg)
   colorschemed *scheme = gg->activeColorScheme;
   if (gg->wvis.npct != scheme->n) {
     gg->wvis.npct = scheme->n;
-    gg->wvis.pct = (gdouble *) g_realloc (gg->wvis.pct,
-                                         gg->wvis.npct * sizeof (gdouble));
+    gg->wvis.pct = (gfloat *) g_realloc (gg->wvis.pct,
+                                         gg->wvis.npct * sizeof (gfloat));
     gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
                                      gg->wvis.npct * sizeof (gint));
   }
@@ -444,7 +444,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint x0, x1, k, hgt;
   gint x = xmargin;
   gint y = ymargin;
-  gdouble diff;
+  gfloat diff;
   vartabled *vt;
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -471,8 +471,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
   if (gg->wvis.npct != scheme->n) {
     gg->wvis.npct = scheme->n;
-    gg->wvis.pct = (gdouble *) g_realloc (gg->wvis.pct,
-                                         gg->wvis.npct * sizeof (gdouble));
+    gg->wvis.pct = (gfloat *) g_realloc (gg->wvis.pct,
+                                         gg->wvis.npct * sizeof (gfloat));
     gg->wvis.n = (gint *) g_realloc (gg->wvis.n,
                                      gg->wvis.npct * sizeof (gint));
     bin_boundaries_set (selected_var, d, gg);
@@ -514,8 +514,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
   /*-- add the variable limits in the top margin --*/
   if (d && selected_var != -1) {
-    gdouble min, max;
-    gdouble val;
+    gfloat min, max;
+    gfloat val;
     gchar *str;
     PangoRectangle rect;
     PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);

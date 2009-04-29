@@ -34,7 +34,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   splotd *sp;
   displayd *dsp;
   GGobiData *dtarget = d;
-  gdouble *raw = NULL, x;
+  greal *raw = NULL, x;
   vartabled *vt;
   gboolean found_missings = false;
 
@@ -63,21 +63,21 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
   }
 
   if (dtarget->ncols) {
-    raw = (gdouble *) g_malloc (dtarget->ncols * sizeof (gdouble));
+    raw = (greal *) g_malloc (dtarget->ncols * sizeof (greal));
     for (j = 0; j < dtarget->ncols; j++) {
       vt = vartable_element_get (j, dtarget);
       if (strcmp (vals[j], "NA") == 0) {  /*-- got a missing --*/
-        raw[j] = (gdouble) 0.0;  /*-- or what? --*/
+        raw[j] = (greal) 0.0;  /*-- or what? --*/
         found_missings = true;
       }
       else {
-        x = (gdouble) atof (vals[j]);
+        x = (greal) atof (vals[j]);
         if (vt->vartype == categorical) {
           /* Loop over levels, and add to the one that is closest to x.
            * Also, increment vt->level_counts[level] */
           gint k, level = 0, dist, ddist = 0;
           for (k = 0; k < vt->nlevels; k++) {
-            dist = fabs ((gdouble) vt->level_values[k] - x);
+            dist = fabs ((greal) vt->level_values[k] - x);
             if (k == 0)
               ddist = dist;     /* initialize ddist */
             else {
@@ -87,7 +87,7 @@ record_add (eeMode mode, gint a, gint b, gchar * lbl, gchar * id,
               }
             }
           }
-          raw[j] = (gdouble) vt->level_values[level];
+          raw[j] = (greal) vt->level_values[level];
           vt->level_counts[level]++;
 
           /* then update the table -- ugh -- no event for this yet.  I
@@ -342,7 +342,7 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
   gint sqdist, near, j, lineid, xdist;
   gint from, to, yd;
   icoords a, b, distab, distac, c;
-  gdouble proj;
+  gfloat proj;
   gboolean doit;
   GGobiData *e = display->e;
   GGobiData *d = display->d;
@@ -389,20 +389,20 @@ find_nearest_edge (splotd * sp, displayd * display, ggobid * gg)
         /* horizontal lines */
         else if (distab.y == 0 && distab.x != 0) {
           sqdist = distac.y * distac.y;
-          if (sqdist <= near && (gint) fabs ((gdouble) distac.x) < xdist) {
+          if (sqdist <= near && (gint) fabs ((gfloat) distac.x) < xdist) {
             near = sqdist;
-            xdist = (gint) fabs ((gdouble) distac.x);
+            xdist = (gint) fabs ((gfloat) distac.x);
             lineid = j;
           }
         }
 
         /* other lines */
         else if (distab.x != 0 && distab.y != 0) {
-          proj = ((gdouble) ((distac.x * distab.x) + (distac.y * distab.y))) /
-            ((gdouble) ((distab.x * distab.x) + (distab.y * distab.y)));
+          proj = ((gfloat) ((distac.x * distab.x) + (distac.y * distab.y))) /
+            ((gfloat) ((distab.x * distab.x) + (distab.y * distab.y)));
 
-          c.x = (gint) (proj * (gdouble) (b.x - a.x)) + a.x;
-          c.y = (gint) (proj * (gdouble) (b.y - a.y)) + a.y;
+          c.x = (gint) (proj * (gfloat) (b.x - a.x)) + a.x;
+          c.y = (gint) (proj * (gfloat) (b.y - a.y)) + a.y;
 
           if (BETWEEN (a.x, b.x, c.x) && BETWEEN (a.y, b.y, c.y)) {
             sqdist = (mpos->x - c.x) * (mpos->x - c.x) +
@@ -465,15 +465,15 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
                     gcoords * eps, gcoords * planar, splotd * sp)
 {
   gcoords prev_planar;
-  gdouble scale_x, scale_y;
-  gdouble precis = (gdouble) PRECISION1;
+  gfloat scale_x, scale_y;
+  greal precis = (greal) PRECISION1;
 
   scale_x = sp->scale.x;
   scale_y = sp->scale.y;
   scale_x /= 2;
-  sp->iscale.x = (gdouble) sp->max.x * scale_x;
+  sp->iscale.x = (greal) sp->max.x * scale_x;
   scale_y /= 2;
-  sp->iscale.y = -1 * (gdouble) sp->max.y * scale_y;
+  sp->iscale.y = -1 * (greal) sp->max.y * scale_y;
 
   if (id >= 0) { /* when moving points, initialize new planar values */
     eps->x = 0;
@@ -486,14 +486,14 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
 
   if (horiz) {   /* relevant distinction for moving points */
     screen->x -= sp->max.x / 2;
-    planar->x = (gdouble) screen->x * precis / sp->iscale.x;
-    planar->x += (gdouble) sp->pmid.x;
+    planar->x = (greal) screen->x * precis / sp->iscale.x;
+    planar->x += (greal) sp->pmid.x;
   }
 
   if (vert) {    /* relevant distinction for moving points */
     screen->y -= sp->max.y / 2;
-    planar->y = (gdouble) screen->y * precis / sp->iscale.y;
-    planar->y += (gdouble) sp->pmid.y;
+    planar->y = (greal) screen->y * precis / sp->iscale.y;
+    planar->y += (greal) sp->pmid.y;
   }
 
   if (id >= 0) {   /* when moving points */
@@ -506,7 +506,7 @@ pt_screen_to_plane (icoords * screen, gint id, gboolean horiz, gboolean vert,
 
 void
 pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
-                   gdouble * world)
+                   greal * world)
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -527,7 +527,7 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
     /*if (!gg->is_pp) { */
     for (j = 0; j < display->t1d.nactive; j++) {
       var = display->t1d.active_vars.els[j];
-      world[var] += (eps->x * (gdouble) display->t1d.F.vals[0][var]);
+      world[var] += (eps->x * (greal) display->t1d.F.vals[0][var]);
     }
     /*} */
     break;
@@ -535,8 +535,8 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
     for (j = 0; j < display->t2d3.nactive; j++) {
       var = display->t2d3.active_vars.els[j];
       world[var] +=
-        (eps->x * (gdouble) display->t2d3.F.vals[0][var] +
-         eps->y * (gdouble) display->t2d3.F.vals[1][var]);
+        (eps->x * (greal) display->t2d3.F.vals[0][var] +
+         eps->y * (greal) display->t2d3.F.vals[1][var]);
     }
     break;
   case TOUR2D:
@@ -544,8 +544,8 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
     for (j = 0; j < display->t2d.nactive; j++) {
       var = display->t2d.active_vars.els[j];
       world[var] +=
-        (eps->x * (gdouble) display->t2d.F.vals[0][var] +
-         eps->y * (gdouble) display->t2d.F.vals[1][var]);
+        (eps->x * (greal) display->t2d.F.vals[0][var] +
+         eps->y * (greal) display->t2d.F.vals[1][var]);
     }
     /*} */
     break;
@@ -553,11 +553,11 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
     /*if (!gg->is_pp) { */
     for (j = 0; j < display->tcorr1.nactive; j++) {
       var = display->tcorr1.active_vars.els[j];
-      world[var] += (eps->x * (gdouble) display->tcorr1.F.vals[0][var]);
+      world[var] += (eps->x * (greal) display->tcorr1.F.vals[0][var]);
     }
     for (j = 0; j < display->tcorr2.nactive; j++) {
       var = display->tcorr2.active_vars.els[j];
-      world[var] += (eps->y * (gdouble) display->tcorr2.F.vals[0][var]);
+      world[var] += (eps->y * (greal) display->tcorr2.F.vals[0][var]);
     }
     /*} */
     break;
@@ -567,16 +567,16 @@ pt_plane_to_world (splotd * sp, gcoords * planar, gcoords * eps,
 }
 
 void
-pt_world_to_raw_by_var (gint j, gdouble * world, gdouble * raw, GGobiData * d)
+pt_world_to_raw_by_var (gint j, greal * world, greal * raw, GGobiData * d)
 {
-  gdouble precis = PRECISION1;
-  gdouble ftmp, rdiff;
-  gdouble x;
+  gfloat precis = PRECISION1;
+  gfloat ftmp, rdiff;
+  gfloat x;
   vartabled *vt = vartable_element_get (j, d);
 
   rdiff = vt->lim.max - vt->lim.min;
 
-  ftmp = (gdouble) (world[j]) / precis;
+  ftmp = (gfloat) (world[j]) / precis;
   x = (ftmp + 1.0) * .5 * rdiff;
   x += vt->lim.min;
 
@@ -585,12 +585,12 @@ pt_world_to_raw_by_var (gint j, gdouble * world, gdouble * raw, GGobiData * d)
 
 void
 pt_screen_to_raw (icoords * screen, gint id, gboolean horiz, gboolean vert,
-                  gdouble * raw, gcoords * eps, GGobiData * d, splotd * sp,
+                  greal * raw, gcoords * eps, GGobiData * d, splotd * sp,
                   ggobid * gg)
 {
   gint j;
   gcoords planar;
-  gdouble *world = (gdouble *) g_malloc0 (d->ncols * sizeof (gdouble));
+  greal *world = (greal *) g_malloc0 (d->ncols * sizeof (greal));
 
   pt_screen_to_plane (screen, id, horiz, vert, eps, &planar, sp);
   pt_plane_to_world (sp, &planar, &planar, world);
@@ -611,7 +611,7 @@ fetch_default_record_values (gchar ** vals, GGobiData * dtarget,
 
   if (dtarget == display->d) {
     /*-- use the screen position --*/
-    gdouble *raw = (gdouble *) g_malloc (dtarget->ncols * sizeof (gdouble));
+    greal *raw = (greal *) g_malloc (dtarget->ncols * sizeof (greal));
     pt_screen_to_raw (&gg->current_splot->mousepos, -1, true, true, /* no id, both horiz and vert are true */
                       raw, &eps, dtarget, gg->current_splot, gg);
     for (j = 0; j < dtarget->ncols; j++) {
@@ -620,7 +620,7 @@ fetch_default_record_values (gchar ** vals, GGobiData * dtarget,
         /* Loop over levels, and choose the one that is closest to x. */
         gint k, level = 0, dist, ddist = 0;
         for (k = 0; k < vt->nlevels; k++) {
-          dist = fabs ((gdouble) vt->level_values[k] - raw[j]);
+          dist = fabs ((greal) vt->level_values[k] - raw[j]);
           if (k == 0)
             ddist = dist;       /* initialize ddist */
           else {

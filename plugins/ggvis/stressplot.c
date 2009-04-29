@@ -98,11 +98,11 @@ void
 draw_stress (ggvisd *ggv, ggobid *gg)
 {
   gint i, j, npixels, start, end;
-  gdouble x, y;
+  gfloat x, y;
   GdkPoint axes[3];
   gchar *str;
   GdkPoint strPts[NSTRESSVALUES];
-  gdouble height;
+  gfloat height;
   GtkWidget *da = ggv->stressplot_da;
   colorschemed *scheme = gg->activeColorScheme;
   PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);
@@ -111,7 +111,7 @@ draw_stress (ggvisd *ggv, ggobid *gg)
   if (gg->plot_GC == NULL)
     init_plot_GC (ggv->stressplot_pix, gg);
 
-  height = (gdouble)da->allocation.height - 2. * (gdouble)STRESSPLOT_MARGIN;
+  height = (gfloat)da->allocation.height - 2. * (gfloat)STRESSPLOT_MARGIN;
 
   str = g_strdup_printf ("%s", ".9999");
   layout_text(layout, str, &rect);
@@ -127,9 +127,9 @@ draw_stress (ggvisd *ggv, ggobid *gg)
 
   npixels = 0;
   for (i=start, j=0; i<end; i++, j++) {
-    x = (gdouble) j ;
+    x = (gfloat) j ;
     strPts[j].x = (gint) (x + STRESSPLOT_MARGIN);
-    y = (gdouble) (1 - ggv->stressvalues.els[i]) * height;
+    y = (gfloat) (1 - ggv->stressvalues.els[i]) * height;
     strPts[j].y = (gint) (y + STRESSPLOT_MARGIN);
     npixels++;
   }

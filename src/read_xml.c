@@ -974,7 +974,7 @@ setDatasetInfo (const xmlChar ** attrs, XMLParserData * data)
   setDefaultDatasetValues (attrs, data);
 
   if (tmp) {
-    arrayd_alloc (&d->raw, d->nrows, d->ncols);
+    arrayf_alloc (&d->raw, d->nrows, d->ncols);
     arrays_alloc (&d->missing, d->nrows, d->ncols);
     br_hidden_alloc (d);
     br_hidden_init (d);
@@ -1545,7 +1545,7 @@ allocVariables (const xmlChar ** attrs, XMLParserData * data)
      in case there are datasets for which the input gives the count
      in the top-level tag. */
   if (d->nrows > 0 && d->ncols > 0) {
-    arrayd_alloc (&d->raw, d->nrows, d->ncols);
+    arrayf_alloc (&d->raw, d->nrows, d->ncols);
     arrays_alloc (&d->missing, d->nrows, d->ncols);
     br_hidden_alloc (d);
   }

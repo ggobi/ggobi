@@ -111,7 +111,7 @@ struct _displayd {
   gint tc1_pos_old, tc1_pos, tc2_pos_old, tc2_pos, t1d_pos_old, t1d_pos;
   /*gint tc_manip_mode;*/
   gboolean tc1_manipvar_inc, tc2_manipvar_inc, t1d_manipvar_inc;
-  gdouble tc1_phi, tc2_phi, t1d_phi;
+  gfloat tc1_phi, tc2_phi, t1d_phi;
 
   gint t2d_manip_var, t2d_manipvar_inc;
   gint t2d_pos1_old, t2d_pos1, t2d_pos2_old, t2d_pos2;
@@ -120,7 +120,7 @@ struct _displayd {
   array_d t2d_manbasis;
   array_d t2d_mvar_3dbasis;
   gboolean t2d_no_dir_flag;
-  gdouble t2d_rx, t2d_ry;
+  gfloat t2d_rx, t2d_ry;
 
 /*-- 1d tour --*/
  tour t1d;
@@ -134,7 +134,7 @@ struct _displayd {
  array_d t2d3_manbasis, t2d3_mvar_3dbasis;
  array_d t2d3_Rmat1, t2d3_Rmat2;
  gint t2d3_pos1_old, t2d3_pos1, t2d3_pos2_old, t2d3_pos2;
- gdouble t2d3_rx, t2d3_ry;
+ gfloat t2d3_rx, t2d3_ry;
  gboolean t2d3_no_dir_flag;
  gboolean t2d3_manipvar_inc;
 
@@ -158,8 +158,8 @@ struct _displayd {
  GtkAccelGroup *t1d_pp_accel_group, *t2d_pp_accel_group;
  optimize0_param t1d_pp_op, t2d_pp_op;
  pp_param t1d_pp_param, t2d_pp_param;
- gdouble t2d_ppindx_mat[100], t1d_ppindx_mat[100];
- gdouble t2d_indx_min, t2d_indx_max, t1d_indx_min, t1d_indx_max;
+ gfloat t2d_ppindx_mat[100], t1d_ppindx_mat[100];
+ gfloat t2d_indx_min, t2d_indx_max, t1d_indx_min, t1d_indx_max;
  gint t2d_ppindx_count, t1d_ppindx_count;
 
  struct _ggobid *ggobi;

@@ -342,7 +342,7 @@ add_ggobi_data(GGobiData *data, GtkTreeModel *model)
 {
   gint i, j, k, level;
   gboolean level_ok;
-  const gdouble **raw;
+  const gfloat **raw;
   vartabled *vt;
   /*-- for working out the width of the longest row label --*/
   gchar *str;

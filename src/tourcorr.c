@@ -53,9 +53,9 @@ display_tourcorr_init_null (displayd *dsp, ggobid *gg)
   vectori_init_null(&dsp->tcorr1.active_vars);
   vectorb_init_null(&dsp->tcorr1.active_vars_p);
 
-  vectord_init_null(&dsp->tcorr1.lambda);
-  vectord_init_null(&dsp->tcorr1.tau);
-  vectord_init_null(&dsp->tcorr1.tinc);
+  vectorf_init_null(&dsp->tcorr1.lambda);
+  vectorf_init_null(&dsp->tcorr1.tau);
+  vectorf_init_null(&dsp->tcorr1.tinc);
 
   /* manipulation controls */
   arrayd_init_null(&dsp->tc1_manbasis);
@@ -80,9 +80,9 @@ display_tourcorr_init_null (displayd *dsp, ggobid *gg)
   vectori_init_null(&dsp->tcorr2.active_vars);
   vectorb_init_null(&dsp->tcorr2.active_vars_p);
 
-  vectord_init_null(&dsp->tcorr2.lambda);
-  vectord_init_null(&dsp->tcorr2.tau);
-  vectord_init_null(&dsp->tcorr2.tinc);
+  vectorf_init_null(&dsp->tcorr2.lambda);
+  vectorf_init_null(&dsp->tcorr2.tau);
+  vectorf_init_null(&dsp->tcorr2.tinc);
 }
 
 void
@@ -110,9 +110,9 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
   vectori_alloc(&dsp->tcorr1.active_vars, nc);
   vectorb_alloc_zero(&dsp->tcorr1.active_vars_p, nc);
 
-  vectord_alloc(&dsp->tcorr1.lambda, nc);
-  vectord_alloc_zero(&dsp->tcorr1.tau, nc);
-  vectord_alloc(&dsp->tcorr1.tinc, nc);
+  vectorf_alloc(&dsp->tcorr1.lambda, nc);
+  vectorf_alloc_zero(&dsp->tcorr1.tau, nc);
+  vectorf_alloc(&dsp->tcorr1.tinc, nc);
 
   /* manipulation controls */
   arrayd_alloc(&dsp->tc1_manbasis, 2, nc);
@@ -137,9 +137,9 @@ alloc_tourcorr (displayd *dsp, ggobid *gg)
   vectori_alloc(&dsp->tcorr2.active_vars, nc);
   vectorb_alloc_zero(&dsp->tcorr2.active_vars_p, nc);
 
-  vectord_alloc(&dsp->tcorr2.lambda, nc);
-  vectord_alloc_zero(&dsp->tcorr2.tau, nc);
-  vectord_alloc(&dsp->tcorr2.tinc, nc);
+  vectorf_alloc(&dsp->tcorr2.lambda, nc);
+  vectorf_alloc_zero(&dsp->tcorr2.tau, nc);
+  vectorf_alloc(&dsp->tcorr2.tinc, nc);
 }
 
 /*-- eliminate the nc columns contained in *cols --*/
@@ -166,9 +166,9 @@ tourcorr_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
       vectori_delete_els (&dsp->tcorr1.active_vars, nc, cols);
       vectorb_delete_els (&dsp->tcorr1.active_vars_p, nc, cols);
 
-      vectord_delete_els (&dsp->tcorr1.lambda, nc, cols);
-      vectord_delete_els (&dsp->tcorr1.tau, nc, cols);
-      vectord_delete_els (&dsp->tcorr1.tinc, nc, cols);
+      vectorf_delete_els (&dsp->tcorr1.lambda, nc, cols);
+      vectorf_delete_els (&dsp->tcorr1.tau, nc, cols);
+      vectorf_delete_els (&dsp->tcorr1.tinc, nc, cols);
 
       arrayd_delete_cols (&dsp->tc1_manbasis, (gint) nc, cols);
       arrayd_delete_cols (&dsp->tc2_manbasis, (gint) nc, cols);
@@ -188,9 +188,9 @@ tourcorr_realloc_down (gint nc, gint *cols, GGobiData *d, ggobid *gg)
       vectori_delete_els (&dsp->tcorr2.active_vars, nc, cols);
       vectorb_delete_els (&dsp->tcorr2.active_vars_p, nc, cols);
 
-      vectord_delete_els (&dsp->tcorr2.lambda, nc, cols);
-      vectord_delete_els (&dsp->tcorr2.tau, nc, cols);
-      vectord_delete_els (&dsp->tcorr2.tinc, nc, cols);
+      vectorf_delete_els (&dsp->tcorr2.lambda, nc, cols);
+      vectorf_delete_els (&dsp->tcorr2.tau, nc, cols);
+      vectorf_delete_els (&dsp->tcorr2.tinc, nc, cols);
     }
   }
 }
@@ -207,9 +207,9 @@ free_tourcorr(displayd *dsp)
   vectori_free(&dsp->tcorr1.active_vars);
   vectorb_free(&dsp->tcorr1.active_vars_p);
 
-  vectord_free(&dsp->tcorr1.lambda);
-  vectord_free(&dsp->tcorr1.tau);
-  vectord_free(&dsp->tcorr1.tinc);
+  vectorf_free(&dsp->tcorr1.lambda);
+  vectorf_free(&dsp->tcorr1.tau);
+  vectorf_free(&dsp->tcorr1.tinc);
 
   arrayd_free(&dsp->tcorr1.Fa, 0, 0);
   arrayd_free(&dsp->tcorr1.Fz, 0, 0);
@@ -231,9 +231,9 @@ free_tourcorr(displayd *dsp)
   vectori_free(&dsp->tcorr2.active_vars);
   vectorb_free(&dsp->tcorr2.active_vars_p);
 
-  vectord_free(&dsp->tcorr2.lambda);
-  vectord_free(&dsp->tcorr2.tau);
-  vectord_free(&dsp->tcorr2.tinc);
+  vectorf_free(&dsp->tcorr2.lambda);
+  vectorf_free(&dsp->tcorr2.tau);
+  vectorf_free(&dsp->tcorr2.tinc);
 
   arrayd_free(&dsp->tcorr2.Fa, 0, 0);
   arrayd_free(&dsp->tcorr2.Fz, 0, 0);
@@ -362,7 +362,7 @@ tourcorr_fade_vars (gboolean fade, ggobid *gg)
   gg->tourcorr.fade_vars = fade;
 }
 
-void tourcorr_speed_set(gdouble slidepos, ggobid *gg) {
+void tourcorr_speed_set(gfloat slidepos, ggobid *gg) {
   displayd *dsp = gg->current_display; 
   cpaneld *cpanel = &dsp->cpanel;
 
@@ -917,11 +917,11 @@ tourcorr_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d,
 }
 
 void
-tourcorr_projdata(splotd *sp, gdouble **world_data, GGobiData *d, ggobid *gg) {
+tourcorr_projdata(splotd *sp, greal **world_data, GGobiData *d, ggobid *gg) {
   gint i, j, m;
   displayd *dsp = (displayd *) sp->displayptr;
-  gdouble precis = (gdouble) PRECISION1;
-  gdouble tmpf, maxx, maxy;
+  greal precis = (greal) PRECISION1;
+  greal tmpf, maxx, maxy;
 
   if (sp->tourcorr.initmax) {
     sp->tourcorr.maxscreen = precis;
@@ -938,8 +938,8 @@ tourcorr_projdata(splotd *sp, gdouble **world_data, GGobiData *d, ggobid *gg) {
     sp->planar[i].y = 0;
     for (j=0; j<d->ncols; j++)
     {
-      sp->planar[i].x += (gdouble)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
-      sp->planar[i].y += (gdouble)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].x += (greal)(dsp->tcorr1.F.vals[0][j]*world_data[i][j]);
+      sp->planar[i].y += (greal)(dsp->tcorr2.F.vals[0][j]*world_data[i][j]);
     }
     sp->planar[i].x *= tmpf;
     sp->planar[i].y *= tmpf;
@@ -1322,9 +1322,9 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiData *d = dsp->d;
   cpaneld *cpanel = &dsp->cpanel;
-  gdouble xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
-  gdouble distx = 0., disty = 0.;
-  gdouble denom = (float) MIN(sp->max.x, sp->max.y)/2.;
+  gfloat xcosphi=1., xsinphi=0., ycosphi=1., ysinphi=0.;
+  gfloat distx = 0., disty = 0.;
+  gfloat denom = (float) MIN(sp->max.x, sp->max.y)/2.;
   gint actual_nxvars = dsp->tcorr1.nactive, actual_nyvars = 
     dsp->tcorr2.nactive;
   gint j;
@@ -1384,8 +1384,8 @@ tourcorr_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
       dsp->tc1_phi = dsp->tc1_phi + distx / denom;
       dsp->tc2_phi = dsp->tc2_phi + disty / denom;
   
-      xcosphi = (gdouble) cos((gdouble) dsp->tc1_phi);
-      xsinphi = (gdouble) sin((gdouble) dsp->tc1_phi);
+      xcosphi = (gfloat) cos((gdouble) dsp->tc1_phi);
+      xsinphi = (gfloat) sin((gdouble) dsp->tc1_phi);
       if (xcosphi > 1.0)
       {
         xcosphi = 1.0;

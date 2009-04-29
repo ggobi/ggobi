@@ -94,7 +94,7 @@ typedef struct
  struct _p1d {
    vector_f spread_data; /* the spreading data */
    lims lim;      /* limits of the spreading data */
-   gdouble mean;
+   gfloat mean;
    /*-- line segments in ASHes --*/
    icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
  } p1d;
@@ -104,10 +104,10 @@ typedef struct
  * tour1d (variables used to record the state of the 1D tour for this plot)
  */
  struct _tour1d {
-   gdouble mincnt;
-   gdouble maxcnt;
-   gdouble minscreenx;
-   gdouble maxscreenx;
+   gfloat mincnt;
+   gfloat maxcnt;
+   gfloat minscreenx;
+   gfloat maxscreenx;
    gboolean initmax;
    icoords ash_baseline;  /*-- for drawing segments from point to baseline --*/
  } tour1d;
@@ -116,7 +116,7 @@ typedef struct
  * tour2d: rescaling so that points don't go outside the planar space
  */
  struct _tour2d {
-   gdouble maxscreen;
+   greal maxscreen;
    gboolean initmax;
  } tour2d;
 
@@ -124,7 +124,7 @@ typedef struct
  * tour2d: rescaling so that points don't go outside the planar space
  */
  struct _tourcorr {
-   gdouble maxscreen;
+   greal maxscreen;
    gboolean initmax;
  } tourcorr;
 
@@ -135,7 +135,7 @@ typedef struct
 
 /*-- rotation implemented as a limited tour2d --*/
  struct _tour2d3 {
-   gdouble maxscreen;
+   greal maxscreen;
    gboolean initmax;
  } tour2d3;
 

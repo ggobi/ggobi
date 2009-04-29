@@ -27,7 +27,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern gdouble no_change (gdouble, gdouble);
+extern gfloat no_change (gfloat, gfloat);
 #ifdef __cplusplus
 }
 #endif
