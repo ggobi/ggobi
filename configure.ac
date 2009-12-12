@@ -142,16 +142,17 @@ AC_PROG_LN_S
 
 # Set up libtool to create only dynamic libraries 
 # and to support DLLs on Windows. Also build libltdl for loading plugins.
-AC_DISABLE_STATIC
-AC_LIBTOOL_WIN32_DLL
-AC_LIBLTDL_CONVENIENCE
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+#AC_LIBTOOL_DLOPEN
+
+# libtool and ltdl configuration
+LT_PREREQ(2.2.6)
+LT_CONFIG_LTDL_DIR([libltdl])
+LT_INIT([dlopen disable-static win32-dll])
+LTDL_INIT([recursive])
 
 # Configure libltdl build
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
-AC_CONFIG_SUBDIRS(libltdl)
 
 # Configure for building against local libintl
 AC_SUBST(INCINTL)
