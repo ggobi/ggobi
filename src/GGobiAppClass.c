@@ -41,12 +41,10 @@ ggobi_app_init (GGobiApp * app)
 void
 ggobi_app_class_init (GGobiAppClass * klass)
 {                               /* why is this stored as the "DATAD_ADDED_SIGNAL" ? */
-  if (g_signal_lookup ("new_ggobi", GGOBI_TYPE_APP) == 0) {
-    //GGobiSignals[DATAD_ADDED_SIGNAL] =
-    g_signal_new ("new_ggobi",
-                  GGOBI_TYPE_APP,
-                  G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
-                  g_cclosure_marshal_VOID__OBJECT,
-                  G_TYPE_NONE, 1, GGOBI_TYPE_GGOBI);
-  }
+  //GGobiSignals[DATAD_ADDED_SIGNAL] =
+  g_signal_new ("new_ggobi",
+                GGOBI_TYPE_APP,
+                G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
+                g_cclosure_marshal_VOID__OBJECT,
+                G_TYPE_NONE, 1, GGOBI_TYPE_GGOBI);
 }
