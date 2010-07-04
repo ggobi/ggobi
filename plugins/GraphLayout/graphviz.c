@@ -267,8 +267,8 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       m = visible[i];
       name = (gchar *) g_array_index (d->rowlab, gchar *, m);
       node = agfindnode (graph, name);
-      pos[i][0] = ND_coord(node).x;
-      pos[i][1] = ND_coord(node).y;
+      pos[i][0] = ND_coord_i(node).x;
+      pos[i][1] = ND_coord_i(node).y;
     }
 
   } else if (layout_type == TWOPI_LAYOUT) {
