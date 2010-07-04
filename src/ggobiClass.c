@@ -151,8 +151,8 @@ ggobi_ggobi_class_init (GGobiGGobiClass * klass)
 
     GGobiSignals[CLUSTERS_CHANGED_SIGNAL] =
       g_signal_new ("clusters_changed", G_TYPE_FROM_CLASS (klass),
-                    G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL, g
-                    _cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1,
+                    G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION, 0, NULL, NULL,
+                    g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1,
                     GGOBI_TYPE_DATA); /* datad pointer */
     
     GGobiSignals[DISPLAY_NEW_SIGNAL] =
