@@ -8,7 +8,7 @@ Name GGobi
 VIProductVersion ${VERSION}
 OutFile ggobi-${VERSION}.exe
 InstallDir $PROGRAMFILES\ggobi
-InstallDirRegKey HKLM "Software\ggobi" "InstallationDirectory"
+# InstallDirRegKey HKLM "Software\ggobi" "InstallationDirectory"
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "../CPLicense.txt"
@@ -72,7 +72,7 @@ Section "GGobi"
 	Push $INSTDIR
 	Call AddToPath
 	
-	WriteRegStr HKLM SOFTWARE\ggobi "InstallationDirectory" "$INSTDIR"
+	# WriteRegStr HKLM SOFTWARE\ggobi "InstallationDirectory" "$INSTDIR"
 	
 	# Set up for uninstallation
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ggobi" "DisplayName" "GGobi Interactive Graphics Platform"

@@ -763,15 +763,17 @@ ggobi_win32_get_localedir()
 {
   static char *ggobi_localedir = NULL;
   if (ggobi_localedir == NULL) {
-    gchar *temp;
+    gchar *temp, *path;
 
-    temp = g_win32_get_package_installation_subdirectory (PACKAGE, dll_name, "locale");
-
+    temp = g_win32_get_package_installation_directory_of_module (NULL);
+    path = g_build_path (temp, "locale");
+    g_free (temp);
+    
     /* ggobi_localedir is passed to bindtextdomain() which isn't
      * UTF-8-aware.
      */
-    ggobi_localedir = g_win32_locale_filename_from_utf8 (temp);
-    g_free (temp);
+    ggobi_localedir = g_win32_locale_filename_from_utf8 (path);
+    g_free (path);
   }
   return ggobi_localedir;
 }
@@ -781,7 +783,7 @@ ggobi_win32_get_packagedir()
 {
   static char *ggobi_datadir = NULL;
   if (ggobi_datadir == NULL)
-    ggobi_datadir = g_win32_get_package_installation_directory (PACKAGE, dll_name);
+    ggobi_datadir = g_win32_get_package_installation_directory (NULL);
   return(ggobi_datadir);
 }
 #endif
