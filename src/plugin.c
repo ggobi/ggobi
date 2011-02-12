@@ -28,17 +28,7 @@ void addInputPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
 void addPlugin (GGobiPluginInfo * info, GtkWidget * list, ggobid * gg);
 
 void plugin_init() {
-  /*const gchar * const *dirs = g_get_system_data_dirs();
-  gint i;*/
-  
-  lt_dlinit();
-  
-  /*lt_dladdsearchdir(sessionOptions->ggobiHome);
-  lt_dladdsearchdir(g_get_current_dir());
-  lt_dladdsearchdir(g_build_filename(g_get_user_data_dir(), "ggobi", NULL));
-  for (i = 0; dirs[i]; i++)
-    lt_dladdsearchdir(g_build_filename(dirs[i], "ggobi", NULL));
-  */
+  // no op
 }
 
 gboolean
@@ -119,25 +109,25 @@ loadPluginLibrary (GGobiPluginDetails * plugin, GGobiPluginInfo * realPlugin)
     }
     else {
       g_critical("error loading plugin %s: %s",
-               plugin->dllName, lt_dlerror());
+                 plugin->dllName, g_module_error());
     }
   }
   return (plugin->loaded == DL_LOADED);
 }
 
-lt_dlhandle
+GModule *
 load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
 {
-  lt_dlhandle handle = NULL;
+  GModule *handle = NULL;
   gchar *fileName = ggobi_find_data_file(plugin->dllName);
   if (fileName) {
-    handle = lt_dlopen(fileName);
+    handle = g_module_open(fileName, G_MODULE_BIND_LAZY);
     g_free(fileName);
   }
   if (!handle) {
     if (sessionOptions->verbose != GGOBI_SILENT) {
       g_critical("Error on loading plugin library %s: %s",
-               plugin->dllName, lt_dlerror());
+               plugin->dllName, g_module_error());
     }
     plugin->loaded = DL_FAILED;
   }
@@ -148,10 +138,11 @@ load_plugin_library (GGobiPluginDetails * plugin, gboolean recurse)
 }
 
 
-lt_ptr
+gpointer
 getPluginSymbol (const char *name, GGobiPluginDetails * plugin)
 {
-  lt_dlhandle lib;
+  GModule *lib;
+  gpointer sym;
 
   if (!plugin)
     return(NULL);
@@ -161,7 +152,9 @@ getPluginSymbol (const char *name, GGobiPluginDetails * plugin)
   else
     lib = plugin->library;
 
-  return (lt_dlsym(lib, name));
+  g_module_symbol(lib, name, &sym);
+  
+  return sym; 
 }
 
 

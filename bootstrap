@@ -1,4 +1,3 @@
 #! /bin/sh
-libtoolize --ltdl --copy --force
 autoreconf -iv --force
 autopoint -f

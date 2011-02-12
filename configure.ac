@@ -141,18 +141,11 @@ AC_PROG_CC
 AC_PROG_LN_S
 
 # Set up libtool to create only dynamic libraries 
-# and to support DLLs on Windows. Also build libltdl for loading plugins.
-#AC_LIBTOOL_DLOPEN
-
-# libtool and ltdl configuration
-LT_PREREQ(2.2.6)
-LT_CONFIG_LTDL_DIR([libltdl])
-LT_INIT([dlopen disable-static win32-dll])
-LTDL_INIT([recursive])
-
-# Configure libltdl build
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
+# and to support DLLs on Windows.
+AC_DISABLE_STATIC
+AC_LIBTOOL_WIN32_DLL
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
 
 # Configure for building against local libintl
 AC_SUBST(INCINTL)
@@ -216,7 +209,7 @@ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile libltdl/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile)
 AC_OUTPUT
 
 echo "*******************************"

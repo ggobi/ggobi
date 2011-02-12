@@ -32,7 +32,7 @@ typedef void (*DLFUNC)();
 typedef struct {
     gchar *name;
     gchar *dllName;
-    lt_dlhandle library;
+    GModule *library;
 
     gchar *description;
     gchar *author;
@@ -119,9 +119,9 @@ typedef gboolean (*OnUnload)(gboolean quitting, GGobiPluginInfo *plugin);
 
 typedef gboolean (*OnUpdateDisplayMenu)(ggobid *gg, PluginInstance *inst);
 
-lt_dlhandle load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse);
+GModule* load_plugin_library(GGobiPluginDetails *plugin, gboolean recurse);
 
-lt_ptr getPluginSymbol(const gchar *name, GGobiPluginDetails *plugin);
+gpointer getPluginSymbol(const gchar *name, GGobiPluginDetails *plugin);
 
 void plugin_init();
 

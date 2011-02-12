@@ -27,7 +27,7 @@ libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
   xyplot_ui.c $(libggobi_la_GOBSOURCES)
 libggobi_la_SOURCES = $(libggobi_la_BUILT) $(libggobi_la_GOBSTAMPS)
-libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS) @LIBLTDL@
+libggobi_la_LIBADD = $(libggobi_la_GOBOBJECTS)
 libggobi_la_DEPENDENCIES = $(libggobi_la_GOBOBJECTS)
 pkginclude_HEADERS = GGobiAPI.h ggobiClass.h tour1d_pp.h GGobiApp.h \
   noop-toggle.h tour2d_pp.h GGobiEvents.h parcoordsClass.h tour_pp.h \
@@ -52,7 +52,7 @@ bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
-INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@ @INCLTDL@
+INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@
 
 EXTRA_DIST = $(libggobi_la_GOBS)
 
