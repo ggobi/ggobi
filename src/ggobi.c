@@ -43,6 +43,7 @@
 
 #ifdef WIN32
 #undef GGOBI_LOCALEDIR
+static gchar* ggobi_win32_get_localedir();
 #define GGOBI_LOCALEDIR ggobi_win32_get_localedir()
 #undef GGOBI_DATADIR
 #define GGOBI_DATADIR NULL
@@ -783,7 +784,7 @@ ggobi_win32_get_packagedir()
 {
   static char *ggobi_datadir = NULL;
   if (ggobi_datadir == NULL)
-    ggobi_datadir = g_win32_get_package_installation_directory (NULL);
+    ggobi_datadir = g_win32_get_package_installation_directory_of_module (NULL);
   return(ggobi_datadir);
 }
 #endif
