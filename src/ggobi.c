@@ -757,8 +757,6 @@ ggobi_find_file_in_dir(const gchar *name, const gchar *dir, gboolean ggobi)
 }
 
 #ifdef WIN32
-G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name)
-
 static gchar*
 ggobi_win32_get_localedir()
 {
