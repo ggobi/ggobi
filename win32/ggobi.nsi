@@ -32,28 +32,46 @@ Section "GGobi"
 	File ..\share\ggobi.ico
 	File ..\ggobirc
 	File ..\src\.libs\libggobi-0.dll
+	File c:\mingw\msys\1.0\local\bin\*.dll
 	
+	SetOutPath $INSTDIR\lib
+	File /r c:\mingw\msys\1.0\local\lib\gtk-2.0
+	File /r c:\mingw\msys\1.0\local\lib\gdk-pixbuf-2.0
+	File /r c:\mingw\msys\1.0\local\lib\glib-2.0
+
 	SetOutPath $INSTDIR\share
 	File ..\share\colorschemes.xml
+	File /r c:\mingw\msys\1.0\local\share\themes
+	
+	SetOutPath $INSTDIR\etc
+	File /r c:\mingw\msys\1.0\local\etc\*
+	SetOutPath $INSTDIR\etc\gtk-2.0
+	File c:\mingw\msys\1.0\local\share\themes\MS-Windows\gtk-2.0\gtkrc
 	
 	# Install the built plugins
 	SetOutPath $INSTDIR\plugins\GraphLayout
 	File ..\plugins\GraphLayout\plugin.la
+	SetOutPath $INSTDIR\plugins\GraphLayout\.libs
 	File ..\plugins\GraphLayout\.libs\plugin-0.dll
 	SetOutPath $INSTDIR\plugins\GraphAction
 	File ..\plugins\GraphAction\plugin.la
+	SetOutPath $INSTDIR\plugins\GraphAction\.libs
 	File ..\plugins\GraphAction\.libs\plugin-0.dll
 	SetOutPath $INSTDIR\plugins\DataViewer
 	File ..\plugins\DataViewer\plugin.la
+	SetOutPath $INSTDIR\plugins\DataViewer\.libs
 	File ..\plugins\DataViewer\.libs\plugin-0.dll
 	SetOutPath $INSTDIR\plugins\ggvis
 	File ..\plugins\ggvis\plugin.la
+	SetOutPath $INSTDIR\plugins\ggvis\.libs
 	File ..\plugins\ggvis\.libs\plugin-0.dll
 	SetOutPath $INSTDIR\plugins\VarCloud
 	File ..\plugins\VarCloud\plugin.la
+	SetOutPath $INSTDIR\plugins\VarCloud\.libs
 	File ..\plugins\VarCloud\.libs\plugin-0.dll
 	SetOutPath $INSTDIR\plugins\DescribeDisplay
 	File ..\plugins\DescribeDisplay\plugin.la
+	SetOutPath $INSTDIR\plugins\DescribeDisplay\.libs
 	File ..\plugins\DescribeDisplay\.libs\plugin-0.dll
 	
 	# Include the header files and libs for those building against GGobi (rggobi)
