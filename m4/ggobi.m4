@@ -14,11 +14,17 @@ AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
 AC_ARG_WITH(ggobi, [--with-ggobi          Compile plugin against the GGobi in a specified directory])
 
 if test -n "$1"; then
-  PKG_CONFIG_PATH="$1:$PKG_CONFIG_PATH"
+  GGOBI_PKG_CONFIG_PATH="$1"
 fi
 
 if test -n "$with_ggobi" && ! test "$with_ggobi" = "no" ;  then
-  PKG_CONFIG_PATH="$with_ggobi:$PKG_CONFIG_PATH"
+  GGOBI_PKG_CONFIG_PATH="$with_ggobi"
+fi
+
+if test -n "$PKG_CONFIG_PATH"; then
+  PKG_CONFIG_PATH="$GGOBI_PKG_CONFIG_PATH:$PKG_CONFIG_PATH"
+else
+  PKG_CONFIG_PATH="$GGOBI_PKG_CONFIG_PATH"
 fi
 
 echo "pkgconfig path: ${PKG_CONFIG_PATH}"

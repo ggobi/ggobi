@@ -75,6 +75,8 @@ Section "GGobi"
 	File ..\plugins\DescribeDisplay\.libs\plugin-0.dll
 	
 	# Include the header files and libs for those building against GGobi (rggobi)
+	SetOutPath $INSTDIR\dev\include
+	File /r c:\mingw\msys\1.0\local\include\*
 	SetOutPath $INSTDIR\dev\include\ggobi
 	File ..\src\*.h
 	File ..\src\GGStructSizes.c
