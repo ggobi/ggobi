@@ -89,8 +89,12 @@ Section "GGobi"
   SetOutPath $INSTDIR\data
 	CreateShortCut "$DESKTOP\ggobi.lnk" "$INSTDIR\ggobi.exe" "" "$INSTDIR\ggobi.ico"
 
-	Push $INSTDIR
-	Call AddToPath
+         Push "PATH" 
+         Push "A"
+         Push "HKLM"
+         Push $INSTDIR
+         Call EnvVarUpdate
+	#Call AddToPath
 	
 	# WriteRegStr HKLM SOFTWARE\ggobi "InstallationDirectory" "$INSTDIR"
 	
