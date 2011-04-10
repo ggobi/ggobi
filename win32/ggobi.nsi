@@ -1,6 +1,7 @@
 # set PATH for all users - requires admin but I think we do anyway
 !define ALL_USERS 1
-!include "AddToPath.NSH"
+!include "LogicLib.nsh"
+!include "EnvVarUpdate.nsh"
 
 !include "MUI.nsh"
 
@@ -112,8 +113,11 @@ Section "Uninstall"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ggobi"
   	DeleteRegKey HKLM SOFTWARE\ggobi
 	# Remove from PATH
-	Push $INSTDIR
-	Call un.RemoveFromPath
+	Push "PATH" 
+        Push "A"
+        Push "HKLM"
+        Push $INSTDIR
+        Call un.EnvVarUpdate
 	# Get rid of shortcut
   SetShellVarContext all
 	Delete "$DESKTOP\ggobi.lnk"
