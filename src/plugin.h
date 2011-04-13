@@ -19,8 +19,6 @@
 
 #include <libxml/tree.h>
 
-#include <ltdl.h>
-
 #include "ggobi.h"
 
 typedef enum {GENERAL_PLUGIN, INPUT_PLUGIN} GGobiPluginType;
