@@ -95,8 +95,13 @@ Section "GGobi"
          Push "HKLM"
          Push $INSTDIR
          Call EnvVarUpdate
-	#Call AddToPath
-	
+	 
+         Push "GGOBI_HOME" 
+         Push "A"
+         Push "HKLM"
+         Push $INSTDIR
+         Call EnvVarUpdate
+         
 	# WriteRegStr HKLM SOFTWARE\ggobi "InstallationDirectory" "$INSTDIR"
 	
 	# Set up for uninstallation
