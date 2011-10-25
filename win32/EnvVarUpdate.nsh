@@ -144,7 +144,27 @@ Function ${UN}EnvVarUpdate
     DetailPrint "ERROR: PathString is blank"
     Goto EnvVarUpdate_Restore_Vars
   ${EndIf}
- 
+
+   
+   Push $6
+   Push $7
+   Push $8
+   StrLen $7 $4  
+   StrLen $6 $5
+   IntOp $8 $6 + $7
+   ${If} $5 == ""
+   ${OrIf} $8 >= ${NSIS_MAX_STRLEN}
+     SetErrors
+     DetailPrint "Current $1 length ($6) too long to modify in NSIS; set manually if needed"
+     Pop $8
+     Pop $7
+     Pop $6
+     Goto EnvVarUpdate_Restore_Vars
+   ${EndIf}
+   Pop $8
+   Pop $7
+   Pop $6
+
   ; Make sure we've got some work to do
   ${If} $5 == ""
   ${AndIf} $2 == "R"
