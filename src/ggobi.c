@@ -698,10 +698,10 @@ ValidateGGobiRef (ggobid * gg, gboolean fatal)
   }
 
   if (fatal) {
-    g_error (error_msg);
+    g_error ("%s", error_msg);
   }
   else
-    g_critical (error_msg);
+    g_critical ("%s", error_msg);
 
   return (NULL);
 }
@@ -718,9 +718,9 @@ ValidateDatadRef (GGobiData * d, ggobid * gg, gboolean fatal)
   }
 
   if (fatal)
-    g_error (error_msg);
+    g_error ("%s", error_msg);
   else
-    g_critical (error_msg);
+    g_critical ("%s", error_msg);
 
   return (NULL);
 }
@@ -739,9 +739,9 @@ ValidateDisplayRef (displayd * d, ggobid * gg, gboolean fatal)
   }
 
   if (fatal)
-    g_error (error_msg);
+    g_error ("%s", error_msg);
   else
-    g_critical (error_msg);
+    g_critical ("%s", error_msg);
 
   return (NULL);
 }
