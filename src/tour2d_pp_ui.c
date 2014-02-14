@@ -4,7 +4,7 @@
  * Copyright (C) AT&T, Duncan Temple Lang, Dianne Cook 1999-2005
  *
  * ggobi is free software; you may use, redistribute, and/or modify it
- * under the terms of the Common Public License, which is distributed
+ * under the terms of the Eclipse Public License, which is distributed
  * with the source code and displayed on the ggobi web site, 
  * www.ggobi.org.  For more information, contact the authors:
  *
