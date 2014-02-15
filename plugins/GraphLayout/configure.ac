@@ -43,6 +43,21 @@ AC_DEFINE(HAVE_BOOL, 1,[Define to 1 if compiler supports bool])
     ],[
 AC_MSG_RESULT(no)])
 
+AC_MSG_CHECKING([whether Graphviz API is based on cgraph])
+CFLAGS=$LIBGVC_CFLAGS
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([
+   #include <gvc.h>
+   int main() {
+     Agraph_t *graph;
+     graph = agopen ("BrowserCanvasLayout", Agdirected, NULL);
+     return 0;
+   }
+])], graphviz_new_api=yes, graphviz_new_api=no)
+AC_MSG_RESULT($graphviz_new_api)
+if test "$graphviz_new_api" = "yes"; then
+  AC_DEFINE(HAVE_CGRAPH,[1],[define for cgraph-based graphviz])
+fi
+
 # Finally, output the configuration
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
