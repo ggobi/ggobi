@@ -51,7 +51,7 @@ struct _GGobiRendererPrivate {
 /* here are local prototypes */
 static void ___object_set_property (GObject *object, guint property_id, const GValue *value, GParamSpec *pspec);
 static void ___object_get_property (GObject *object, guint property_id, GValue *value, GParamSpec *pspec);
-#line 0 "renderer.gob"
+#line 1 "renderer.gob"
 static void ggobi_renderer_init (GGobiRenderer * o) G_GNUC_UNUSED;
 #line 57 "ggobi-renderer.c"
 static GdkDrawable * ___real_ggobi_renderer_create_target (GGobiRenderer * self, GdkDrawable * parent);

@@ -57,10 +57,10 @@ struct _GGobiRendererCairoPrivate {
 /* here are local prototypes */
 static void ___object_set_property (GObject *object, guint property_id, const GValue *value, GParamSpec *pspec);
 static void ___object_get_property (GObject *object, guint property_id, GValue *value, GParamSpec *pspec);
-#line 0 "renderer-cairo.gob"
+#line 1 "renderer-cairo.gob"
 static void ggobi_renderer_cairo_init (GGobiRendererCairo * o) G_GNUC_UNUSED;
 #line 63 "ggobi-renderer-cairo.c"
-#line 0 "renderer-cairo.gob"
+#line 1 "renderer-cairo.gob"
 static void ggobi_renderer_cairo_class_init (GGobiRendererCairoClass * c) G_GNUC_UNUSED;
 #line 66 "ggobi-renderer-cairo.c"
 #line 36 "renderer-cairo.gob"

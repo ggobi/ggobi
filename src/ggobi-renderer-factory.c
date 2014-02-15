@@ -44,10 +44,10 @@ typedef GGobiRendererFactory Self;
 typedef GGobiRendererFactoryClass SelfClass;
 
 /* here are local prototypes */
-#line 0 "renderer-factory.gob"
+#line 1 "renderer-factory.gob"
 static void ggobi_renderer_factory_init (GGobiRendererFactory * o) G_GNUC_UNUSED;
 #line 50 "ggobi-renderer-factory.c"
-#line 0 "renderer-factory.gob"
+#line 1 "renderer-factory.gob"
 static void ggobi_renderer_factory_class_init (GGobiRendererFactoryClass * c) G_GNUC_UNUSED;
 #line 53 "ggobi-renderer-factory.c"
 static GGobiRenderer * ___real_ggobi_renderer_factory_create (GGobiRendererFactory * self, GdkDrawable * parent);
