@@ -447,6 +447,7 @@ void       splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint
 void       splot_add_point_label (gboolean, gint, gboolean, splotd *, GdkDrawable *, ggobid *);
 void       splot_connect_expose_handler (gint, splotd *);
 void       splot_cursor_set (gint jcursor, splotd *sp);
+void       splot_cursor_unset (splotd *sp);
 void       splot_dimension_set(splotd* sp, gint width, gint height);
 void       splot_draw_tour_axes(splotd *sp, GdkDrawable *, ggobid *);
 void       splot_edges_draw (splotd *sp, gboolean hiddens_p, GdkDrawable *drawable, ggobid *gg);

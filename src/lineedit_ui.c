@@ -281,7 +281,7 @@ add_edges_or_points_cb (GtkToggleButton * button, ggobid * gg)
 
   if (button->active) {
     cpanel->ee_mode = ADDING_EDGES;
-    splot_cursor_set ((gint) NULL, gg->current_splot);
+    splot_cursor_unset (gg->current_splot);
     gtk_label_set_text (GTK_LABEL (w), tip_edges);
   }
   else {
@@ -594,7 +594,7 @@ edgeedit_activate (gboolean state, displayd * display, ggobid * gg)
       splot_cursor_set (GDK_CROSSHAIR, gg->current_splot);
   }
   else
-    splot_cursor_set ((gint) NULL, gg->current_splot);
+    splot_cursor_unset (gg->current_splot);
 
   return redraw_style;
 }

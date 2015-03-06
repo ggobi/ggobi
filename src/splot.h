@@ -51,7 +51,7 @@ typedef struct
  GdkPixmap *pixmap0, *pixmap1;  /* 2-stage drawing */
 
  GdkCursor *cursor;
- gint jcursor;
+ GdkCursorType jcursor;
 
  RedrawStyle redraw_style;
 

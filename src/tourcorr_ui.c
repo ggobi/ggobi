@@ -142,7 +142,7 @@ static void manip_cb (GtkWidget *w, ggobid *gg)
   cpanel->tcorr.manip_mode = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   if (cpanel->tcorr.manip_mode == CMANIP_OFF)
-    splot_cursor_set ((gint) NULL, sp);
+    splot_cursor_unset (sp);
   else
     splot_cursor_set (GDK_HAND2, sp);
 }

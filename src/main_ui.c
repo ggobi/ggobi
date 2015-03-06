@@ -487,15 +487,15 @@ imode_activate (splotd * sp, ProjectionMode pmode, InteractionMode imode,
         break;
       case TOUR2D3:
         if (cpanel->t2d3.manip_mode != MANIP_OFF)
-          splot_cursor_set ((gint) NULL, sp);
+          splot_cursor_unset (sp);
         break;
       case TOUR2D:
         if (cpanel->t2d.manip_mode != MANIP_OFF)
-          splot_cursor_set ((gint) NULL, sp);
+          splot_cursor_unset (sp);
         break;
       case COTOUR:
         if (cpanel->tcorr.manip_mode != MANIP_OFF)
-          splot_cursor_set ((gint) NULL, sp);
+          splot_cursor_unset (sp);
         break;
       case TOUR1D:
       case NULL_PMODE:
@@ -513,7 +513,7 @@ imode_activate (splotd * sp, ProjectionMode pmode, InteractionMode imode,
       redraw_style = identify_activate (state, display, gg);
       break;
     case SCALE:
-      splot_cursor_set ((gint) NULL, sp);
+      splot_cursor_unset (sp);
         /*-- for insurance, because sometimes scaling doesn't quit --*/
       disconnect_motion_signal (sp);
         /*-- --*/

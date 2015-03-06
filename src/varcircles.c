@@ -231,7 +231,7 @@ varcircles_cursor_set_default (GGobiData * d)
 {
   GdkWindow *window = GTK_WIDGET (d->varpanel_ui.hpane)->window;
   gdk_cursor_destroy (d->vcirc_ui.cursor);
-  d->vcirc_ui.jcursor = (gint) NULL;
+  d->vcirc_ui.jcursor = 0;
   gdk_window_set_cursor (window, NULL);
 }
 
@@ -367,8 +367,8 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gint j;
   GtkWidget *vb, *da;
 
-  d->vcirc_ui.jcursor = (gint) NULL;  /*-- start with the default cursor --*/
-  d->vcirc_ui.cursor = (gint) NULL;
+  d->vcirc_ui.jcursor = 0;  /*-- start with the default cursor --*/
+  d->vcirc_ui.cursor = NULL;
 
   /*-- don't pack this in the hpane yet --*/
   d->vcirc_ui.ebox = gtk_event_box_new ();

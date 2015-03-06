@@ -921,22 +921,28 @@ disconnect_scroll_signal (splotd *sp) {
  * Return to the default cursor
 */
 void
-splot_cursor_set (gint jcursor, splotd *sp)
+splot_cursor_unset (splotd *sp)
 {
   GdkWindow *window = sp->da->window;
 
   if (!GTK_WIDGET_REALIZED(sp->da))
     return;
-  
-  if (jcursor == (gint) NULL) {
-    if (sp->cursor != NULL)
-      gdk_cursor_destroy (sp->cursor);
-    sp->jcursor = (gint) NULL;
-    sp->cursor = (gint) NULL;
-    gdk_window_set_cursor (window, NULL);
-  } else {
-    sp->jcursor = (gint) jcursor;
-    sp->cursor = gdk_cursor_new (sp->jcursor);
-    gdk_window_set_cursor (window, sp->cursor);
-  }
+
+  sp->jcursor = 0;
+  if (sp->cursor != NULL)
+    gdk_cursor_destroy (sp->cursor);
+  sp->cursor = NULL;
+  gdk_window_set_cursor (window, NULL);
+}
+
+void
+splot_cursor_set (GdkCursorType jcursor, splotd *sp)
+{
+  GdkWindow *window = sp->da->window;
+
+  if (!GTK_WIDGET_REALIZED(sp->da))
+    return;
+
+  sp->cursor = gdk_cursor_new (sp->jcursor);
+  gdk_window_set_cursor (window, sp->cursor);
 }

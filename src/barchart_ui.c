@@ -212,9 +212,8 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
    * be restored to the special cursor as soon as the mouse moves.
    * If we want to be really precise, we can check the regions here, too.
    */
-  splot_cursor_set ((gint) NULL, sp);
-  sp->cursor = NULL;
-
+  splot_cursor_unset (sp);
+  
   return retval;
 }
 
@@ -256,8 +255,7 @@ mouse_motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
        restore the cursor to the default.
      */
     if (!button1_p && !button2_p && !cursor_set && sp->jcursor) {
-      splot_cursor_set ((gint) NULL, sp);
-      sp->cursor = NULL;
+      splot_cursor_unset (sp);
     }
   }
 
