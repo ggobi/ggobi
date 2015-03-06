@@ -4,7 +4,7 @@ libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
 libggobi_la_GOBSTAMPS = $(libggobi_la_GOBS:%.gob=.%.gob.stamp)
-libggobi_la_LDFLAGS  = @GTK_LIBS@ @LIBXML_LIBS@
+libggobi_la_LDFLAGS  = @GTK_LIBS@ @GMODULE_LIBS@ @LIBXML_LIBS@ -lm
 libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   barchart_ui.c brush.c brush_api.c brush_bins.c brush_init.c brush_link.c \
   brush_ui.c color.c color_ui.c cpanel.c display.c display_tree.c display_ui.c \
@@ -52,7 +52,7 @@ bin_PROGRAMS  = ggobi
 ggobi_SOURCES = ggobiMain.c
 ggobi_LDADD   = libggobi.la
 
-INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @LIBXML_CFLAGS@
+INCLUDES = @SRC_DEBUG@ @GTK_CFLAGS@ @GMODULE_CFLAGS@ @LIBXML_CFLAGS@
 
 EXTRA_DIST = $(libggobi_la_GOBS)
 
