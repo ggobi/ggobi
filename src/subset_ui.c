@@ -71,7 +71,7 @@ set_adjustment (GtkWidget *w, GtkAdjustment *adj_new)
   if (w) {
     btn = GTK_SPIN_BUTTON (w);
     adj_current = gtk_spin_button_get_adjustment (btn);
-    if ((gint)adj_current != (gint)adj_new) {
+    if (adj_current != adj_new) {
       g_object_ref (G_OBJECT(adj_current));
       gtk_spin_button_set_adjustment (btn, adj_new);
     }
