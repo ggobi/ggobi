@@ -189,7 +189,7 @@ quick_message (const gchar * const message, gboolean modal)
 
   dialog =
     gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
-                            message);
+                            "%s", message);
 
   if (modal)
     gtk_window_set_modal (GTK_WINDOW (dialog), true);

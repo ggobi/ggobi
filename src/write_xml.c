@@ -37,14 +37,14 @@ static void
 write_xml_string(FILE *f, gchar *str)
 {
   gchar *fmtstr = g_markup_printf_escaped("%s", str);
-  fprintf(f, fmtstr);
+  fprintf(f, "%s", fmtstr);
   g_free(fmtstr);
 }
 static void
 write_xml_string_fmt(FILE *f, gchar *fmt, gchar *str)
 {
   gchar *fmtstr = g_markup_printf_escaped(fmt, str);
-  fprintf(f, fmtstr);
+  fprintf(f, "%s", fmtstr);
   g_free(fmtstr);
 }
 
