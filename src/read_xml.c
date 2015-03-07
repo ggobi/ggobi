@@ -2023,7 +2023,8 @@ isXMLFile (const gchar * fileName, ggobid * gg, GGobiPluginInfo * info)
       continue;
     if (c == '<') {
       gchar buf[10];
-      fgets (buf, 5, f);
+      if (fgets (buf, 5, f) == NULL)
+        return (false);
       fclose (f);
       if (strcmp (buf, "?xml") == 0) {
         return (true);
