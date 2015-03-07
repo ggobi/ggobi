@@ -23,7 +23,6 @@
 */
 
 #include <stdlib.h>
-#define __USE_ISOC99
 #include <math.h>
 #include <gtk/gtk.h>
 #include "vars.h"

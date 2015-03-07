@@ -19,7 +19,6 @@
 #include <strings.h>
 #endif
 
-#define __USE_ISOC99
 #include <math.h>
 #include <stdlib.h>
 #include <unistd.h>
