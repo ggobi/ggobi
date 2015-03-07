@@ -119,7 +119,7 @@ filesel_ok (GtkWidget * chooser)
       XmlWriteInfo *info = g_new0(XmlWriteInfo, 1);
 
       /*-- if fname already contains ".xml", then don't add it --*/
-      if (len >= 4 && g_strncasecmp (&fname[len - 4], ".xml", 4) == 0)
+      if (len >= 4 && g_ascii_strncasecmp (&fname[len - 4], ".xml", 4) == 0)
         filename = g_strdup (fname);
       else
         filename = g_strdup_printf ("%s.xml", fname);
@@ -132,7 +132,7 @@ filesel_ok (GtkWidget * chooser)
     break;
     case CSVDATA:
       /*-- if fname already contains ".csv", then don't add it --*/
-      if (len >= 4 && g_strncasecmp (&fname[len - 4], ".csv", 4) == 0)
+      if (len >= 4 && g_ascii_strncasecmp (&fname[len - 4], ".csv", 4) == 0)
         filename = g_strdup (fname);
       else
         filename = g_strdup_printf ("%s.csv", fname);
