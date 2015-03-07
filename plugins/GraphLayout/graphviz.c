@@ -213,7 +213,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
   }
 
 #ifndef HAVE_CGRAPH
-  aginit(AGRAPH, );
+  aginit();
 #endif
   if (gvc == NULL)
     gvc = gvContext();
@@ -230,7 +230,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     m = visible[i];
     name = (gchar *) g_array_index (d->rowlab, gchar *, m);
 #ifdef HAVE_CGRAPH
-    agnode(graph, name, 0);
+    agnode(graph, name, 1);
 #else
     agnode(graph, name);
 #endif    
@@ -256,7 +256,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
     /*-- if head and tail are both in the visible subset --*/
     if (head && tail) {
 #ifdef HAVE_CGRAPH
-      edge = agedge(graph, tail, head, "", 0);
+      edge = agedge(graph, tail, head, "", 1);
 #else
       edge = agedge(graph, tail, head);
 #endif
@@ -367,7 +367,7 @@ void dot_neato_layout_cb (GtkWidget *button, PluginInstance *inst)
       model = "subset";
       modelchar = 'b';
     }
-    agsafeset (graph, "model", model, NULL);
+    agsafeset (graph, "model", model, "");
 
     /* In place of MODE_MAJOR, you could use MODE_KK which is the old neato */
     if (gl->neato_use_edge_length_p && weightvar >= 0) {
