@@ -39,14 +39,14 @@ gint myrnd (gint);
 
 /* 
  This variable is used as a temporary global value which
- is used to communicate with qsort and psort since we have no
+ is used to communicate with qsort and p_sort since we have no
  provision from textur to pass additional arguments.
 
  In a multi-threaded version, we would need to protect this.
 */
 static ggobid *CurrentGGobi;
 gint
-psort (const void *arg1, const void *arg2)
+p_sort (const void *arg1, const void *arg2)
 {
   ggobid *gg = CurrentGGobi;
 
@@ -195,7 +195,7 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
 
   indx = (gint *) g_malloc (ny * sizeof (gint));
 /*
- * gy is needed solely for the psort routine:  psort is used by
+ * gy is needed solely for the p_sort routine:  p_sort is used by
  * qsort to put an index vector in the order that yy will assume.
 */
   gg->p1d.gy = (gfloat *) g_malloc (ny * sizeof (gfloat));
@@ -208,7 +208,7 @@ textur (gfloat * yy, gfloat * shft, gint ny, gint option, gfloat del,
 
   CurrentGGobi = gg;
 
-  qsort ((void *) indx, (gsize) ny, sizeof (gint), psort);
+  qsort ((void *) indx, (gsize) ny, sizeof (gint), p_sort);
   qsort ((void *) yy, (gsize) ny, sizeof (gfloat), fcompare);
   CurrentGGobi = NULL;
 /*
