@@ -34,16 +34,16 @@ typedef struct {
   gint n;               /*-- n <= MAXNCOLORS --*/
   gfloat **data;        /*-- the data in the colortable, in its
                              original system and dimensions --*/
-  GdkColor *rgb;         /*-- the data converted to rgb, of length n --*/
+  cairo_pattern_t **rgb;         /*-- the data converted to rgb, of length n --*/
   GArray *colorNames;   /*-- in case we have them --*/
 
   gfloat *bg;           /*-- high-contrast background color, rgb --*/
-  GdkColor rgb_bg;     /*-- high-contrast background color, rgb --*/
+  cairo_pattern_t *rgb_bg;     /*-- high-contrast background color, rgb --*/
 
   GdkColor rgb_hidden;  /*-- for hidden points and edges, close to bg --*/
 
   gfloat *accent;       /*-- high-contrast accent color, rgb --*/
-  GdkColor rgb_accent; /*-- high-contrast accent color, rgb --*/
+  cairo_pattern_t *rgb_accent; /*-- high-contrast accent color, rgb --*/
 } colorschemed;
 
 colorschemed *findColorSchemeByName(GList * schemes, const gchar * name);

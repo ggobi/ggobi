@@ -192,14 +192,14 @@ void
 varcircles_delete_nth (gint jvar, GGobiData * d)
 {
   GtkWidget *w;
-  GdkPixmap *pix;
+  cairo_surface_t *pix;
 
   w = varcircles_get_nth (LBL, jvar, d);
   d->vcirc_ui.label = g_slist_remove (d->vcirc_ui.label, (gpointer) w);
   w = varcircles_get_nth (DA, jvar, d);
   d->vcirc_ui.da = g_slist_remove (d->vcirc_ui.da, (gpointer) w);
 
-  pix = (GdkPixmap *) g_slist_nth_data (d->vcirc_ui.da_pix, jvar);
+  pix = (cairo_surface_t *) g_slist_nth_data (d->vcirc_ui.da_pix, jvar);
   d->vcirc_ui.da_pix = g_slist_remove (d->vcirc_ui.da_pix, (gpointer) w);
 
 
@@ -247,61 +247,17 @@ manip_select_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
   return true;
 }
 
-#ifdef FREEZE_IMPLEMENTED
 static gint
-freeze_select_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
-{
-  g_printerr ("not yet implemented\n");
-  return true;
-}
-#endif
-
-static gint
-da_manip_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
+da_manip_draw_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-#ifdef ENABLE_CAIRO
-  cairo_t *c = gdk_cairo_create (w->window);
-  gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
-  cairo_rectangle (c, 0, 0, w->allocation.width, w->allocation.height);
-  cairo_fill (c);
-  cairo_destroy (c);
-#else
-  GdkGC *gc = gdk_gc_new (w->window);
-
-  gdk_gc_set_foreground (gc, &gg->vcirc_manip_color);
-  gdk_draw_rectangle (w->window, gc,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
-  gdk_gc_destroy (gc);
-#endif
+  cairo_t *cr = gdk_cairo_create (w->window);
+  cairo_set_source (cr, gg->vcirc_manip_color);
+  cairo_paint (cr);
+  cairo_destroy (cr);
 
   return true;
 }
-
-#ifdef FREEZE_IMPLEMENTED
-static gint
-da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
-{
-  ggobid *gg = GGobiFromWidget (w, true);
-#ifdef ENABLE_CAIRO
-  cairo_t *c = gdk_cairo_create (w->window);
-  gdk_cairo_set_source_color (c, &gg->vcirc_freeze_color);
-  cairo_rectangle (c, 0, 0, w->allocation.width, w->allocation.height);
-  cairo_fill (c);
-  cairo_destroy (c);
-#else
-  GdkGC *gc = gdk_gc_new (w->window);
-
-  gdk_gc_set_foreground (gc, &gg->vcirc_freeze_color);
-  gdk_draw_rectangle (w->window, gc,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
-
-  gdk_gc_destroy (gc);
-#endif
-
-  return true;
-}
-#endif
 
 /*-- hide the circles interface --*/
 void
@@ -431,8 +387,8 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da, false, false, 2);
   GGobi_widget_set (da, gg, true);
-  g_signal_connect (G_OBJECT (da), "expose_event",
-                    G_CALLBACK (da_manip_expose_cb), d);
+  g_signal_connect (G_OBJECT (da), "draw",
+                    G_CALLBACK (da_manip_draw_cb), d);
   gtk_widget_show (da);
 
   d->vcirc_ui.manip_btn = gtk_button_new_with_label ("Manip");
@@ -444,29 +400,6 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   g_signal_connect (G_OBJECT (d->vcirc_ui.manip_btn),
                     "button_press_event", G_CALLBACK (manip_select_cb), d);
   gtk_widget_show (d->vcirc_ui.manip_btn);
-
-#ifdef FREEZE_IMPLEMENTED
-  /* -- a drawing area to place next to the freeze button as a color key -- */
-  da = gtk_drawing_area_new ();
-  gtk_widget_set_double_buffered (da, false);
-  gtk_widget_set_size_request (GTK_WIDGET (da), 8, 8);
-  gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
-  gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da, false, false, 2);
-  GGobi_widget_set (da, gg, true);
-  g_signal_connect (G_OBJECT (da), "expose_event",
-                    G_CALLBACK (da_freeze_expose_cb), d);
-  gtk_widget_show (da);
-
-  d->vcirc_ui.freeze_btn = gtk_button_new_with_label ("Freeze");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), d->vcirc_ui.freeze_btn,
-                        "Click here, then click on the variable you wish to freeze",
-                        NULL);
-  gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), d->vcirc_ui.freeze_btn,
-                      true, true, 2);
-  g_signal_connect (G_OBJECT (d->vcirc_ui.freeze_btn),
-                    "button_press_event", G_CALLBACK (freeze_select_cb), d);
-  gtk_widget_show (d->vcirc_ui.freeze_btn);
-#endif
 }
 
 void
@@ -474,7 +407,7 @@ varcircles_delete (gint nc, gint jvar, GGobiData * d, ggobid * gg)
 {
   gint j;
   GtkWidget *w;
-  GdkPixmap *pix;
+  cairo_surface_t *pix;
 
   if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every circle --*/
     for (j = jvar; j < jvar + nc; j++) {
@@ -489,9 +422,9 @@ varcircles_delete (gint nc, gint jvar, GGobiData * d, ggobid * gg)
       /*-- without a ref, this will be destroyed --*/
       gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
 
-      pix = (GdkPixmap *) g_slist_nth_data (d->vcirc_ui.da, jvar);
+      pix = (cairo_surface_t *) g_slist_nth_data (d->vcirc_ui.da, jvar);
       d->vcirc_ui.da_pix = g_slist_remove (d->vcirc_ui.da_pix, pix);
-      gdk_pixmap_unref (pix);
+      cairo_surface_destroy (pix);
     }
   }
 }
@@ -504,7 +437,7 @@ varcircles_clear (ggobid * gg)
   gint j;
   GSList *l;
   GGobiData *d;
-  GdkPixmap *pix;
+  cairo_surface_t *pix;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
@@ -590,8 +523,8 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), da,
                         "Click left to select or deselect", NULL);
 
-  g_signal_connect (G_OBJECT (da), "expose_event",
-                    G_CALLBACK (da_expose_cb), GINT_TO_POINTER (j));
+  g_signal_connect (G_OBJECT (da), "draw",
+                    G_CALLBACK (da_draw_cb), GINT_TO_POINTER (j));
   g_signal_connect (G_OBJECT (da), "button_press_event",
                     G_CALLBACK (varcircle_sel_cb), GINT_TO_POINTER (j));
   g_object_set_data (G_OBJECT (da), "datad", d);
@@ -629,8 +562,9 @@ varcircles_refresh (GGobiData * d, ggobid * gg)
 
   for (j = 0; j < d->ncols; j++) {
     da = varcircles_get_nth (DA, j, d);
-    if (GTK_WIDGET_REALIZED (da) && GTK_WIDGET_VISIBLE (da))
+    if (GTK_WIDGET_REALIZED (da) && GTK_WIDGET_VISIBLE (da)) {
       varcircle_draw (j, d, gg);
+    }
   }
 }
 
@@ -643,11 +577,9 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
   cpaneld *cpanel;
   gint k, len;
   GtkWidget *da = varcircles_get_nth (DA, jvar, d);
-  GdkPixmap *da_pix;
-#ifdef ENABLE_CAIRO
-  cairo_t *c;
+  cairo_surface_t *da_pix;
+  cairo_t *cr;
   double radius = VAR_CIRCLE_DIAM / 2.0;
-#endif
 
   if (sp == NULL || jvar < 0 || jvar >= d->ncols)
     return;  /*-- return --*/
@@ -664,54 +596,32 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
 
   if ((len = g_slist_length (d->vcirc_ui.da_pix)) < d->ncols) {
     for (k = len; k < d->ncols; k++) {
-      d->vcirc_ui.da_pix = g_slist_append (d->vcirc_ui.da_pix,
-                                           gdk_pixmap_new (da->window,
-                                                           VAR_CIRCLE_DIAM +
-                                                           1,
-                                                           VAR_CIRCLE_DIAM +
-                                                           1, -1));
-      /*
-       * clear and initialize each pixmap here, because they may be
-       * exposed out of sequence, and then noise is drawn to the
-       * variable circle on the screen.
-       */
-      da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, k);
-      gdk_draw_rectangle (da_pix, gg->unselvarbg_GC, true,
-                          0, 0, VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
-#ifdef ENABLE_CAIRO
-      c = gdk_cairo_create (da_pix);
-      cairo_arc (c, radius, radius, radius, 0, 2 * M_PI);
-      cairo_set_source_rgb (c, 0, 0, 0);
-      cairo_fill_preserve (c);
-      cairo_set_source_rgb (c, 1.0, 1.0, 1.0);
-      cairo_stroke (c);
-      cairo_destroy (c);
-#else
-      gdk_draw_arc (da_pix, gg->selvarbg_GC, true,
-                    0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
-      gdk_draw_arc (da_pix, gg->unselvarfg_GC, false,
-                    0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
-#endif
+      cairo_surface_t *surface =
+        gdk_window_create_similar_image_surface (da->window,
+                                                 CAIRO_FORMAT_ARGB32,
+                                                 VAR_CIRCLE_DIAM + 1,
+                                                 VAR_CIRCLE_DIAM + 1,
+                                                 0);
+      d->vcirc_ui.da_pix = g_slist_append (d->vcirc_ui.da_pix, surface);
+      cr = cairo_create (surface);
+      cairo_arc (cr, radius, radius, radius, 0, 2 * M_PI);
+      cairo_set_source_rgb (cr, 0, 0, 0);
+      cairo_fill_preserve (cr);
+      cairo_set_source_rgb (cr, 1.0, 1.0, 1.0);
+      cairo_stroke (cr);
+      cairo_destroy (cr);
     }
   }
 
   da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, jvar);
 
-  /*-- clear the pixmap --*/
-  gdk_draw_rectangle (da_pix, gg->unselvarbg_GC, true,
-                      0, 0, VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
+  cr = cairo_create(da_pix);
+  cairo_paint(cr);
+  cairo_arc (cr, radius, radius, radius - 1, 0, 2 * M_PI);
+  cairo_set_source_rgb (cr, 1.0, 1.0, 1.0);
+  cairo_fill_preserve (cr);
+  cairo_set_source_rgb (cr, 0, 0, 0);
 
-#ifdef ENABLE_CAIRO
-  c = gdk_cairo_create (da_pix);
-  cairo_arc (c, radius, radius, radius - 1, 0, 2 * M_PI);
-  cairo_set_source_rgb (c, 1.0, 1.0, 1.0);
-  cairo_fill_preserve (c);
-  cairo_set_source_rgb (c, 0, 0, 0);
-#else
-  /*-- add a filled circle for the background --*/
-  gdk_draw_arc (da_pix, gg->selvarbg_GC, true,
-                0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
-#endif
   /*-- add the appropriate line --*/
   if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
     GGobiExtendedDisplayClass *klass;
@@ -724,33 +634,16 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
    * add an open circle for the outline
    */
   if (chosen) {
-#ifdef ENABLE_CAIRO
-    cairo_set_line_width (c, 2);
-#else
-    gdk_draw_arc (da_pix, gg->selvarfg_GC, false,
-                  0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
-#endif
+    cairo_set_line_width (cr, 2);
   }
   else {
-#ifdef ENABLE_CAIRO
-    cairo_set_line_width (c, 1);
-#else
-    gdk_draw_arc (da_pix, gg->unselvarfg_GC, false,
-                  0, 0, VAR_CIRCLE_DIAM, VAR_CIRCLE_DIAM, 0, 64 * 360);
-#endif
+    cairo_set_line_width (cr, 1);
   }
 
-#ifdef ENABLE_CAIRO
-  cairo_stroke (c);
-  cairo_destroy (c);
-#endif
+  cairo_stroke (cr);
+  cairo_destroy (cr);
 
-  /*
-   * copy the pixmap to the window
-   */
-  gdk_draw_drawable (da->window, gg->unselvarfg_GC,
-                     da_pix, 0, 0, 0, 0,
-                     VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
+  redraw_widget (da);
 }
 
 void
@@ -764,13 +657,13 @@ tour_draw_circles (GGobiData * d, ggobid * gg)
 }
 
 gboolean
-da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
+da_draw_cb (GtkWidget * w, cairo_t * cr, gpointer cbd)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   gint j = GPOINTER_TO_INT (cbd);
   GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (w), "datad");
   GtkWidget *da = varcircles_get_nth (DA, j, d);
-  GdkPixmap *da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, j);
+  cairo_surface_t *da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, j);
 
   if (j >= d->ncols)
     return false;
@@ -778,12 +671,9 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   if (da_pix == NULL) {
     varcircle_draw (j, d, gg);
   }
-  else {
-    gdk_draw_pixmap (da->window, gg->unselvarfg_GC,
-                     da_pix, 0, 0, 0, 0,
-                     VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
-  }
 
+  show_buffer(cr, da_pix);
+ 
   return true;
 }
 

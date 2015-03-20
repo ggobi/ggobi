@@ -57,8 +57,8 @@ typedef struct _GGobiInitInfo {
     gchar *filename; /* the name of the file from which this information was read. */
 
     gchar *colorSchemeFile; /* */
-    GdkColor *bgColor;
-    GdkColor *fgColor;
+    GdkRGBA *bgColor;
+    GdkRGBA *fgColor;
     glyphd    glyph;
 
     gboolean createInitialScatterPlot;

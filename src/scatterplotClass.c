@@ -249,7 +249,8 @@ variableSelect (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 }
 
 static gboolean
-varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
+varcircleDraw (displayd * display, gint jvar, cairo_surface_t * da_pix,
+               ggobid * gg)
 {
   gdouble r = VAR_CIRCLE_DIAM / 2.0;
   gint x, y, k;
@@ -257,31 +258,18 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
   gboolean chosen = false;
 
 #ifdef ENABLE_CAIRO
-  cairo_t *c = gdk_cairo_create (da_pix);
-  cairo_set_source_rgb (c, 1.0, 0, 1.0);
-  cairo_set_line_width (c, 1);
+  cairo_t *cr = cairo_create (da_pix);
+  cairo_set_source_rgb (cr, 1.0, 0, 1.0);
+  cairo_set_line_width (cr, 1);
 #endif
 
   switch (cpanel->pmode) {
   case TOUR1D:
     x = (gint) (display->t1d.F.vals[0][jvar] * (gfloat) r);
     y = 0;
-#ifndef ENABLE_CAIRO
-    gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
-#endif
     if (jvar == display->t1d_manip_var) {
-#ifdef ENABLE_CAIRO
-      cairo_arc (c, r, r, r - 5, (5.0 / 6) * M_PI, (7.0 / 6) * M_PI);
-      cairo_stroke (c);
-      cairo_arc (c, r, r, r - 5, (11.0 / 6) * M_PI, (13.0 / 6) * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10,
-                    150 * 64, 60 * 64);
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false, 5, 5,
-                    VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 330 * 64,
-                    60 * 64);
-#endif
+      cairo_arc (cr, r, r, r - 5, (5.0 / 6) * M_PI, (7.0 / 6) * M_PI);
+      cairo_arc (cr, r, r, r - 5, (11.0 / 6) * M_PI, (13.0 / 6) * M_PI);
     }
 
     for (k = 0; k < display->t1d.nactive; k++) {
@@ -295,17 +283,8 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
   case TOUR2D3:
     x = (gint) (display->t2d3.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->t2d3.F.vals[1][jvar] * (gfloat) r);
-#ifndef ENABLE_CAIRO
-    gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
-#endif
     if (jvar == display->t2d3_manip_var) {
-#ifdef ENABLE_CAIRO
-      cairo_arc (c, r, r, r - 5, 0, 2 * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 0 * 64,
-                    360 * 64);
-#endif
+      cairo_arc (cr, r, r, r - 5, 0, 2 * M_PI);
     }
 
     for (k = 0; k < display->t2d3.nactive; k++) {
@@ -319,17 +298,8 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
   case TOUR2D:
     x = (gint) (display->t2d.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->t2d.F.vals[1][jvar] * (gfloat) r);
-#ifndef ENABLE_CAIRO
-    gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
-#endif
     if (jvar == display->t2d_manip_var) {
-#ifdef ENABLE_CAIRO
-      cairo_arc (c, r, r, r - 5, 0, 2 * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 0 * 64,
-                    360 * 64);
-#endif
+      cairo_arc (cr, r, r, r - 5, 0, 2 * M_PI);
     }
 
     for (k = 0; k < display->t2d.nactive; k++) {
@@ -348,36 +318,13 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     /*          if (xvar) { */
     x = (gint) (display->tcorr1.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->tcorr2.F.vals[0][jvar] * (gfloat) r);
-#ifndef ENABLE_CAIRO
-    gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
-#endif
     if (jvar == display->tc1_manip_var) {
-#ifdef ENABLE_CAIRO
-      cairo_arc (c, r, r, r - 5, (5.0 / 6) * M_PI, (7.0 / 6) * M_PI);
-      cairo_stroke (c);
-      cairo_arc (c, r, r, r - 5, (11.0 / 6) * M_PI, (13.0 / 6) * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10,
-                    150 * 64, 60 * 64);
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false, 5, 5,
-                    VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 330 * 64,
-                    60 * 64);
-#endif
+      cairo_arc (cr, r, r, r - 5, (5.0 / 6) * M_PI, (7.0 / 6) * M_PI);
+      cairo_arc (cr, r, r, r - 5, (11.0 / 6) * M_PI, (13.0 / 6) * M_PI);
     }
     if (jvar == display->tc2_manip_var) {
-#ifdef ENABLE_CAIRO
-      cairo_arc (c, r, r, r - 5, (1.0 / 3) * M_PI, (2.0 / 3) * M_PI);
-      cairo_stroke (c);
-      cairo_arc (c, r, r, r - 5, (4.0 / 3) * M_PI, (5.0 / 3) * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 60 * 64,
-                    60 * 64);
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false, 5, 5,
-                    VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 240 * 64,
-                    60 * 64);
-#endif
+      cairo_arc (cr, r, r, r - 5, (1.0 / 3) * M_PI, (2.0 / 3) * M_PI);
+      cairo_arc (cr, r, r, r - 5, (4.0 / 3) * M_PI, (5.0 / 3) * M_PI);
     }
 
     for (k = 0; k < display->tcorr1.nactive; k++) {
@@ -394,34 +341,17 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     }
     break;
 
-
-
-
-
-
-    /*      } 
-       else {
-
-       x = 0;
-       y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
-       gdk_draw_line (da_pix,
-       gg->selvarfg_GC, r, r, r+x, r-y);
-
-       } */
-
   default:
     break;
   }
 
-#ifdef ENABLE_CAIRO
-  cairo_stroke (c);
-  cairo_set_source_rgb (c, 0, 0, 0);
-  cairo_set_line_width (c, 2);
-  cairo_move_to (c, r, r);
-  cairo_line_to (c, r + x, r - y);
-  cairo_stroke (c);
-  cairo_destroy (c);
-#endif
+  cairo_stroke (cr);
+  cairo_set_source_rgb (cr, 0, 0, 0);
+  cairo_set_line_width (cr, 2);
+  cairo_move_to (cr, r, r);
+  cairo_line_to (cr, r + x, r - y);
+  cairo_stroke (cr);
+  cairo_destroy (cr);
 
   return (chosen);
 }
@@ -1429,37 +1359,41 @@ drawEdge (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 }
 
 void
-scatter1DAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
+scatter1DAddPlotLabels (splotd * sp, cairo_t *cr)
 {
-  PangoLayout *layout =
-    gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
+  PangoLayout *layout = pango_cairo_create (cr);
   PangoRectangle rect;
   GGobiData *d = sp->displayptr->d;
 
   layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->p1dvar), &rect);
-  gdk_draw_layout (drawable, gc,
-                   sp->max.x / 2 - rect.width / 2,
-                   sp->max.y - rect.height - 5, layout);
+  
+  cairo_move_to(cr,
+                sp->max.x / 2 - rect.width / 2,
+                sp->max.y - rect.height - 5);
+  pango_cairo_show_layout(cr, layout);
+  
   g_object_unref (G_OBJECT (layout));
 }
 
 void
-scatterXYAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
+scatterXYAddPlotLabels (splotd * sp, cairo_t * cr)
 {
-  PangoLayout *layout =
-    gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
+  PangoLayout *layout = pango_cairo_create (cr);
   PangoRectangle rect;
 
   GGobiData *d = sp->displayptr->d;
 
   /*-- xyplot: right justify the label --*/
   layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->xyvars.x), &rect);
-  gdk_draw_layout (drawable, gc,
-                   sp->max.x - rect.width - 5,
-                   sp->max.y - rect.height - 5, layout);
+  cairo_move_to(cr,
+                sp->max.x - rect.width - 5,
+                sp->max.y - rect.height - 5);
+  pango_cairo_show_layout(cr, layout);
 
   layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->xyvars.y), &rect);
-  gdk_draw_layout (drawable, gc, 5, 5, layout);
+  cairo_move_to(cr, 5, 5);
+  pango_cairo_show_layout(cr, layout);
+  
   g_object_unref (G_OBJECT (layout));
 }
 
@@ -1469,13 +1403,13 @@ addPlotLabels (splotd * sp, GdkDrawable * drawable, ggobid * gg)
 /* Same as scatmat... */
   cpaneld *cpanel = &(sp->displayptr->cpanel);
   if (cpanel->pmode == XYPLOT)
-    scatterXYAddPlotLabels (sp, drawable, gg->plot_GC);
+    scatterXYAddPlotLabels (sp, drawable, gg->plot_cr);
   else if (cpanel->pmode == P1PLOT)
-    scatter1DAddPlotLabels (sp, drawable, gg->plot_GC);
+    scatter1DAddPlotLabels (sp, drawable, gg->plot_cr);
 }
 
 static void
-withinDrawToUnbinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
+withinDrawToUnbinned (splotd * sp, gint m, cairo_t * cr)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -1489,19 +1423,18 @@ withinDrawToUnbinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
     baseline = (proj == TOUR1D) ? &sp->tour1d.ash_baseline :
       &sp->p1d.ash_baseline;
 
+    cairo_move_to(cr, sp->screen[m].x, sp->screen[m].y);
     if (display->p1d_orientation == HORIZONTAL)
-      gdk_draw_line (drawable, gc,
-                     sp->screen[m].x, sp->screen[m].y,
-                     sp->screen[m].x, baseline->y);
+      cairo_line_to(cr, sp->screen[m].x, baseline->y);
     else
-      gdk_draw_line (drawable, gc,
-                     sp->screen[m].x, sp->screen[m].y,
-                     baseline->x, sp->screen[m].y);
+      cairo_line_to(cr, baseline->x, sp->screen[m].y);
+
+    cairo_stroke(cr);
   }
 }
 
 void
-addMarkupCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
+addMarkupCues (splotd * sp, cairo_t * cr, ggobid * gg)
 {
 /* See splot_add_markup_to_pixmap */
   displayd *display = sp->displayptr;
@@ -1511,20 +1444,21 @@ addMarkupCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
         display->options.edges_arrowheads_show_p ||
         display->options.edges_directed_show_p)
       if (e->nearest_point != -1)
-        splot_add_identify_edge_cues (sp, drawable, e->nearest_point,
+        splot_add_identify_edge_cues (sp, cr, e->nearest_point,
                                       true, gg);
 }
 
 void
-addScalingCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
+addScalingCues (splotd * sp, cairo_t * cr, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   if (!cpanel->scale.updateAlways_p) {
-    if (gg->buttondown)
-      gdk_draw_line (drawable, gg->plot_GC,
-                     sp->mousedownpos.x, sp->mousedownpos.y,
-                     sp->mousepos.x, sp->mousepos.y);
+    if (gg->buttondown) {
+      cairo_move_to(cr, sp->mousedownpos.x, sp->mousedownpos.y);
+      cairo_line_to(cr, sp->mousepos.x, sp->mousepos.y);
+      cairo_stroke(cr);
+    }
   }
 }
 

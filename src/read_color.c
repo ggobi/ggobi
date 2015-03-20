@@ -41,7 +41,7 @@ gint getAnnotationColor (xmlNodePtr node, xmlDocPtr doc,
 gint getBackgroundColor (xmlNodePtr node, xmlDocPtr doc,
                          colorschemed * scheme);
 gint getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original,
-               GdkColor * col);
+               GdkRGBA * col);
 
 colorschemed *
 read_colorscheme (gchar * fileName, GList ** list)
@@ -210,7 +210,7 @@ getForegroundColors (xmlNodePtr node, xmlDocPtr doc, colorschemed * scheme)
 
   scheme->n = n;
   scheme->data = (gfloat **) g_malloc (n * sizeof (gfloat *));
-  scheme->rgb = (GdkColor *) g_malloc (n * sizeof (GdkColor));
+  scheme->rgb = (cairo_pattern_t *) g_malloc (n * sizeof (cairo_pattern_t));
 
   tmp = XML_CHILDREN (node);
   n = 0;
@@ -266,16 +266,14 @@ getAnnotationColor (xmlNodePtr node, xmlDocPtr doc, colorschemed * scheme)
  Puts the actual values into original and fills in the RGB settings for `col'.
  */
 gint
-getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original, GdkColor * col)
+getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original, GdkRGBA * col)
 {
   xmlNodePtr tmp;
   gint i = 0, numElements = 3;  /* RGB only at present. */
   gfloat *vals;
   gfloat colorsystem_min = 0.0;
   gfloat colorsystem_max = 1.0;
-  gfloat max = 65535;
 
-  /*-- color values must be scaled onto [0,65535] --*/
   gchar *tmpVal;
   tmpVal = (gchar *) xmlGetProp (node, (xmlChar *) "min");
   if (tmpVal) {
@@ -307,10 +305,9 @@ getColor (xmlNodePtr node, xmlDocPtr doc, gfloat ** original, GdkColor * col)
     vals[i] =
       (vals[i] - colorsystem_min) / (colorsystem_max - colorsystem_min);
 
-  /*-- scale onto [0,65535] --*/
-  col->red = (guint16) (max * vals[0]);
-  col->green = (guint16) (max * vals[1]);
-  col->blue = (guint16) (max * vals[2]);
+  col->red = vals[0];
+  col->green = vals[1];
+  col->blue = vals[2];
 
   return (numElements);
 }

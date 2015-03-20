@@ -259,10 +259,10 @@ treeLabel (splotd * splot, GGobiData * d, ggobid * gg)
   return(ggobi_data_get_col_name(d, splot->p1dvar));
 }
 
-static GdkSegment *
-allocWhiskers (GdkSegment * whiskers, splotd * sp, gint nr, GGobiData * d)
+static isegments *
+allocWhiskers (isegments * whiskers, splotd * sp, gint nr, GGobiData * d)
 {
-  return ((GdkSegment *) g_realloc (whiskers, 2 * nr * sizeof (GdkSegment)));
+  return ((isegments *) g_realloc (whiskers, 2 * nr * sizeof (isegments)));
 }
 
 void
@@ -291,7 +291,7 @@ drawCase_p (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 }
 
 void
-withinDrawBinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
+withinDrawBinned (splotd * sp, gint m, cairo_t * cr)
 {
   displayd *display = sp->displayptr;
   GGobiData *d = display->d;
@@ -305,75 +305,41 @@ withinDrawBinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
     n = 2 * m;
     lwidth = lwidth_from_gsize (d->glyph_now.els[m].size);
     gtype = d->glyph_now.els[m].type;
-    ltype = set_lattribute_from_ltype (ltype_from_gtype (gtype), gg);
-    gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
-                                ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-    gdk_draw_line (drawable, gc,
-                   sp->whiskers[n].x1, sp->whiskers[n].y1,
-                   sp->whiskers[n].x2, sp->whiskers[n].y2);
+    set_dash_from_ltype (ltype_from_gtype (gtype), gg);
+    cairo_set_line_width(cr, lwidth);
+    cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+    cairo_move_to (cr, sp->whiskers[n].x1, sp->whiskers[n].y1);
+    cairo_line_to (cr, sp->whiskers[n].x2, sp->whiskers[n].y2);
     n++;
-    gdk_draw_line (drawable, gc,
-                   sp->whiskers[n].x1, sp->whiskers[n].y1,
-                   sp->whiskers[n].x2, sp->whiskers[n].y2);
+    cairo_move_to (cr, sp->whiskers[n].x1, sp->whiskers[n].y1);
+    cairo_line_to (cr, sp->whiskers[n].x2, sp->whiskers[n].y2);
+    cairo_stroke(cr);
   }
-  gdk_gc_set_line_attributes (gg->plot_GC,
-                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
+  
+  cairo_set_dash(cr, NULL, 0, 0);
+  cairo_set_line_width(cr, 0);
+  cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
 }
-
-/* I think these two routines are identical ... */
-void
-withinDrawUnbinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
-{
-  displayd *display = sp->displayptr;
-  GGobiData *d = display->d;
-  ggobid *gg = GGobiFromSPlot (sp);
-  gint n, lwidth, ltype, gtype;
-
-  if (!gg || !display)
-    return;
-
-  if (display->options.whiskers_show_p) {
-    n = 2 * m;
-    lwidth = lwidth_from_gsize (d->glyph_now.els[m].size);
-    gtype = d->glyph_now.els[m].type;
-    ltype = set_lattribute_from_ltype (ltype_from_gtype (gtype), gg);
-    gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
-                                ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-    gdk_draw_line (drawable, gc,
-                   sp->whiskers[n].x1, sp->whiskers[n].y1,
-                   sp->whiskers[n].x2, sp->whiskers[n].y2);
-    n++;
-    gdk_draw_line (drawable, gc,
-                   sp->whiskers[n].x1, sp->whiskers[n].y1,
-                   sp->whiskers[n].x2, sp->whiskers[n].y2);
-  }
-  gdk_gc_set_line_attributes (gg->plot_GC,
-                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-}
-
 
 static void
-addPlotLabels (displayd * display, splotd * sp, GdkDrawable * drawable,
+addPlotLabels (displayd * display, splotd * sp, cairo_t * cr,
                GGobiData * d, ggobid * gg)
 {
   PangoRectangle rect;
   PangoLayout *layout =
-    gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
+    pango_cairo_create_layout (cr, NULL);
   cpaneld *cpanel = &display->cpanel;
-
 
   layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->p1dvar), &rect);
   if (cpanel->parcoords_arrangement == ARRANGE_ROW)
-    gdk_draw_layout (drawable, gg->plot_GC,
-                     (rect.width <=
-                      sp->max.x) ? sp->max.x / 2 - rect.width / 2 : 0,
-                     sp->max.y - rect.height - 5, layout);
-
+    cairo_move_to(cr, (rect.width <=
+                       sp->max.x) ? sp->max.x / 2 - rect.width / 2 : 0,
+                  sp->max.y - rect.height - 5);    
   else
-    gdk_draw_layout (drawable, gg->plot_GC, 5, 5, layout);
+    cairo_move_to(cr, 5, 5);
 
+  pango_cairo_show_layout (cr, layout);
+  
   g_object_unref (G_OBJECT (layout));
 }
 
@@ -486,7 +452,7 @@ add_xml_parcoords_variables (xmlNodePtr node, GList * plots, displayd * dpy)
 /*-- add highlighting for parallel coordinates plot --*/
 static void
 splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
-                        GdkDrawable * drawable, ggobid * gg)
+                        cairo_t * cr, ggobid * gg)
 {
   gint n;
   displayd *display = sp->displayptr;
@@ -497,29 +463,24 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
     return;
 
   if (display->options.whiskers_show_p) {
-    gdk_gc_set_line_attributes (gg->plot_GC,
-                                3, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                                GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[d->color_now.els[k]]);
+    cairo_set_line_width(cr, 3);
+    cairo_set_source (cr, scheme->rgb[d->color_now.els[k]]);
 
     n = 2 * k;
-    gdk_draw_line (drawable, gg->plot_GC,
-                   sp->whiskers[n].x1, sp->whiskers[n].y1,
-                   sp->whiskers[n].x2, sp->whiskers[n].y2);
+    cairo_move_to (cr, sp->whiskers[n].x1, sp->whiskers[n].y1);
+    cairo_line_to (cr, sp->whiskers[n].x2, sp->whiskers[n].y2);
     n++;
-    gdk_draw_line (drawable, gg->plot_GC,
-                   sp->whiskers[n].x1, sp->whiskers[n].y1,
-                   sp->whiskers[n].x2, sp->whiskers[n].y2);
+    cairo_move_to (cr, sp->whiskers[n].x1, sp->whiskers[n].y1);
+    cairo_line_to (cr, sp->whiskers[n].x2, sp->whiskers[n].y2);
 
-    gdk_gc_set_line_attributes (gg->plot_GC,
-                                0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                                GDK_JOIN_ROUND);
+    cairo_stroke(cr);
+    cairo_set_line_width(cr, 0);
   }
 
   if (nearest_p) {
     /* Add the label for the nearest point at the top as well */
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-    splot_add_point_label (true, k, true, sp, drawable, gg);
+    cairo_set_source (cr, scheme->rgb_accent);
+    splot_add_point_label (true, k, true, sp, cr, gg);
   }
 }
 
@@ -663,7 +624,7 @@ parcoordsSPlotClassInit (GGobiParCoordsSPlotClass * klass)
   klass->parent_class.draw_case_p = drawCase_p;
 
   klass->parent_class.within_draw_to_binned = withinDrawBinned;
-  klass->parent_class.within_draw_to_unbinned = withinDrawUnbinned;
+  klass->parent_class.within_draw_to_unbinned = withinDrawBinned;
 
   klass->parent_class.splot_assign_points_to_bins = splotAssignPointsToBins;
 

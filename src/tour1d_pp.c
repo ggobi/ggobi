@@ -552,20 +552,18 @@ void t1d_clear_pppixmap(displayd *dsp, ggobid *gg)
     hgt = dsp->t1d_ppda->allocation.height;
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (dsp->t1d_pp_pixmap, gg->plot_GC,
-                      true, 0, 0, wid, hgt);
+  cairo_t *cr = cairo_create(dsp->t1d_pp_pixmap);
+  cairo_set_source (cr, scheme->rgb_bg);
+  cairo_paint (cr);
+  
+  cairo_set_source(cr, scheme->rgb_accent);
+  cairo_move_to(cr, margin, hgt - margin);
+  cairo_line_to_preserve(cr, wid - margin, hgt - margin);
+  cairo_line_to(cr, margin, margin);
+  cairo_stroke(cr);
+  cairo_destroy(cr);
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_line (dsp->t1d_pp_pixmap, gg->plot_GC,
-    margin, hgt - margin,
-    wid - margin, hgt - margin);
-  gdk_draw_line (dsp->t1d_pp_pixmap, gg->plot_GC,
-    margin, hgt - margin, margin, margin);
-
-  gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
-                   0, 0, 0, 0,
-                   wid, hgt);
+  redraw_widget (dsp->t1d_ppda);
 }
 
 void t1d_clear_ppda(displayd *dsp, ggobid *gg)
@@ -584,10 +582,9 @@ void t1d_clear_ppda(displayd *dsp, ggobid *gg)
   t1d_clear_pppixmap(dsp, gg);
 }
 
-void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
+void t1d_ppdraw_all(gint margin, displayd *dsp, ggobid *gg)
 {
-  /*gint xpos, ypos, xstrt, ystrt;*/
-  GdkPoint pptrace[100];
+  icoords pptrace[100];
   gint i;
 
   t1d_clear_pppixmap(dsp, gg);
@@ -599,12 +596,18 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
       dsp->t1d_indx_min)/(gfloat) (dsp->t1d_indx_max-dsp->t1d_indx_min)) * 
       (gfloat) (hgt - 2*margin));
   }
-  gdk_draw_lines (dsp->t1d_pp_pixmap, gg->plot_GC,
-    pptrace, dsp->t1d_ppindx_count);
 
-  gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
-    0, 0, 0, 0, wid, hgt);
+  if (dsp->t1d_ppindx_count > 0) {
+    cairo_t *cr = cairo_create(dsp->t1d_pp_pixmap);
+    cairo_set_source(cr, scheme->rgb_accent);
+    cairo_move_to(cr, pptrace[0].x, pptrace[0].y);
+    for (i=1; i<dsp->t1d_ppindx_count; i++)
+      cairo_line_to(cr, pptrace[i].x, pptrace[i].y);
+    cairo_stroke(cr);
+    cairo_destroy(cr);
+  }
 
+  redraw_widget (dsp->t1d_ppda);
 }
 
 /* This is writes text to the pp window to in form the
@@ -615,20 +618,16 @@ void t1d_ppdraw_think(displayd *dsp, ggobid *gg)
   colorschemed *scheme = gg->activeColorScheme;
   gint wid = dsp->t1d_ppda->allocation.width, 
     hgt = dsp->t1d_ppda->allocation.height;
-  PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, "Thinking...");
+  cairo_t *cr = cairo_create(dsp->t1d_pp_pixmap);
+  PangoLayout *layout = pango_cairo_create_layout(cr, "Thinking...");
   
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_layout(dsp->t1d_pp_pixmap, gg->plot_GC, 10, 10, layout);
+  cairo_set_source (cr, scheme->rgb_accent);
+  cairo_move_to(cr, 10, 10);
+  pango_cairo_show_layout(cr, layout);
   g_object_unref(G_OBJECT(layout));
-  /*gdk_text_extents (
-    gtk_style_get_font (style),
-    varlab, strlen (varlab),
-    &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (dsp->t1d_pp_pixmap,
-    gtk_style_get_font (style),
-      gg->plot_GC, 10, 10, varlab);*/
-  gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
-    0, 0, 0, 0, wid, hgt);
+  cairo_destroy(cr);
+  
+  redraw_widget (dsp->t1d_ppda);
 }
 
 /* This is the pp index plot drawing routine */ 
@@ -636,8 +635,6 @@ void t1d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
-  gint wid = dsp->t1d_ppda->allocation.width, 
-    hgt = dsp->t1d_ppda->allocation.height;
   gint j;
   static gboolean init = true;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");
@@ -661,13 +658,12 @@ void t1d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
       dsp->t1d_indx_max);
     gtk_label_set_text(GTK_LABEL(dsp->t1d_pplabel),label);
  
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     if (dsp->t1d_ppindx_count == 0) 
     {
       dsp->t1d_ppindx_count++;
     }
     else if (dsp->t1d_ppindx_count > 0 && dsp->t1d_ppindx_count < 80) {
-      t1d_ppdraw_all(wid, hgt, margin, dsp, gg);
+      t1d_ppdraw_all(margin, dsp, gg);
       dsp->t1d_ppindx_count++;
     }
     else if (dsp->t1d_ppindx_count >= 80) 
@@ -675,7 +671,7 @@ void t1d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
       /* cycle values back into array */
       for (j=0; j<=dsp->t1d_ppindx_count; j++)
         dsp->t1d_ppindx_mat[j] = dsp->t1d_ppindx_mat[j+1];
-      t1d_ppdraw_all(wid, hgt, margin, dsp, gg);
+      t1d_ppdraw_all(margin, dsp, gg);
     }
   g_free (label);
 }

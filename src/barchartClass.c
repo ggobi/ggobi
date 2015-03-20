@@ -527,7 +527,7 @@ barchartDisplayClassInit (GGobiBarChartDisplayClass * klass)
 
 void
 barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
-                             GdkDrawable * drawable, ggobid * gg)
+                             cairo_t * cr, ggobid * gg)
 {
   barchartSPlotd *sp = GGOBI_BARCHART_SPLOT (rawsp);
   PangoLayout *layout =
@@ -540,19 +540,21 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
   gint j;
 
   nbins = sp->bar->nbins;
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  cairo_set_source (cr, scheme->rgb_accent);
 
   if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
     string = g_strdup_printf ("%ld point%s < %.2f", sp->bar->low_bin->count,
                               sp->bar->low_bin->count == 1 ? "" : "s",
                               sp->bar->breaks[0] + sp->bar->offset);
-
-    gdk_draw_rectangle (drawable, gg->plot_GC, FALSE,
-                        sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
-                        sp->bar->low_bin->rect.width,
-                        sp->bar->low_bin->rect.height);
+    cairo_rectangle (cr,
+                     sp->bar->low_bin->rect.x, sp->bar->low_bin->rect.y,
+                     sp->bar->low_bin->rect.width,
+                     sp->bar->low_bin->rect.height);
+    cairo_stroke (cr);
     layout_text (layout, string, NULL);
-    gdk_draw_layout (drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+
+    cairo_move_to (cr, mousepos.x, mousepos.y);
+    pango_cairo_show_layout (cr, layout);
     g_free (string);
   }
   for (i = 1; i < nbins + 1; i++) {
@@ -593,13 +595,15 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
                  sp->bar->bins[i - 1].count == 1 ? "" : "s", levelName);
 #endif
       }
-      gdk_draw_rectangle (drawable, gg->plot_GC, FALSE,
-                          sp->bar->bins[i - 1].rect.x,
-                          sp->bar->bins[i - 1].rect.y,
-                          sp->bar->bins[i - 1].rect.width,
-                          sp->bar->bins[i - 1].rect.height);
+      cairo_rectangle (cr,
+                       sp->bar->bins[i - 1].rect.x,
+                       sp->bar->bins[i - 1].rect.y,
+                       sp->bar->bins[i - 1].rect.width,
+                       sp->bar->bins[i - 1].rect.height);
+      cairo_stroke (cr);
       layout_text (layout, string, NULL);
-      gdk_draw_layout (drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+      cairo_move_to (cr, mousepos.x, mousepos.y);
+      pango_cairo_show_layout (cr, layout);
       g_free (string);
     }
   }
@@ -609,12 +613,14 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
                               sp->bar->high_bin->count == 1 ? "" : "s",
                               sp->bar->breaks[nbins] + sp->bar->offset);
 
-    gdk_draw_rectangle (drawable, gg->plot_GC, FALSE,
-                        sp->bar->high_bin->rect.x, sp->bar->high_bin->rect.y,
-                        sp->bar->high_bin->rect.width,
-                        sp->bar->high_bin->rect.height);
+    cairo_rectangle (cr,
+                     sp->bar->high_bin->rect.x, sp->bar->high_bin->rect.y,
+                     sp->bar->high_bin->rect.width,
+                     sp->bar->high_bin->rect.height);
+    cairo_stroke (cr);
     layout_text (layout, string, NULL);
-    gdk_draw_layout (drawable, gg->plot_GC, mousepos.x, mousepos.y, layout);
+    cairo_move_to (cr, mousepos.x, mousepos.y);
+    pango_cairo_show_layout (cr, layout);
     g_free (string);
   }
   g_object_unref (G_OBJECT (layout));

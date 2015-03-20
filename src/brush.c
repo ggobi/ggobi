@@ -57,31 +57,26 @@ ltype_from_gtype (gint gtype)
   return ltype;
 }
 
-/* sets dashes and returns a gtk line attribute */
-gint
-set_lattribute_from_ltype (gint ltype, ggobid * gg)
+void
+set_dash_from_ltype (gint ltype, cairo_t * cr)
 {
-  gint8 dash_list[2];
-  gint lattr = GDK_LINE_SOLID;
-
+  double dash_list[2];
+  
   switch (ltype) {    /* one of the three EDGETYPES; should be an enum */
   case SOLID:
-    lattr = GDK_LINE_SOLID;
     break;
   case WIDE_DASH:
-    lattr = GDK_LINE_ON_OFF_DASH;
     dash_list[0] = 8;
     dash_list[1] = 2;
-    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+    cairo_set_dash (cr, dash_list, 2, 0);
     break;
   case NARROW_DASH:
-    lattr = GDK_LINE_ON_OFF_DASH;
     dash_list[0] = 4;
     dash_list[1] = 2;
-    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+    cairo_set_dash (cr, dash_list, 2, 0);
     break;
   }
-  return lattr;
+
 }
 
 void
@@ -402,25 +397,24 @@ brush_boundaries_set (cpaneld * cpanel,
 }
 
 void
-brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiData * d,
+brush_draw_label (splotd * sp, cairo_t * cr, GGobiData * d,
                   ggobid * gg)
 {
   PangoRectangle rect;
-  PangoLayout *layout =
-    gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
+  PangoLayout *layout = pango_cairo_create_layout (cr);
 
   if (d->npts_under_brush > 0) {
     gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
     layout_text (layout, str, &rect);
-    gdk_draw_layout (drawable, gg->plot_GC,
-                     sp->max.x - rect.width - 5, 5, layout);
+    cairo_move_to(cr, sp->max.x - rect.width - 5, 5); 
+    pango_cairo_show_layout(cr, layout);
     g_free (str);
   }
   g_object_unref (G_OBJECT (layout));
 }
 
 void
-brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
+brush_draw_brush (splotd * sp, cairo_t * cr, GGobiData * d,
                   ggobid * gg)
 {
 /*
@@ -440,10 +434,8 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
   gint y2 = MAX (brush_pos->y1, brush_pos->y2);
 
   if (cpanel->br.mode == BR_TRANSIENT) {
-    gint8 dash_list[2];
-    gdk_gc_set_line_attributes (gg->plot_GC,
-                                0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND,
-                                GDK_JOIN_ROUND);
+    double dash_list[2];
+    
     /* just selection: set special dash pattern and draw like points */
     if (selection_p) {
       dash_list[0] = 2;
@@ -452,48 +444,48 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
       dash_list[0] = 4;
       dash_list[1] = 4;
     }
-    gdk_gc_set_dashes(gg->plot_GC, 0, dash_list, 2);
+    cairo_set_dash(cr, dash_list, 2, 0);
   }
   
   if (point_painting_p || selection_p) {
 
     /* set brush color for points */
     if (cpanel->br.point_targets == br_shadow) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+      cairo_set_source (cr, scheme->rgb_hidden);
     }
     else if (cpanel->br.point_targets == br_unshadow) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      cairo_set_source (cr, scheme->rgb_accent);
     }
     else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red ||
               scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue ||
               scheme->rgb[gg->color_id].green != scheme->rgb_bg.green) &&
              !selection_p) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+      cairo_set_source (cr, scheme->rgb[gg->color_id]);
     }
     else {
       /* for selection (at least) */
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      cairo_set_source (cr, scheme->rgb_accent);
     }
 
-    gdk_draw_rectangle (drawable, gg->plot_GC, false,
-                        x1, y1, (x2 > x1) ? (x2 - x1) : (x1 - x2),
-                        (y2 > y1) ? (y2 - y1) : (y1 - y2));
+    cairo_rectangle(cr, x1, y1,
+                    (x2 > x1) ? (x2 - x1) : (x1 - x2),
+                    (y2 > y1) ? (y2 - y1) : (y1 - y2));
+    cairo_stroke(cr);
+    
     /* Mark the corner to which the cursor will be attached */
-    gdk_draw_rectangle (drawable, gg->plot_GC, true,
-                        brush_pos->x2 - 1, brush_pos->y2 - 1, 2, 2);
-
+    cairo_rectangle(cr, brush_pos->x2 - 1, brush_pos->y2 - 1, 2, 2);
+    cairo_fill(cr);
+    
     /*
      * highlight brush: but only in the current display
      */
     if (cpanel->br.brush_on_p && display == gg->current_display) {
-      gdk_draw_rectangle (drawable, gg->plot_GC, false,
-                          x1 - 1, y1 - 1,
-                          (x2 > x1) ? (x2 - x1 + 2) : (x1 - x2 + 2),
-                          (y2 > y1) ? (y2 - y1 + 2) : (y1 - y2 + 2));
-
+      cairo_rectangle(cr, x1 - 1, y1 - 1,
+                      (x2 > x1) ? (x2 - x1 + 2) : (x1 - x2 + 2),
+                      (y2 > y1) ? (y2 - y1 + 2) : (y1 - y2 + 2));
       /* Mark the corner to which the cursor will be attached */
-      gdk_draw_rectangle (drawable, gg->plot_GC, true,
-                          brush_pos->x2 - 2, brush_pos->y2 - 2, 4, 4);
+      cairo_rectangle(cr, brush_pos->x2 - 2, brush_pos->y2 - 2, 4, 4);
+      cairo_stroke(cr);
     }
   }
 
@@ -501,39 +493,36 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
 
     /* set brush color for edges */
     if (cpanel->br.edge_targets == br_shadow) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+      cairo_set_source(cr, scheme->rgb_hidden);
     }
     else if (cpanel->br.point_targets == br_unshadow) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      cairo_set_source(cr, scheme->rgb_accent);
     }
-    else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
-             (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
-             (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green)) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+    else if (scheme->rgb[gg->color_id] != scheme->rgb_bg) {
+      cairo_set_source(cr, scheme->rgb[gg->color_id]);
     }
     else {
       /* I don't remember what this is for ... -- dfs */
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      cairo_set_source(cr, scheme->rgb_accent);
     }
 
-    gdk_draw_line (drawable, gg->plot_GC,
-                   x1 + (x2 - x1) / 2, y1, x1 + (x2 - x1) / 2, y2);
-    gdk_draw_line (drawable, gg->plot_GC,
-                   x1, y1 + (y2 - y1) / 2, x2, y1 + (y2 - y1) / 2);
-
+    cairo_move_to(cr, x1 + (x2 - x1) / 2, y1);
+    cairo_line_to(cr, x1 + (x2 - x1) / 2, y2);
+    cairo_move_to(cr, x1, y1 + (y2 - y1) / 2);
+    cairo_line_to(cr, x2, y1 + (y2 - y1) / 2);
+    
     if (cpanel->br.brush_on_p) {
-      gdk_draw_line (drawable, gg->plot_GC,
-                     x1 + (x2 - x1) / 2 + 1, y1, x1 + (x2 - x1) / 2 + 1, y2);
-      gdk_draw_line (drawable, gg->plot_GC,
-                     x1, y1 + (y2 - y1) / 2 + 1, x2, y1 + (y2 - y1) / 2 + 1);
+      cairo_move_to(cr, x1 + (x2 - x1) / 2 + 1, y1);
+      cairo_line_to(cr, x1 + (x2 - x1) / 2 + 1, y2);
+      cairo_move_to(cr, x1, y1 + (y2 - y1) / 2 + 1);
+      cairo_line_to(cr, x2, y1 + (y2 - y1) / 2 + 1);
     }
 
+    cairo_stroke(cr);
   }
 
   if (cpanel->br.mode == BR_TRANSIENT)
-    gdk_gc_set_line_attributes (gg->plot_GC,
-                                0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                                GDK_JOIN_ROUND);
+    cairo_set_dash(cr, NULL, 0, 0);
 }
 
 /*----------------------------------------------------------------------*/

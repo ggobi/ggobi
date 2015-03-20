@@ -217,6 +217,24 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   return retval;
 }
 
+/* Adapted from:
+   stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-triangle
+*/
+static gboolean point_in_triangle(GdkPoint p, GdkPoint *triangle)
+{
+  GdkPoint a = triangle[0], b = triangle[1], c = triangle[3];
+  int as_x = p.x-a.x;
+  int as_y = p.y-a.y;
+
+  bool p_ab = (b.x-a.x)*as_y-(b.y-a.y)*as_x > 0;
+
+  if((c.x-a.x)*as_y-(c.y-a.y)*as_x > 0 == p_ab) return false;
+
+  if((c.x-b.x)*(p.y-b.y)-(c.y-b.y)*(p.x-b.x) > 0 != p_ab) return false;
+
+  return true;
+}
+
 static gint
 mouse_motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
 {
@@ -232,25 +250,22 @@ mouse_motion_notify_cb (GtkWidget * w, GdkEventMotion * event, splotd * sp)
     return false;
 
   if (bsp->bar->is_histogram) {
-    GdkRegion *region;
     gboolean cursor_set = FALSE;
 
     /* This should be determined by when the button is pressed, and
      * not re-decided while the button is moving -- dfs */
-    region = gdk_region_polygon (bsp->bar->anchor_rgn, 3, GDK_WINDING_RULE);
-    if (gdk_region_point_in (region, sp->mousepos.x, sp->mousepos.y)) {
+    if (point_in_triangle (sp->mousepos, bsp->bar->anchor_rgn))
+    {
       splot_cursor_set (GDK_HAND2, sp);
       cursor_set = TRUE;
     }
-    gdk_region_destroy (region);
 
-    region = gdk_region_polygon (bsp->bar->offset_rgn, 3, GDK_WINDING_RULE);
-    if (gdk_region_point_in (region, sp->mousepos.x, sp->mousepos.y)) {
+    if (point_in_triangle (sp->mousepos, bsp->bar->offset_rgn))
+    {
       splot_cursor_set (GDK_BOTTOM_SIDE, sp);
       cursor_set = TRUE;
     }
-    gdk_region_destroy (region);
-
+    
     /* If all buttons are up and we're outside the triangular regions,
        restore the cursor to the default.
      */
@@ -389,7 +404,6 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   gboolean retval = true;
   ggobid *gg = GGobiFromSPlot (sp);
   gboolean button1_p, button2_p;
-  GdkRegion *region;
   barchartSPlotd *bsp = GGOBI_BARCHART_SPLOT (sp);
 
   mousepos_get_pressed (w, event, &button1_p, &button2_p, sp);
@@ -401,17 +415,13 @@ button_press_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
     bsp->bar->anchor_drag = FALSE;
     bsp->bar->width_drag = FALSE;
 
-    region = gdk_region_polygon (bsp->bar->anchor_rgn, 3, GDK_WINDING_RULE);
-    if (gdk_region_point_in (region, sp->mousepos.x, sp->mousepos.y)) {
+    if (point_in_triangle (sp->mousepos, bsp->bar->anchor_rgn)) {
       bsp->bar->anchor_drag = TRUE;
     }
-    gdk_region_destroy (region);
-
-    region = gdk_region_polygon (bsp->bar->offset_rgn, 3, GDK_WINDING_RULE);
-    if (gdk_region_point_in (region, sp->mousepos.x, sp->mousepos.y)) {
+    
+    if (point_in_triangle (sp->mousepos, bsp->bar->offset_rgn)) {
       bsp->bar->width_drag = TRUE;
     }
-    gdk_region_destroy (region);
   }
 
   sp->motion_id = g_signal_connect (G_OBJECT (sp->da),

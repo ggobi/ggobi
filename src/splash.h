@@ -1,6 +1,6 @@
 
 /* XPM */
-static char *splash[] = {
+static const char *splash[] = {
 /* width height num_colors chars_per_pixel */
 "   664   332        2            1",
 /* colors */

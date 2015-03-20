@@ -100,8 +100,8 @@ gboolean tsplotEventHandlersToggle(displayd *dpy, splotd *sp, gboolean state, Pr
 gboolean tsplotKeyEventHandled(GtkWidget *, displayd *, splotd *sp, GdkEventKey *, ggobid *);
 gchar *tsplot_tree_label(splotd *sp, GGobiData *d, ggobid *gg);
 
-GdkSegment * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, GGobiData *d);
-void tsplotAddPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg);
+isegments * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, GGobiData *d);
+void tsplotAddPlotLabels(displayd *display, splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg);
 
 
 

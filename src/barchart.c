@@ -38,8 +38,7 @@ void barchart_init_categorical (barchartSPlotd * sp, GGobiData * d);
 void barchart_set_initials (barchartSPlotd * sp, GGobiData * d);
 void rectangle_inset (gbind * bin);
 void barchart_allocate_structure (barchartSPlotd * sp, GGobiData * d);
-void button_draw_with_shadows (GdkPoint * region, GdkDrawable * drawable,
-                               ggobid * gg);
+void button_draw_with_shadows (GdkPoint * region, cairo_t * cr, ggobid * gg);
 gboolean rect_intersect (GdkRectangle * rect1, GdkRectangle * rect2,
                          GdkRectangle * dest);
 gboolean pt_in_rect (icoords pt, GdkRectangle rect);
@@ -670,28 +669,31 @@ barchart_redraw (splotd * rawsp, GGobiData * d, ggobid * gg, gboolean binned)
   barchart_recalc_counts (sp, d, gg);
   barchart_recalc_group_counts (sp, d, gg);
 
+  cairo_t *cr = cairo_create(rawsp->pixmap0);
+  
 /* dfs: if there are hiddens, draw the entire rectangle in the shadow color */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+  cairo_set_source (cr, scheme->rgb_hidden);
   for (i = 0; i < sp->bar->nbins; i++) {
     bin = &sp->bar->bins[i];
     if (bin->nhidden) {
-      gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
-                          bin->rect.x, bin->rect.y, bin->rect.width,
-                          bin->rect.height + 1);
+      cairo_rectangle (cr, bin->rect.x, bin->rect.y,
+                       bin->rect.width, bin->rect.height + 1);
     }
   }
+  cairo_fill(cr);
 /* */
   for (j = 0; j < sp->bar->ncolors; j++) {
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
+    cairo_set_source (cr, scheme->rgb[j]);
 
     for (i = 0; i < sp->bar->nbins; i++) {
       bin = &sp->bar->cbins[i][j];
       if (bin->count > 0) {
-        gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
-                            bin->rect.x, bin->rect.y, bin->rect.width,
-                            bin->rect.height);
+        cairo_rectangle (cr, bin->rect.x, bin->rect.y,
+                         bin->rect.width, bin->rect.height);
       }
     }
+
+    cairo_fill(cr);
   }
 
 /* draw overflow bins if necessary */
@@ -699,66 +701,70 @@ barchart_redraw (splotd * rawsp, GGobiData * d, ggobid * gg, gboolean binned)
     /*  start with the hiddens */
     if (sp->bar->high_bin->nhidden) {
       bin = sp->bar->high_bin;
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
-      gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
-                          bin->rect.x, bin->rect.y, bin->rect.width,
-                          bin->rect.height + 1);
+      cairo_set_source (cr, scheme->rgb_hidden);
+      cairo_rectangle (cr,
+                       bin->rect.x, bin->rect.y,
+                       bin->rect.width, bin->rect.height + 1);
+      cairo_fill(cr);
     }
     for (j = 0; j < sp->bar->ncolors; j++) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
+      cairo_set_source (cr, scheme->rgb[j]);
       bin = &sp->bar->col_high_bin[j];
-      if (bin->count > 0)
-        gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
-                            bin->rect.x, bin->rect.y, bin->rect.width,
-                            bin->rect.height);
+      if (bin->count > 0) {
+        cairo_rectangle (cr,
+                         bin->rect.x, bin->rect.y,
+                         bin->rect.width, bin->rect.height);
+        cairo_fill(cr);
+      }
     }
   }
   if (sp->bar->low_pts_missing) {
     /*  start with the hiddens */
     if (sp->bar->low_bin->nhidden) {
       bin = sp->bar->low_bin;
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
-      gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
-                          bin->rect.x, bin->rect.y, bin->rect.width,
-                          bin->rect.height + 1);
+      cairo_set_source (cr, scheme->rgb_hidden);
+      cairo_rectangle (cr,
+                       bin->rect.x, bin->rect.y,
+                       bin->rect.width, bin->rect.height + 1);
+      cairo_fill(cr);
     }
     for (j = 0; j < sp->bar->ncolors; j++) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
+      cairo_set_source (cr, scheme->rgb[j]);
       bin = &sp->bar->col_low_bin[j];
-      if (bin->count > 0)
-        gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
-                            bin->rect.x, bin->rect.y, bin->rect.width,
-                            bin->rect.height);
+      if (bin->count > 0) {
+        cairo_rectangle (cr,
+                         bin->rect.x, bin->rect.y,
+                         bin->rect.width, bin->rect.height);
+        cairo_stroke(cr);
+      }
     }
   }
 
 /* mark empty bins with a small circle */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  cairo_set_source (cr, scheme->rgb_accent);
   for (i = 0; i < sp->bar->nbins; i++) {
     bin = &sp->bar->bins[i];
     if (bin->count == 0) {
       radius = bin->rect.height / 4;
-      gdk_draw_line (rawsp->pixmap0, gg->plot_GC,
-                     bin->rect.x, bin->rect.y,
-                     bin->rect.x, bin->rect.y + bin->rect.height);
-      gdk_draw_arc (rawsp->pixmap0, gg->plot_GC, FALSE,
-                    bin->rect.x - radius / 2,
-                    bin->rect.y + bin->rect.height / 2 - radius / 2,
-                    radius, radius, 0, 64 * 360);
+      cairo_move_to(cr, bin->rect.x, bin->rect.y);
+      cairo_line_to (cr, bin->rect.x, bin->rect.y + bin->rect.height);
+      cairo_arc(cr, bin->rect.x, bin->rect.y + bin->rect.height / 2, radius,
+                0, 2*M_PI);
+      cairo_stroke(cr);
     }
   }
 
+  cairo_destroy(cr);
   return (false);
 }
 
 void
-barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
+barchart_splot_add_plot_labels (splotd * sp, cairo_t * cr,
                                 ggobid * gg)
 {
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
-  PangoLayout *layout =
-    gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
+  PangoLayout *layout = pango_cairo_create_layout (cr);
   PangoRectangle rect;
 
   vartabled *vtx;
@@ -766,8 +772,10 @@ barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
   vtx = vartable_element_get (sp->p1dvar, d);
 
   layout_text (layout, ggobi_data_get_col_name(d, sp->p1dvar), &rect);
-  gdk_draw_layout (drawable, gg->plot_GC, sp->max.x - rect.width - 5,
-                   sp->max.y - rect.height - 5, layout);
+  cairo_move_to (cr,
+                 sp->max.x - rect.width - 5,
+                 sp->max.y - rect.height - 5);
+  pango_cairo_show_layout (cr,  layout);
 
   if (vtx->vartype == categorical) {
     gint i;
@@ -790,10 +798,11 @@ barchart_splot_add_plot_labels (splotd * sp, GdkDrawable * drawable,
                                   -1) ? "missing" : vtx->level_names[level]);
 
       layout_text (layout, catname, NULL);
-      gdk_draw_layout (drawable, gg->plot_GC,
-                       bsp->bar->bins[i].rect.x + 2,
-                       bsp->bar->bins[i].rect.y +
-                       bsp->bar->bins[i].rect.height / 2 + 2, layout);
+      cairo_move_to(cr,
+                    bsp->bar->bins[i].rect.x + 2,
+                    bsp->bar->bins[i].rect.y +
+                      bsp->bar->bins[i].rect.height / 2 + 2);
+      pango_cairo_show_layout (cr, layout);
 
       g_free (catname);
     }
@@ -1413,7 +1422,7 @@ barchart_sort_index (gfloat * yy, gint ny, ggobid * gg, barchartSPlotd * sp)
 }
 
 void
-barchart_default_visual_cues_draw (splotd * rawsp, GdkDrawable * drawable,
+barchart_default_visual_cues_draw (splotd * rawsp, cairo_t * cr,
                                    ggobid * gg)
 {
   vartabled *vtx;
@@ -1454,8 +1463,7 @@ barchart_default_visual_cues_draw (splotd * rawsp, GdkDrawable * drawable,
     btn[0].y = y + halfwidth;
     btn[1].y = y - halfwidth;
     btn[2].y = y;
-    button_draw_with_shadows (btn, drawable, gg);
-    //button_draw_with_shadows(sp->bar->anchor_rgn, drawable, gg);
+    button_draw_with_shadows (btn, cr, gg);
 
 /* calculate & draw offset_rgn */
     y = sp->bar->bins[0].rect.y;
@@ -1476,37 +1484,34 @@ barchart_default_visual_cues_draw (splotd * rawsp, GdkDrawable * drawable,
     btn[0].y = y + halfwidth;
     btn[1].y = y - halfwidth;
     btn[2].y = y;
-    button_draw_with_shadows (btn, drawable, gg);
-    //button_draw_with_shadows(sp->bar->offset_rgn, drawable, gg);
+    button_draw_with_shadows (btn, cr, gg);
   }
 }
 
 void
-button_draw_with_shadows (GdkPoint * region, GdkDrawable * drawable,
-                          ggobid * gg)
+button_draw_with_shadows (GdkPoint * region, cairo_t * cr, ggobid * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
-  /*gdk_gc_set_foreground(gg->plot_GC, &gg->wvis.gray3); */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->lightgray);
-  gdk_draw_polygon (drawable, gg->plot_GC, TRUE, region, 3);
-
+  cairo_set_source (cr, gg->lightgray);
+  draw_polygon (cr, region, 3);
+  cairo_fill(cr);
+  
 /* dark shadows */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-
-  gdk_draw_polygon (drawable, gg->plot_GC, FALSE, region, 3);
-  gdk_draw_line (drawable, gg->plot_GC, region[0].x, region[2].y,
-                 region[2].x, region[2].y);
-
+  cairo_set_source (cr, scheme->rgb_bg);
+  draw_polygon (cr, region, 3);
+  cairo_move_to (cr, region[0].x, region[2].y);
+  cairo_line_to (cr, region[2].x, region[2].y);
+  cairo_stroke(cr);
+  
 /* light shadows */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-
-  gdk_draw_line (drawable, gg->plot_GC, region[0].x, region[0].y,
-                 region[1].x, region[1].y);
-  gdk_draw_line (drawable, gg->plot_GC, region[1].x, region[1].y,
-                 region[2].x, region[2].y);
-  gdk_draw_line (drawable, gg->plot_GC, region[0].x, region[2].y + 1,
-                 region[2].x, region[2].y + 1);
+  cairo_set_source (cr, scheme->rgb_accent);
+  cairo_move_to (cr, region[0].x, region[0].y);
+  cairo_line_to (cr, region[1].x, region[1].y);
+  cairo_line_to (cr, region[2].x, region[2].y);
+  cairo_move_to (cr, region[0].x, region[2].y + 1);
+  cairo_line_to (cr, region[2].x, region[2].y + 1);
+  cairo_stroke (cr);
 }
 
 gboolean
@@ -1540,7 +1545,7 @@ pt_in_rect (icoords pt, GdkRectangle rect)
 /* Cues that are drawn in the default mode, indicating that the
  * binwidth and anchor point can be changed. */
 void
-barchart_add_bar_cues (splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
+barchart_add_bar_cues (splotd * rawsp, cairo_t * cr, ggobid * gg)
 {
   displayd *display = rawsp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -1548,7 +1553,7 @@ barchart_add_bar_cues (splotd * rawsp, GdkDrawable * drawable, ggobid * gg)
   if (cpanel->imode != DEFAULT_IMODE)
     return;
 
-  barchart_default_visual_cues_draw (rawsp, drawable, gg);
+  barchart_default_visual_cues_draw (rawsp, cr, gg);
 }
 
 

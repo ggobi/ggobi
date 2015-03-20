@@ -450,20 +450,20 @@ void t2d_clear_pppixmap(displayd *dsp, ggobid *gg)
     hgt = dsp->t2d_ppda->allocation.height;
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (dsp->t2d_pp_pixmap, gg->plot_GC,
-                      true, 0, 0, wid, hgt);
+  cairo_t *cr = cairo_create(dsp->t2d_pp_pixmap);
+  cairo_set_source (cr, scheme->rgb_bg);
+  cairo_paint (cr);
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_line (dsp->t2d_pp_pixmap, gg->plot_GC,
-    margin, hgt - margin,
-    wid - margin, hgt - margin);
-  gdk_draw_line (dsp->t2d_pp_pixmap, gg->plot_GC,
-    margin, hgt - margin, margin, margin);
+  cairo_set_source (cr, scheme->rgb_accent);
+  cairo_move_to (cr, margin, hgt - margin);
+  cairo_line_to (cr, wid - margin, hgt - margin);
+  cairo_move_to (cr, margin, hgt - margin);
+  cairo_line_to (cr, margin, margin);
+  cairo_stroke (cr);
 
-  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
-                   0, 0, 0, 0,
-                   wid, hgt);
+  cairo_destroy (cr);
+  
+  redraw_widget (dsp->t2d_ppda);
 }
 
 void t2d_clear_ppda(displayd *dsp, ggobid *gg)
@@ -496,12 +496,15 @@ void t2d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
       dsp->t2d_indx_min)/(gfloat) (dsp->t2d_indx_max-dsp->t2d_indx_min)) * 
       (gfloat) (hgt - 2*margin));
   }
-  gdk_draw_lines (dsp->t2d_pp_pixmap, gg->plot_GC,
-    pptrace, dsp->t2d_ppindx_count);
 
-  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
-    0, 0, 0, 0, wid, hgt);
-
+  if (dsp->t2d_ppindx_count > 0) {
+    cairo_move_to (cr, pptrace[0].x, pptrace[0].y);
+    for (i=1; i<dsp->t2d_ppindx_count; i++) {
+      cairo_line_to (cr, pptrace[i].x, pptrace[i].y);
+    }
+  }
+  
+  redraw_widget (dsp->t2d_ppda);
 }
 
 /* This is writes text to the pp window to inform the
@@ -512,20 +515,17 @@ void t2d_ppdraw_think(displayd *dsp, ggobid *gg)
   colorschemed *scheme = gg->activeColorScheme;
   gint wid = dsp->t2d_ppda->allocation.width, 
     hgt = dsp->t2d_ppda->allocation.height;
-  PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, "Thinking...");
+  cairo_t *cr = cairo_create (dsp->t2d_pp_pixmap);
+  PangoLayout *layout = pango_cairo_create_layout (cr);
   
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_layout(dsp->t2d_pp_pixmap, gg->plot_GC, 10, 10, layout);
+  cairo_set_source (cr, scheme->rgb_accent);
+  cairo_move_to (cr, 10, 10);
+  pango_cairo_show_layout (cr, layout);
+  
   g_object_unref(G_OBJECT(layout));
-  /*gdk_text_extents (
-    gtk_style_get_font (style),
-    varlab, strlen (varlab),
-    &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (dsp->t2d_pp_pixmap,
-    gtk_style_get_font (style),
-     gg->plot_GC, 10, 10, varlab);*/
-  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
-    0, 0, 0, 0, wid, hgt);
+  cairo_destroy (cr);
+  
+  redraw_widget (dsp->t2d_ppda);
 }
 
 /* This is the pp index plot drawing routine */ 
@@ -556,8 +556,7 @@ void t2d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
   label = g_strdup_printf ("PP index: (%3.1f) %5.3f (%3.1f)",
     dsp->t2d_indx_min, dsp->t2d_ppindx_mat[dsp->t2d_ppindx_count], dsp->t2d_indx_max);
   gtk_label_set_text(GTK_LABEL(dsp->t2d_pplabel),label);
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  
   if (dsp->t2d_ppindx_count == 0) 
   {
     dsp->t2d_ppindx_count++;

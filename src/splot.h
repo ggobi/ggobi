@@ -39,7 +39,6 @@ typedef struct
 
 } GGobiSPlotClass;
 
-
 typedef struct 
 {
 
@@ -48,7 +47,7 @@ typedef struct
  displayd *displayptr;  /* a pointer to the enclosing display */
 
  GtkWidget *da;                 /* drawing_area */
- GdkPixmap *pixmap0, *pixmap1;  /* 2-stage drawing */
+ cairo_surface_t *pixmap0, *pixmap1;  /* 2-stage drawing */
 
  GdkCursor *cursor;
  GdkCursorType jcursor;
@@ -61,13 +60,13 @@ typedef struct
  /*
   * line segments in scatterplot and scatmat
  */
- GdkSegment *arrowheads;
- GdkSegment *edges;
+ isegments *arrowheads;
+ isegments *edges;
 
  /*
   * line segments in parallel coordinates plot
  */
- GdkSegment *whiskers;
+ isegments *whiskers;
 
  gcoords *planar;
  icoords *screen;
@@ -143,9 +142,9 @@ typedef struct
  struct _win32 {
    gint       npoints;
    GdkPoint   *points;
-   GdkSegment *segs;
-   GdkSegment *whisker_segs;
-   GdkSegment *ash_segs;
+   isegments *segs;
+   isegments *whisker_segs;
+   isegments *ash_segs;
    rectd      *open_rects;
    rectd      *filled_rects;
    arcd       *open_arcs;
@@ -176,11 +175,11 @@ typedef struct
  
    gboolean (*identify_notify)(icoords, splotd *, GGobiData *, ggobid *);
 
-   void (*add_plot_labels)(splotd *, GdkDrawable *, ggobid *gg);
-   void (*add_markup_cues)(splotd *, GdkDrawable *, ggobid *);
-   void (*add_scaling_cues)(splotd *, GdkDrawable *, ggobid *);
-   void (*add_identify_cues)(gboolean, gint k, splotd *, GdkDrawable *, ggobid *);
-   void (*add_identify_edge_cues)(gint k, splotd *, GdkDrawable *, gboolean, ggobid *);
+   void (*add_plot_labels)(splotd *, cairo_t *, ggobid *gg);
+   void (*add_markup_cues)(splotd *, cairo_t *, ggobid *);
+   void (*add_scaling_cues)(splotd *, cairo_t *, ggobid *);
+   void (*add_identify_cues)(gboolean, gint k, splotd *, cairo_t *, ggobid *);
+   void (*add_identify_edge_cues)(gint k, splotd *, cairo_t *, gboolean, ggobid *);
 
    gboolean (*redraw)(splotd *, GGobiData *, ggobid *, gboolean binned);
 
@@ -196,7 +195,7 @@ typedef struct
    gint (*active_paint_points)(splotd *, GGobiData *, ggobid *);
 
 
-   GdkSegment *(*alloc_whiskers)(GdkSegment *, splotd *sp, gint nrows, GGobiData *d);
+   isegments *(*alloc_whiskers)(isegments *, splotd *sp, gint nrows, GGobiData *d);
 
 	/** called from splot_plot_edge */
    gboolean (*draw_edge_p)(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg);
@@ -205,8 +204,8 @@ typedef struct
         first datad in splot_plot_edge and just hand it the one dataset. */
    gboolean (*draw_case_p)(splotd *sp, gint m, GGobiData *d, ggobid *gg);
 
-   void (*within_draw_to_binned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
-   void (*within_draw_to_unbinned)(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
+   void (*within_draw_to_binned)(splotd *sp, gint m, cairo_t *cr);
+   void (*within_draw_to_unbinned)(splotd *sp, gint m, cairo_t *cr);
 
   void (*splot_assign_points_to_bins)(GGobiData *, splotd *, ggobid *);
 

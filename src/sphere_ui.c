@@ -95,7 +95,7 @@ deleteit (ggobid * gg)
   for (l = gg->d; l; l = l->next)
     sphere_free ((GGobiData *) l->data);
 
-  gdk_pixmap_unref (gg->sphere_ui.scree_pixmap);
+  cairo_surface_destroy (gg->sphere_ui.scree_pixmap);
   gtk_widget_destroy (gg->sphere_ui.window);
 
   gg->sphere_ui.window = NULL;
@@ -134,8 +134,7 @@ vars_stdized_send_event (GGobiData * d, ggobid * gg)
       GTK_WIDGET_VISIBLE (gg->sphere_ui.stdized_entry)) {
     gboolean rval = false;
 
-    g_signal_emit_by_name (G_OBJECT (gg->sphere_ui.stdized_entry),
-                           "expose_event", (gpointer) d, (gpointer) & rval);
+    redraw_widget (gg->sphere_ui.stdized_entry);
   }
 }
 
@@ -254,17 +253,15 @@ static gint
 scree_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 {
   if (gg->sphere_ui.scree_pixmap != NULL)
-    gdk_pixmap_unref (gg->sphere_ui.scree_pixmap);
+    cairo_surface_destroy (gg->sphere_ui.scree_pixmap);
 
-  gg->sphere_ui.scree_pixmap = gdk_pixmap_new (w->window,
-                                               w->allocation.width,
-                                               w->allocation.height, -1);
+  gg->sphere_ui.scree_pixmap = create_buffer (w);
 
   return false;
 }
 
 static gint
-scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
+scree_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
   gint margin = 10;
   gint j;
@@ -279,17 +276,19 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 
   CHECK_GG (gg);
 
+  cairo_t *pix_cr = cairo_create(gg->sphere_ui.scree_pixmap);
+  
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (gg->sphere_ui.scree_pixmap, gg->plot_GC,
-                      true, 0, 0, wid, hgt);
+  cairo_set_source (pix_cr, scheme->rgb_bg);
+  cairo_paint (pix_cr);
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC,
-                 margin, hgt - margin, wid - margin, hgt - margin);
-  gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC,
-                 margin, hgt - margin, margin, margin);
-
+  cairo_set_source (pix_cr, scheme->rgb_accent);
+  cairo_move_to (pix_cr, margin, hgt - margin);
+  cairo_line_to (pix_cr, wid - margin, hgt - margin);
+  cairo_move_to (pix_cr, margin, hgt - margin);
+  cairo_line_to (pix_cr, margin, margin);
+  cairo_stroke (pix_cr);
+  
   if (d != NULL) {
 
     sphvars = (gint *) g_malloc (d->ncols * sizeof (gint));
@@ -307,16 +306,18 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
         (gint) (((gfloat) (hgt - margin)) -
                 evals[j] / evals[0] * (hgt - 2 * margin));
       tickmk = g_strdup_printf ("%d", j + 1);
-      layout = gtk_widget_create_pango_layout (gg->sphere_ui.scree_da, NULL);
+      layout = pango_cairo_create_layout (pix_cr);
       layout_text (layout, tickmk, &rect);
-      gdk_draw_layout (gg->sphere_ui.scree_pixmap, gg->plot_GC, xpos,
-                       hgt - margin / 2 - 0.75 * rect.height, layout);
+      cairo_move_to (pix_cr, xpos, hgt - margin / 2 - 0.75 * rect.height);
+      pango_cairo_show_layout (pix_cr, layout);
       g_object_unref (G_OBJECT (layout));
       g_free (tickmk);
 
-      if (j > 0)
-        gdk_draw_line (gg->sphere_ui.scree_pixmap,
-                       gg->plot_GC, xstrt, ystrt, xpos, ypos);
+      if (j > 0) {
+        cairo_move_to (pix_cr, xstrt, ystrt);
+        cairo_line_to (pix_cr, xpos, ypos);
+        cairo_stroke (pix_cr);
+      }
 
       xstrt = xpos;
       ystrt = ypos;
@@ -325,8 +326,7 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
     g_free ((gpointer) evals);
   }
 
-  gdk_draw_pixmap (w->window, gg->plot_GC, gg->sphere_ui.scree_pixmap,
-                   0, 0, 0, 0, w->allocation.width, w->allocation.height);
+  show_buffer(cr, gg->sphere_ui.scree_pixmap);
   return false;
 }
 
@@ -342,8 +342,7 @@ scree_plot_make (ggobid * gg)
 
   if (pca_calc (d, gg)) {  /*-- spherevars_set is called here --*/
     gboolean rval = false;
-    g_signal_emit_by_name (G_OBJECT (gg->sphere_ui.scree_da),
-                           "expose_event", (gpointer) gg, (gpointer) & rval);
+    redraw_widget (gg->sphere_ui.scree_da);
     pca_diagnostics_set (d, gg);
   }
   else {
@@ -449,8 +448,8 @@ sphere_panel_open (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.scree_da, true, true, 1);
 
     g_signal_connect (G_OBJECT (gg->sphere_ui.scree_da),
-                      "expose_event",
-                      G_CALLBACK (scree_expose_cb), (gpointer) gg);
+                      "draw",
+                      G_CALLBACK (scree_draw_cb), (gpointer) gg);
     g_signal_connect (G_OBJECT (gg->sphere_ui.scree_da),
                       "configure_event",
                       G_CALLBACK (scree_configure_cb), (gpointer) gg);

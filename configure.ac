@@ -173,11 +173,9 @@ AC_PATH_PROG(GOB2, gob2,,$PATH)
 
 PKG_PROG_PKG_CONFIG(0.20)
 
-# FIND GTK2
+ echo "Looking for gtk3"
 
- echo "Looking for gtk2"
-
-PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.6.0])
+PKG_CHECK_MODULES(GTK, [gtk+-3.0])
 
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)

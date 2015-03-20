@@ -319,7 +319,7 @@ ggobi_alloc (ggobid * tmp)
   tmp->printOptions = NULL;
   tmp->pluginInstances = NULL;
 
-  tmp->plot_GC = NULL;
+  tmp->plot_cr = NULL;
 
 
   tmp->colorSchemes = sessionOptions->colorSchemes;

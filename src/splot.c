@@ -60,21 +60,12 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
   /*-- Create new backing pixmaps of the appropriate size --*/
   if (sp->pixmap0 != NULL)
-    gdk_pixmap_unref (sp->pixmap0);
+    cairo_surface_destroy (sp->pixmap0);
   if (sp->pixmap1 != NULL)
-    gdk_pixmap_unref (sp->pixmap1);
-/*
-  sp->pixmap0 = gdk_pixmap_new (w->window,
-    w->allocation.width, w->allocation.height, -1);
-  sp->pixmap1 = gdk_pixmap_new (w->window,
-    w->allocation.width, w->allocation.height, -1);
-*/
+    cairo_surface_destroy (sp->pixmap1);
 
-  renderer = ggobi_renderer_factory_create(factory, w->window);
-  sp->pixmap0 = GDK_DRAWABLE(renderer);
-  renderer = ggobi_renderer_factory_create(factory, w->window);
-  sp->pixmap1 = GDK_DRAWABLE(renderer);
-  g_object_unref(G_OBJECT(factory));
+  sp->pixmap0 = create_buffer(w->window);
+  sp->pixmap1 = create_buffer(w->window);
   
   if (cpanel->imode == BRUSH) {
     sp->brush_pos.x1 = (gint) ((gfloat) sp->brush_pos.x1 *
@@ -117,7 +108,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
 
 
 static gint
-splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
+splot_draw_cb (GtkWidget *w, cairo_t *cr, splotd *sp)
 {
   gboolean retval = true;
   ggobid *gg = GGobiFromSPlot (sp);
@@ -128,20 +119,20 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
   if (w->allocation.width < 2 || w->allocation.height < 2)
     return retval;
 
-  splot_redraw (sp, sp->redraw_style, gg);
+  show_buffer(cr, splot_redraw_pixmap (sp, sp->redraw_style, gg));
 
   return retval;
 }
 
 void
-splot_connect_expose_handler (gboolean idled, splotd *sp) 
+splot_connect_draw_handler (gboolean idled, splotd *sp) 
 {
   if (idled)  // if idle_proc running
     g_signal_handlers_disconnect_by_func (G_OBJECT (sp->da),
-       G_CALLBACK(splot_expose_cb), GTK_OBJECT (sp));
+       G_CALLBACK(splot_draw_cb), GTK_OBJECT (sp));
   else
     g_signal_connect (G_OBJECT (sp->da),
-      "expose_event", G_CALLBACK(splot_expose_cb), (gpointer) sp);
+      "draw", G_CALLBACK(splot_draw_cb), (gpointer) sp);
 }
 
 /*-- this will be called by a key_press_cb for each scatterplot mode --*/
@@ -379,10 +370,10 @@ splot_edges_realloc (gint nedges_prev, splotd *sp, GGobiData *e)
 {
   gint i;
 
-  sp->edges = (GdkSegment *) g_realloc ((gpointer) sp->edges,
-    e->edge.n * sizeof (GdkSegment));
-  sp->arrowheads = (GdkSegment *) g_realloc ((gpointer) sp->arrowheads,
-    e->edge.n * sizeof (GdkSegment));
+  sp->edges = (isegments *) g_realloc ((gpointer) sp->edges,
+    e->edge.n * sizeof (isegments));
+  sp->arrowheads = (isegments *) g_realloc ((gpointer) sp->arrowheads,
+    e->edge.n * sizeof (isegments));
 
   /*-- these aren't useful values, but they're finite --*/
   if (nedges_prev > 0) {
@@ -466,8 +457,8 @@ splot_init(splotd *sp, displayd *display, ggobid *gg)
   gtk_widget_set_double_buffered(sp->da, false);
 
   g_signal_connect (G_OBJECT (sp->da),
-                      "expose_event",
-                      G_CALLBACK(splot_expose_cb),
+                      "draw",
+                      G_CALLBACK(splot_draw_cb),
                       (gpointer) sp);
   g_signal_connect (G_OBJECT (sp->da),
                       "configure_event",

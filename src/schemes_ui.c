@@ -85,7 +85,7 @@ colorscheme_set_cb (GtkTreeSelection * sel, GtkTreeView * tree_view)
     d = (GGobiData *) g_slist_nth_data (gg->d, 0);
   }
 
-  g_signal_emit_by_name (G_OBJECT (gg->svis.da), "expose_event",
+  g_signal_emit_by_name (G_OBJECT (gg->svis.da), "draw",
                          (gpointer) gg, (gpointer) & rval);
 }
 
@@ -111,10 +111,8 @@ da_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 {
   /*-- Create new backing pixmaps of the appropriate size --*/
   if (gg->svis.pix != NULL)
-    gdk_pixmap_unref (gg->svis.pix);
-  gg->svis.pix = gdk_pixmap_new (w->window,
-                                 w->allocation.width, w->allocation.height,
-                                 -1);
+    cairo_surface_destroy (gg->svis.surface);
+  gg->svis.surface = create_buffer(w);
 
   gtk_widget_queue_draw (w);
 
@@ -141,17 +139,17 @@ bin_boundaries_set (GGobiData * d, ggobid * gg)
 }
 
 static void
-da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+da_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
   gint height = w->allocation.height - 2 * ymargin;
   gint x0, x1, k, hgt;
   colorschemed *scheme = (gg->svis.scheme != NULL) ?
     gg->svis.scheme : gg->activeColorScheme;
   GGobiData *d = NULL;
-  GdkPixmap *pix = gg->svis.pix;
+  cairo_surface_t *surface = gg->svis.surface;
 
-  if (gg->svis.GC == NULL)
-    gg->svis.GC = gdk_gc_new (w->window);
+  if (gg->svis.cr == NULL)
+    gg->svis.cr = cairo_create (surface);
 
   hgt = height / (scheme->n - 1);
 
@@ -163,22 +161,20 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
   }
 
   /*-- clear the pixmap --*/
-  gdk_gc_set_foreground (gg->svis.GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (pix, gg->svis.GC, TRUE,
-                      0, 0, w->allocation.width, w->allocation.height);
-
+  cairo_set_source (gg->svis.cr, scheme->rgb_bg);
+  cairo_paint (gg->svis.cr);
 
   /*-- draw the color bars --*/
   x0 = xmargin;
   for (k = 0; k < scheme->n; k++) {
     x1 = xmargin + gg->svis.pct[k] * (w->allocation.width - 2 * xmargin);
-    gdk_gc_set_foreground (gg->svis.GC, &scheme->rgb[k]);
-    gdk_draw_rectangle (pix, gg->svis.GC, TRUE, x0, ymargin, x1 - x0, height);
+    cairo_set_source (gg->svis.cr, scheme->rgb[k]);
+    cairo_draw_rectangle (gg->svis.cr, x0, ymargin, x1 - x0, height);
+    cairo_fill(gg->svis.cr);
     x0 = x1;
   }
 
-  gdk_draw_pixmap (w->window, gg->svis.GC, pix,
-                   0, 0, 0, 0, w->allocation.width, w->allocation.height);
+  show_buffer(cr, surface);
 }
 
 
@@ -305,8 +301,7 @@ scale_set_cb (GtkWidget * w, ggobid * gg)
   }
 
   displays_plot (NULL, FULL, gg);
-  g_signal_emit_by_name (G_OBJECT (gg->svis.da), "expose_event",
-                         (gpointer) gg, (gpointer) & rval);
+  redraw_widget (w);
 
   entry_set_scheme_name (gg);
 
@@ -414,8 +409,8 @@ svis_window_open (ggobid * gg)
                       "configure_event",
                       G_CALLBACK (da_configure_cb), (gpointer) gg);
     g_signal_connect (G_OBJECT (gg->svis.da),
-                      "expose_event",
-                      G_CALLBACK (da_expose_cb), (gpointer) gg);
+                      "draw",
+                      G_CALLBACK (da_draw_cb), (gpointer) gg);
 
     gtk_widget_set_events (gg->svis.da, GDK_EXPOSURE_MASK);
 

@@ -72,7 +72,7 @@ close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
 }
 
 static gint
-cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
+cluster_symbol_show (GtkWidget * w, cairo_t * cr, gpointer cbd)
 {
   gint k = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget (w, true);
@@ -80,20 +80,19 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   glyphd g;
   GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   colorschemed *scheme = gg->activeColorScheme;
-
+  
   /*-- fill in the background color --*/
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  cairo_set_source (cr, scheme->rgb_bg);
+  cairo_paint (cr);
 
   /*-- draw the appropriate symbol in the appropriate color --*/
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[d->clusv[k].color]);
   g.type = d->clusv[k].glyphtype;
   g.size = d->clusv[k].glyphsize;
 
   pos.x = w->allocation.width / 2;
   pos.y = w->allocation.height / 2;
-  draw_glyph (w->window, &g, &pos, 0, gg);
+  cairo_set_source (cr, scheme->rgb[d->clusv[k].color]);
+  draw_glyph (cr, &g, &pos, 0, gg);
 
   return FALSE;
 }
@@ -326,8 +325,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     }
   }
 
-  g_signal_emit_by_name (G_OBJECT (w), "expose_event",
-                         (gpointer) gg, (gpointer) & rval);
+  redraw_widget (w);
 
   /* clusters_set reorders clusv, so it's bad news here */
   /*clusters_set (d, gg); */
@@ -352,7 +350,7 @@ cluster_add (gint k, GGobiData * d, ggobid * gg)
                          GDK_EXPOSURE_MASK | GDK_ENTER_NOTIFY_MASK
                          | GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
 
-  g_signal_connect (G_OBJECT (d->clusvui[k].da), "expose_event",
+  g_signal_connect (G_OBJECT (d->clusvui[k].da), "draw",
                     G_CALLBACK (cluster_symbol_show), GINT_TO_POINTER (k));
   g_signal_connect (G_OBJECT (d->clusvui[k].da), "button_press_event",
                     G_CALLBACK (cluster_symbol_cb), GINT_TO_POINTER (k));

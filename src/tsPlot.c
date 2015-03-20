@@ -28,10 +28,10 @@ static void tsWorldToPlane(splotd *sp, GGobiData *d, ggobid *gg);
 static void tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiData *d, ggobid *gg);
 static gboolean tsDrawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg);
 static gboolean tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg);
-static void tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) ;
-static void tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
-static void tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc);
-static GdkSegment * tsAllocWhiskers(GdkSegment *, splotd *sp, gint nrows, GGobiData *d);
+static void tsAddPlotLabels(splotd *sp, cairo_t *cr, ggobid *gg) ;
+static void tsWithinDrawBinned(splotd *sp, gint m, cairo_t *cr, GdkGC *gc);
+static void tsShowWhiskers(splotd *sp, gint m, cairo_t *cr, GdkGC *gc);
+static isegments * tsAllocWhiskers(isegments *, splotd *sp, gint nrows, GGobiData *d);
 static gchar *tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg);
 
 
@@ -85,51 +85,49 @@ tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg)
 }
 
 void
-tsAddPlotLabels(splotd *sp, GdkDrawable *drawable, ggobid *gg) 
+tsAddPlotLabels(splotd *sp, cairo_t *cr, ggobid *gg) 
 {
   displayd *display = sp->displayptr;
   GList *l = display->splots;
-  PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, NULL);
+  PangoLayout *layout = pango_cairo_create_layout(cr);
   PangoRectangle rect;
 
   if (l->data == sp) {
     layout_text(layout, ggobi_data_get_transformed_col_name(display->d, sp->xyvars.x), &rect);
-      gdk_draw_layout(drawable, gg->plot_GC, 
-      sp->max.x - rect.width - 5,
-      sp->max.y - rect.height - 5,
-      layout
-    );
+    cairo_move_to(cr,
+                  sp->max.x - rect.width - 5,
+                  sp->max.y - rect.height - 5);
+    pango_cairo_show_layout(cr, layout);
   }
   layout_text(layout, ggobi_data_get_transformed_col_name(display->d, sp->xyvars.y), &rect);
-  gdk_draw_layout(drawable, gg->plot_GC, 5, 5, layout);
+  cairo_move_to(cr, 5, 5);
+  pango_cairo_show_layout(cr, layout);
   g_object_unref(G_OBJECT(layout));
 }
 
 void
-tsWithinDrawBinned(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
+tsWithinDrawBinned(splotd *sp, gint m, cairo_t *cr)
 {
-  gdk_draw_line (drawable, gc,
-    sp->whiskers[m].x1, sp->whiskers[m].y1,
-    sp->whiskers[m].x2, sp->whiskers[m].y2);
+  cairo_move_to(cr, sp->whiskers[m].x1, sp->whiskers[m].y1);
+  cairo_line_to(cr, sp->whiskers[m].x2, sp->whiskers[m].y2);
 }
 
 
 void
-tsShowWhiskers(splotd *sp, gint m, GdkDrawable *drawable, GdkGC *gc)
+tsShowWhiskers(splotd *sp, gint m, cairo_t *cr)
 {
   displayd *dpy = sp->displayptr;
      /*-- there are n-1 whiskers --*/
-  if (dpy->options.whiskers_show_p && m < dpy->d->nrows_in_plot-1) 
-     gdk_draw_line (drawable, gc,
-       sp->whiskers[m].x1, sp->whiskers[m].y1,
-       sp->whiskers[m].x2, sp->whiskers[m].y2);
+  if (dpy->options.whiskers_show_p && m < dpy->d->nrows_in_plot-1) {
+    cairo_move_to(cr, sp->whiskers[m].x1, sp->whiskers[m].y1);
+    cairo_line_to(cr, sp->whiskers[m].x2, sp->whiskers[m].y2);
+  }
 }
 
-
-GdkSegment * 
-tsAllocWhiskers(GdkSegment *whiskers, splotd *sp, gint nrows, GGobiData *d)
+isegments * 
+tsAllocWhiskers(isegments *whiskers, splotd *sp, gint nrows, GGobiData *d)
 {
-  return((GdkSegment *) g_realloc (whiskers, (nrows-1) * sizeof (GdkSegment)));
+  return((isegments *) g_realloc (whiskers, (nrows-1) * sizeof (isegments)));
 }
 
 gchar *

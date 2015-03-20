@@ -199,9 +199,8 @@ struct _ggobid {
 /*--------------------------------------------------------------------*/
 /*                         color                                      */
 /*--------------------------------------------------------------------*/
-  GdkGC *rectangle_GC;
-  GdkColor mediumgray, lightgray, darkgray;  /* for 3d rectangles */
-  GdkColor vcirc_freeze_color, vcirc_manip_color; /* for variable circles */
+  cairo_surface_t *mediumgray, *lightgray, *darkgray;  /* for 3d rectangles */
+  cairo_surface_t *vcirc_freeze_color, *vcirc_manip_color; /* for variable circles */
   gshort color_id, color_0;     /* 0:ncolors-1 */
   gboolean mono_p;
 
@@ -218,10 +217,9 @@ struct _ggobid {
 
 /*---------------------- graphics contexts -----------------------------*/
 
-  GdkGC *plot_GC;
-  GdkGC *selvarfg_GC, *selvarbg_GC;     /* white background, thick lines */
-  GdkGC *unselvarfg_GC, *unselvarbg_GC; /* grey background, thin lines */
-  GdkGC *manipvarfg_GC;         /* white background, thin purple line */
+  //GdkGC *selvarfg_GC, *selvarbg_GC;     /* white background, thick lines */
+  //GdkGC *unselvarfg_GC, *unselvarbg_GC; /* grey background, thin lines */
+  //GdkGC *manipvarfg_GC;         /* white background, thin purple line */
 
 /*--------------------------- jittering --------------------------------*/
 
@@ -341,7 +339,7 @@ struct _ggobid {
   struct _Sphere {
     GtkWidget *window;
     GtkWidget *scree_da;
-    GdkPixmap *scree_pixmap;
+    cairo_surface_t *scree_pixmap;
 
     GtkObject *npcs_adj;
     GtkWidget *stdized_entry, *variance_entry, *condnum_entry;
@@ -363,9 +361,9 @@ struct _ggobid {
 
   struct _SchemeChooser {
     GtkWidget *window, *entry_preview, *entry_applied, *da;
-    GdkPixmap *pix;
+    cairo_surface_t *surface;
     colorschemed *scheme; /*-- current color scheme --*/
-    GdkGC *GC;
+    cairo_t *cr;
     gfloat *pct;
     gint npct;
   } svis;
@@ -374,9 +372,8 @@ struct _ggobid {
 
   struct _WeightedVis {
     GtkWidget *window, *da;
-    GdkPixmap *pix;
-    GdkGC *GC;
-
+    cairo_surface_t *pix;
+    
     gfloat *pct;
     gint npct;
     gint *n;   /*-- number of points that will take on each color --*/

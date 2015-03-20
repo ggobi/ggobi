@@ -859,5 +859,7 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
   return d;
 }
 
-
-
+void
+redraw_widget (GtkWidget *w) {
+  gtk_widget_queue_draw_area(w, 0, 0, w->allocation.width, w->allocation.height);
+}

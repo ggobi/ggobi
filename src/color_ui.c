@@ -110,10 +110,8 @@ choose_glyph_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 
   gg->glyph_id.type = type;
   gg->glyph_id.size = size;
-  g_signal_emit_by_name (G_OBJECT (gg->color_ui.symbol_display),
-                         "expose_event", (gpointer) sp, (gpointer) & rval);
-  g_signal_emit_by_name (G_OBJECT (gg->color_ui.line_display),
-                         "expose_event", (gpointer) sp, (gpointer) & rval);
+  redraw_widget (gg->color_ui.symbol_display);
+  redraw_widget (gg->color_ui.line_display);
 }
 
 static void
@@ -164,7 +162,7 @@ find_symbol_selection_circle_pos (icoords * pos, ggobid * gg)
 }
 
 static void
-redraw_symbol_display (GtkWidget * w, ggobid * gg)
+redraw_symbol_display (GtkWidget * w, cairo_t *cr, ggobid * gg)
 {
   gint i;
   glyphd g;
@@ -177,13 +175,9 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
   margin = gg->color_ui.margin;
   spacing = gg->color_ui.spacing;
 
-  if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+  cairo_set_source(cr, scheme->rgb_bg);
+  cairo_paint(cr);
+  cairo_set_source (cr, scheme->rgb[gg->color_id]);
 
   /*
    * The factor of three is dictated by the sizing of circles
@@ -191,8 +185,9 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
    */
   pos.y = margin + 3 / 2;
   pos.x = spacing / 2;
-  gdk_draw_point (w->window, gg->plot_GC, pos.x, pos.y);
-
+  cairo_rectangle (cr, pos.x, pos.y, 1 , 1);
+  cairo_fill(cr);
+  
   pos.y = 0;
   for (i = 0; i < NGLYPHSIZES; i++) {
     g.size = i;
@@ -200,27 +195,27 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
     pos.x = spacing + spacing / 2;
 
     g.type = PLUS;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (cr, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = X;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (cr, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = OC;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (cr, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = OR;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (cr, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = FC;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (cr, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = FR;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (cr, &g, &pos, 0, gg);
   }
 
   if (!gg->mono_p) {
@@ -229,21 +224,18 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
     gint radius = (3 * NGLYPHSIZES) / 2 + gg->color_ui.margin / 2;
     find_symbol_selection_circle_pos (&p, gg);
 
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-    gdk_gc_set_line_attributes (gg->plot_GC,
-                                2, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                                GDK_JOIN_ROUND);
-    gdk_draw_arc (w->window, gg->plot_GC, false, p.x - radius, p.y - radius,
-                  2 * radius, 2 * radius, 0, (gshort) 23040);
-    gdk_gc_set_line_attributes (gg->plot_GC, 0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                                GDK_JOIN_ROUND);
+    cairo_set_source (cr, scheme->rgb_accent);
+    cairo_set_line_width(cr, 2);
+    cairo_arc(cr, p.x, p.y, radius, 0, 2*M_PI);
+    cairo_set_line_width(cr, 0);
   }
+
 }
 
 static gint
-symbol_display_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+symbol_display_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
-  redraw_symbol_display (w, gg);
+  redraw_symbol_display (w, cr, gg);
   return FALSE;
 }
 
@@ -302,21 +294,22 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
   gint i, linewidth;
   icoords pos;
   gint margin, spacing;
-  gint8 dash_list[2];
+  double dash_list[2];
   colorschemed *scheme = gg->activeColorScheme;
 
   margin = gg->color_ui.margin;
   spacing = gg->color_ui.spacing;
 
-  if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
+  cairo_t *cr = gdk_cairo_create(w->window);
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+  cairo_set_source (cr, scheme->rgb_bg);
+  cairo_paint(cr);
+  cairo_set_source (cr, scheme->rgb[gg->color_id]);
 
   pos.y = 0;
+  cairo_save(cr);
+  cairo_set_line_width(cr, linewidth);
+  cairo_set_line_cap(cr, CAIRO_CAP_BUTT);
   for (i = 0; i < NGLYPHSIZES; i++) {
     linewidth = (i < 3) ? 0 : (i - 2) * 2;
     pos.y += (margin + ((i == 0) ? (3 * i) / 2 : 3 * i));
@@ -324,49 +317,48 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
     pos.x = spacing;
     dash_list[0] = 4;
     dash_list[1] = 2;
-    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
-    gdk_gc_set_line_attributes (gg->plot_GC, linewidth,
-                                GDK_LINE_ON_OFF_DASH, GDK_CAP_BUTT,
-                                GDK_JOIN_ROUND);
-    gdk_draw_line (w->window, gg->plot_GC, pos.x, pos.y, pos.x + spacing,
-                   pos.y);
-
+    cairo_set_dash (cr, dash_list, 2, 0);
+    cairo_move_to(cr, pos.x, pos.y);
+    cairo_line_to(cr, pos.x + spacing, pos.y);
+    cairo_stroke(cr);
+    
     pos.x += (2 * spacing);
-    gdk_gc_set_line_attributes (gg->plot_GC, linewidth,
-                                GDK_LINE_ON_OFF_DASH, GDK_CAP_BUTT,
-                                GDK_JOIN_ROUND);
+    
     dash_list[0] = 8;
     dash_list[1] = 2;
-    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
-    gdk_draw_line (w->window, gg->plot_GC,
-                   pos.x, pos.y, pos.x + spacing, pos.y);
-
+    cairo_set_dash (cr, dash_list, 2, 0);
+    cairo_move_to(cr, pos.x, pos.y);
+    cairo_line_to(cr, pos.x + spacing, pos.y);
+    cairo_stroke(cr);
+    
     pos.x += (2 * spacing);
-    gdk_gc_set_line_attributes (gg->plot_GC, linewidth,
-                                GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-    gdk_draw_line (w->window, gg->plot_GC,
-                   pos.x, pos.y, pos.x + spacing, pos.y);
+    cairo_set_dash(cr, NULL, 0, 0);
+    cairo_move_to(cr, pos.x, pos.y);
+    cairo_line_to(cr, pos.x + spacing, pos.y);
+    cairo_stroke(cr);
   }
 
-  gdk_gc_set_line_attributes (gg->plot_GC, 0,
-                              GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-
+  cairo_restore(cr);
+  
   if (!gg->mono_p) {
     icoords p;
     find_line_selection_pos (&p, gg);
 
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-    gdk_draw_rectangle (w->window, gg->plot_GC, false,
-                        p.x - spacing / 2 - margin / 2,
-                        p.y - (NGLYPHSIZES + 1) / 2 - margin / 2,
-                        spacing + margin, (NGLYPHSIZES + 1) + margin);
+    cairo_set_source (cr, scheme->rgb_accent);
+    cairo_rectangle (cr, false,
+                     p.x - spacing / 2 - margin / 2,
+                     p.y - (NGLYPHSIZES + 1) / 2 - margin / 2,
+                     spacing + margin, (NGLYPHSIZES + 1) + margin);
+    cairo_stroke(cr);
   }
+
+  cairo_destroy(cr);
 }
 
 static gint
-line_display_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+line_display_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
-  redraw_line_display (w, gg);
+  redraw_line_display (w, cr, gg);
   return FALSE;
 }
 
@@ -401,14 +393,12 @@ set_color_fg (GtkWidget * w, GdkEventButton * event, ggobid * gg)
   }
   else {
     gint rval = false;
-    g_signal_emit_by_name (G_OBJECT (gg->color_ui.symbol_display),
-                           "expose_event", (gpointer) gg, (gpointer) & rval);
-    g_signal_emit_by_name (G_OBJECT (gg->color_ui.line_display),
-                           "expose_event", (gpointer) gg, (gpointer) & rval);
+    redraw_widget (gg->color_ui.symbol_display);
+    redraw_widget (gg->color_ui.line_display);
   }
 
-  redraw_fg (gg->color_ui.fg_da[prev], prev, gg);
-  redraw_fg (w, k, gg);
+  redraw_widget (gg->color_ui.fg_da[prev]);
+  redraw_widget (w);
 }
 
 static gint
@@ -436,140 +426,107 @@ set_color_id (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 
 /*-- Redraw one of the foreground color swatches --*/
 static void
-redraw_fg (GtkWidget * w, gint k, ggobid * gg)
+redraw_fg (GtkWidget * w, cairo_t *cr, gint k, ggobid * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
-  if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
-
-  gdk_gc_set_foreground (gg->plot_GC, &gg->activeColorScheme->rgb[k]);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  cairo_set_source (cr, gg->activeColorScheme->rgb[k]);
+  cairo_paint(cr);
 
   /*
    * Draw a background border around the box containing the selected color
    */
   if (k == gg->color_id) {
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-    gdk_draw_rectangle (w->window, gg->plot_GC,
-                        false, 0, 0, w->allocation.width - 1,
-                        w->allocation.height - 1);
-    gdk_draw_rectangle (w->window, gg->plot_GC, false, 1, 1,
-                        w->allocation.width - 2, w->allocation.height - 2);
+    cairo_set_source (cr, scheme->rgb_bg);
+    cairo_rectangle (cr, 0, 0,
+                     w->allocation.width - 1, w->allocation.height - 1);
+    cairo_rectangle (cr, 1, 1,
+                     w->allocation.width - 2, w->allocation.height - 2);
+    cairo_stroke(cr);
   }
 }
 
 static gint
-color_expose_fg (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+color_draw_fg (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
   gint k = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (w), "index"));
 
   if (k <= gg->activeColorScheme->n)
-    redraw_fg (w, k, gg);
+    redraw_fg (w, cr, k, gg);
 
   return FALSE;
 }
 
+static void
+fill_with_pattern(cairo_t *cr, cairo_pattern_t *pattern) {
+  cairo_set_source(cr, pattern);
+  cairo_paint(cr);
+}
 
 static void
-redraw_bg (GtkWidget * w, ggobid * gg)
+redraw_bg (cairo_t *cr, ggobid * gg)
 {
-  colorschemed *scheme = gg->activeColorScheme;
-
-  if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  colorschemed *scheme = gg->activeColorScheme;  
+  fill_with_pattern(cr, scheme->rgb_bg);
 }
 
 static gint
-color_expose_bg (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+color_draw_bg (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
-  redraw_bg (w, gg);
+  redraw_bg (cr, gg);
   return FALSE;
 }
 
 static void
-redraw_accent (GtkWidget * w, ggobid * gg)
+redraw_accent (cairo_t *cr, ggobid * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
-
-  if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  fill_with_pattern(cr, scheme->rgb_accent);
 }
 
 static gint
-color_expose_accent (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+color_draw_accent (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
-  redraw_accent (w, gg);
+  redraw_accent (cr, gg);
   return FALSE;
 }
 
 static void
-redraw_hidden (GtkWidget * w, ggobid * gg)
+redraw_hidden (cairo_t *cr, ggobid * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
-
-  if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  fill_with_pattern(cr, scheme->rgb_hidden);
 }
 
 static gint
-color_expose_hidden (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+color_draw_hidden (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
-  redraw_hidden (w, gg);
+  redraw_hidden (cr, gg);
   return FALSE;
 }
 static void
 reverse_video_cb (GtkWidget * ok_button, ggobid * gg)
 {
   gulong pixel;
-  gushort r, g, b;
+  gdouble r, g, b;
   gint rval = false;
   colorschemed *scheme = gg->activeColorScheme;
   gboolean writeable = false, best_match = true;
 
-  r = scheme->rgb_accent.red;
-  g = scheme->rgb_accent.green;
-  b = scheme->rgb_accent.blue;
-  pixel = scheme->rgb_accent.pixel;
+  cairo_pattern_t *accent = scheme->rgb_accent;
+  scheme->rgb_accent = scheme->rgb_bg;
+  scheme->rgb_bg = accent;
 
-  scheme->rgb_accent.red = scheme->rgb_bg.red;
-  scheme->rgb_accent.green = scheme->rgb_bg.green;
-  scheme->rgb_accent.blue = scheme->rgb_bg.blue;
-  scheme->rgb_accent.pixel = scheme->rgb_bg.pixel;
+  cairo_pattern_get_rgba(scheme->rgb_hidden, &r, &g, &b, NULL);
+  cairo_pattern_destroy(scheme->rgb_hidden);
+  scheme->rgb_hidden = cairo_pattern_create_rgb(1-r, 1-g, 1-b);
+  
+  redraw_widget (gg->color_ui.symbol_display);
+  redraw_widget (gg->color_ui.line_display);
 
-  scheme->rgb_bg.red = r;
-  scheme->rgb_bg.green = g;
-  scheme->rgb_bg.blue = b;
-  scheme->rgb_bg.pixel = pixel;
-
-  scheme->rgb_hidden.red = 65535 - scheme->rgb_hidden.red;
-  scheme->rgb_hidden.green = 65535 - scheme->rgb_hidden.green;
-  scheme->rgb_hidden.blue = 65535 - scheme->rgb_hidden.blue;
-  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                 &scheme->rgb_hidden, writeable, best_match))
-    g_printerr ("failure allocating hidden color\n");
-
-  g_signal_emit_by_name (G_OBJECT (gg->color_ui.symbol_display),
-                         "expose_event", (gpointer) gg, (gpointer) & rval);
-  g_signal_emit_by_name (G_OBJECT (gg->color_ui.line_display),
-                         "expose_event", (gpointer) gg, (gpointer) & rval);
-
-  redraw_bg (gg->color_ui.bg_da, gg);
-  redraw_accent (gg->color_ui.accent_da, gg);
-  redraw_hidden (gg->color_ui.hidden_da, gg);
+  redraw_widget (gg->color_ui.bg_da);
+  redraw_widget (gg->color_ui.accent_da);
+  redraw_widget (gg->color_ui.hidden_da);
 
   displays_plot ((splotd *) NULL, FULL, gg);
 }
@@ -581,66 +538,44 @@ reverse_video_cb (GtkWidget * ok_button, ggobid * gg)
 void
 color_changed_cb (GtkWidget * colorsel, ggobid * gg)
 {
-  GdkColor gdk_color;
-  GdkColormap *cmap = gdk_colormap_get_system ();
+  GdkRGBA gdk_color;
   splotd *sp = gg->current_splot;
 
   colorschemed *scheme = gg->activeColorScheme;
 
   /* Get current color */
-  gtk_color_selection_get_current_color (GTK_COLOR_SELECTION (colorsel),
-                                         &gdk_color);
+  gtk_color_selection_get_current_rgb (GTK_COLOR_SELECTION (colorsel),
+                                       &gdk_color);
 
   /* Allocate color */
-  if (gdk_color_alloc (cmap, &gdk_color)) {
+  cairo_pattern_t *pattern = cairo_pattern_create_rgb(gdk_color.red,
+                                                      gdk_color.green,
+                                                      gdk_color.blue);
+  
     if (gg->color_ui.current_da == gg->color_ui.bg_da) {
-
-      scheme->rgb_bg.pixel = gdk_color.pixel;
-      scheme->rgb_bg.red = gdk_color.red;
-      scheme->rgb_bg.green = gdk_color.green;
-      scheme->rgb_bg.blue = gdk_color.blue;
-
-      redraw_bg (gg->color_ui.bg_da, gg);
+      scheme->rgb_bg = pattern;
     }
     else if (gg->color_ui.current_da == gg->color_ui.accent_da) {
-
-      scheme->rgb_accent.pixel = gdk_color.pixel;
-      scheme->rgb_accent.red = gdk_color.red;
-      scheme->rgb_accent.green = gdk_color.green;
-      scheme->rgb_accent.blue = gdk_color.blue;
-
-      redraw_accent (gg->color_ui.accent_da, gg);
+      scheme->rgb_accent = pattern;
     }
     else if (gg->color_ui.current_da == gg->color_ui.hidden_da) {
-
-      scheme->rgb_hidden.pixel = gdk_color.pixel;
-      scheme->rgb_hidden.red = gdk_color.red;
-      scheme->rgb_hidden.green = gdk_color.green;
-      scheme->rgb_hidden.blue = gdk_color.blue;
-
-      redraw_hidden (gg->color_ui.hidden_da, gg);
+      scheme->rgb_hidden = pattern;
     }
     else {
-
-      gg->activeColorScheme->rgb[gg->color_id].pixel = gdk_color.pixel;
-      gg->activeColorScheme->rgb[gg->color_id].red = gdk_color.red;
-      gg->activeColorScheme->rgb[gg->color_id].green = gdk_color.green;
-      gg->activeColorScheme->rgb[gg->color_id].blue = gdk_color.blue;
-
-      redraw_fg (gg->color_ui.fg_da[gg->color_id], gg->color_id, gg);
+      gg->activeColorScheme->rgb[gg->color_id] = pattern;
     }
 
-    redraw_symbol_display (gg->color_ui.symbol_display, gg);
-    redraw_line_display (gg->color_ui.line_display, gg);
+    fill_with_pattern (gg->color_ui.current_da->window, pattern);
+    
+    redraw_widget (gg->color_ui.symbol_display);
+    redraw_widget (gg->color_ui.line_display);
 
     if (sp->da != NULL) {
       gboolean rval = false;
-      g_signal_emit_by_name (G_OBJECT (sp->da), "expose_event",
-                             (gpointer) sp, (gpointer) & rval);
+      redraw_widget (sp->da);
     }
 
     displays_plot ((splotd *) NULL, FULL, gg);
-  }
 }
 
 static void
@@ -767,26 +702,20 @@ delete_symbol_window_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 void
 symbol_window_redraw (ggobid * gg)
 {
-/*
- * Send expose events where necessary; show the appropriate
- * number of fg_da widgets.
-*/
   gint k;
   splotd *sp = gg->current_splot;
   gint rval = false;
 
   if (gg->color_ui.symbol_display) {
 
-    g_signal_emit_by_name (G_OBJECT (gg->color_ui.symbol_display),
-                           "expose_event", (gpointer) sp, (gpointer) & rval);
-    g_signal_emit_by_name (G_OBJECT (gg->color_ui.line_display),
-                           "expose_event", (gpointer) sp, (gpointer) & rval);
-    redraw_bg (gg->color_ui.bg_da, gg);
-    redraw_accent (gg->color_ui.accent_da, gg);
+    redraw_widget (gg->color_ui.symbol_display);
+    redraw_widget (gg->color_ui.line_display);
+    redraw_widget (gg->color_ui.bg_da);
+    redraw_widget (gg->color_ui.accent_da);
 
     for (k = 0; k < gg->activeColorScheme->n; k++) {
       gtk_widget_show (gg->color_ui.fg_da[k]);
-      redraw_fg (gg->color_ui.fg_da[k], k, gg);
+      redraw_widget (gg->color_ui.fg_da[k]);
     }
     for (k = gg->activeColorScheme->n; k < MAXNCOLORS; k++) {
       gtk_widget_hide (gg->color_ui.fg_da[k]);
@@ -881,8 +810,8 @@ make_symbol_window (ggobid * gg)
                           NULL);
 
     g_signal_connect (G_OBJECT (gg->color_ui.symbol_display),
-                      "expose_event",
-                      G_CALLBACK (symbol_display_expose_cb), gg);
+                      "draw",
+                      G_CALLBACK (symbol_display_draw_cb), gg);
     g_signal_connect (G_OBJECT (gg->color_ui.symbol_display),
                       "button_press_event", G_CALLBACK (choose_glyph_cb), gg);
 
@@ -910,8 +839,8 @@ make_symbol_window (ggobid * gg)
                           NULL);
 
     g_signal_connect (G_OBJECT (gg->color_ui.line_display),
-                      "expose_event",
-                      G_CALLBACK (line_display_expose_cb), gg);
+                      "draw",
+                      G_CALLBACK (line_display_draw_cb), gg);
 /*
     g_signal_connect (G_OBJECT (gg->color_ui.line_display),
       "button_press_event",
@@ -955,7 +884,7 @@ make_symbol_window (ggobid * gg)
       g_signal_connect (G_OBJECT (gg->color_ui.fg_da[k]),
                         "button_press_event", G_CALLBACK (set_color_id), gg);
       g_signal_connect (G_OBJECT (gg->color_ui.fg_da[k]),
-                        "expose_event", G_CALLBACK (color_expose_fg), gg);
+                        "draw", G_CALLBACK (color_draw_fg), gg);
       gtk_table_attach (GTK_TABLE (fg_table),
                         gg->color_ui.fg_da[k], i, i + 1, j, j + 1,
                         GTK_FILL, GTK_FILL, 10, 10);
@@ -992,7 +921,7 @@ make_symbol_window (ggobid * gg)
                            | GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
 
     g_signal_connect (G_OBJECT (gg->color_ui.bg_da),
-                      "expose_event", G_CALLBACK (color_expose_bg), gg);
+                      "draw", G_CALLBACK (color_draw_bg), gg);
     g_signal_connect (G_OBJECT (gg->color_ui.bg_da),
                       "button_press_event", G_CALLBACK (set_color_id), gg);
 
@@ -1023,7 +952,7 @@ make_symbol_window (ggobid * gg)
                            GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
 
     g_signal_connect (G_OBJECT (gg->color_ui.accent_da),
-                      "expose_event", G_CALLBACK (color_expose_accent), gg);
+                      "draw", G_CALLBACK (color_draw_accent), gg);
     g_signal_connect (G_OBJECT (gg->color_ui.accent_da),
                       "button_press_event", G_CALLBACK (set_color_id), gg);
 
@@ -1054,7 +983,7 @@ make_symbol_window (ggobid * gg)
                            GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
 
     g_signal_connect (G_OBJECT (gg->color_ui.hidden_da),
-                      "expose_event", G_CALLBACK (color_expose_hidden), gg);
+                      "draw", G_CALLBACK (color_draw_hidden), gg);
     g_signal_connect (G_OBJECT (gg->color_ui.hidden_da),
                       "button_press_event", G_CALLBACK (set_color_id), gg);
 

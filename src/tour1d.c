@@ -835,7 +835,7 @@ void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
     gg->tour1d.idled = 0;
   }
 
-  splot_connect_expose_handler (dsp->t1d.idled, sp);
+  splot_connect_draw_handler (dsp->t1d.idled, sp);
 }
 
 void tour1d_reinit(ggobid *gg)

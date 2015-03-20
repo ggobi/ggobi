@@ -1243,7 +1243,7 @@ void tourcorr_func (gboolean state, displayd *dsp, ggobid *gg)
     gg->tourcorr.idled = 0;
   }
 
-  splot_connect_expose_handler (dsp->tcorr1.idled, sp);
+  splot_connect_draw_handler (dsp->tcorr1.idled, sp);
 }
 
 void tourcorr_reinit(ggobid *gg)

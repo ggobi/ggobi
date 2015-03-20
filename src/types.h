@@ -67,6 +67,9 @@ typedef struct {
   gfloat x, y;
 } fcoords;
 typedef struct {
+  gint x1, y1, x2, y2;
+} isegments;
+typedef struct {
   gfloat min, max;
 } lims;
 typedef struct {

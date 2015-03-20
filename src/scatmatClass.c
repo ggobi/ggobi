@@ -558,15 +558,15 @@ worldToPlane (splotd * sp, GGobiData * d, ggobid * gg)
 
 static void
 addIdentifyCues (gboolean nearest_p, gint k, splotd * sp,
-                 GdkDrawable * drawable, ggobid * gg)
+                 cairo_t * cr, ggobid * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
   if (nearest_p)
-    splot_add_diamond_cue (k, sp, drawable, gg);
+    splot_add_diamond_cue (k, sp, cr, gg);
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  splot_add_point_label (nearest_p, k, false, sp, drawable, gg);
+  cairo_set_source (cr, scheme->rgb_accent);
+  splot_add_point_label (nearest_p, k, false, sp, cr, gg);
 }
 
 gboolean
@@ -602,13 +602,13 @@ drawCaseP (splotd * sp, gint m, GGobiData * d, ggobid * gg)
 }
 
 void
-addPlotLabels (splotd * sp, GdkDrawable * drawable, ggobid * gg)
+addPlotLabels (splotd * sp, cairo_t * cr, ggobid * gg)
 {
   if (sp->p1dvar == -1)
-    scatterXYAddPlotLabels (sp, drawable, gg->plot_GC);
+    scatterXYAddPlotLabels (sp, drawable, gg->plot_cr);
   else {
            /*-- 1dplot: center the label --*/
-    scatter1DAddPlotLabels (sp, drawable, gg->plot_GC);
+    scatter1DAddPlotLabels (sp, drawable, gg->plot_cr);
   }
 }
 

@@ -240,8 +240,7 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
       if (selected_var != -1 && selected_var < d->ncols)
         bin_counts_reset (selected_var, d, gg);
 
-      g_signal_emit_by_name(G_OBJECT (w), "expose_event",
-        (gpointer) gg, (gpointer) &rval);
+      redraw_widget (w);
 
       if (gg->wvis.update_method == WVIS_UPDATE_CONTINUOUSLY) {
         record_colors_reset (selected_var, d, gg);
@@ -328,9 +327,8 @@ da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 {
   /*-- Create new backing pixmaps of the appropriate size --*/
   if (gg->wvis.pix != NULL)
-    gdk_pixmap_unref (gg->wvis.pix);
-  gg->wvis.pix = gdk_pixmap_new (w->window,
-    w->allocation.width, w->allocation.height, -1);
+    cairo_surface_destroy (gg->wvis.pix);
+  gg->wvis.pix = create_buffer (w);
 
   gtk_widget_queue_draw (w);
 
@@ -412,12 +410,10 @@ bin_boundaries_set (gint selected_var, GGobiData *d, ggobid *gg)
 
 static void binning_method_cb (GtkWidget *w, ggobid *gg)
 {
-  gboolean rval = false;
   gg->wvis.binning_method = gtk_combo_box_get_active(GTK_COMBO_BOX(w));
 
   gg->wvis.npct = 0;  /*-- force bin_boundaries_set to be called --*/
-  g_signal_emit_by_name(G_OBJECT (gg->wvis.da), "expose_event",
-    (gpointer) gg, (gpointer) &rval);
+  redraw_widget (gg->wvis.da);
 }
 
 static void update_method_cb (GtkWidget *w, ggobid *gg)
@@ -438,7 +434,7 @@ static void alloc_pct (ggobid *gg)
 }
 
 static void
-da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
+da_draw_cb (GtkWidget *w, cairo_t *cr, ggobid *gg)
 {
   gint height = w->allocation.height - 2*ymargin;
   gint x0, x1, k, hgt;
@@ -453,7 +449,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   gint selected_var = -1;
 
   GtkWidget *da = gg->wvis.da;
-  GdkPixmap *pix = gg->wvis.pix;
+  cairo_surface_t *pix = gg->wvis.pix;
 
   if(tree_view) {
     d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
@@ -463,9 +459,6 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
       select_tree_view_row (tree_view, selected_var);
     }
   }
-
-  if (gg->wvis.GC == NULL)
-    gg->wvis.GC = gdk_gc_new (w->window);
 
   hgt = height / (scheme->n - 1);
 
@@ -480,29 +473,31 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   }
 
   /*-- clear the pixmap --*/
-  gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (pix, gg->wvis.GC, TRUE,
-                      0, 0, w->allocation.width, w->allocation.height);
 
-
+  cairo_t pix_cr = cairo_create(pix);
+  cairo_set_source(pix_cr, scheme->rgb_bg);
+  cairo_paint(pix_cr);
+  
   /*-- draw the color bars --*/
   x0 = xmargin;
   for (k=0; k<scheme->n; k++) {
     x1 = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-    gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb[k]);
-    gdk_draw_rectangle (pix, gg->wvis.GC,
-                        TRUE, x0, ymargin, x1 - x0, height);
+    cairo_set_source (pix_cr, scheme->rgb[k]);
+    cairo_rectangle(pix_cr, x0, ymargin, x1 - x0, height);
     x0 = x1;
   }
+  cairo_fill(pix_cr);
 
   /*-- draw the horizontal lines --*/
   x0 = xmargin; y = ymargin + 10;
   x1 = xmargin + (w->allocation.width - 2*xmargin) - 1;
-  gdk_gc_set_foreground (gg->wvis.GC, &gg->mediumgray);
+  cairo_set_source(pix_cr, gg->mediumgray);
   for (k=0; k<scheme->n-1; k++) {
-    gdk_draw_line (pix, gg->wvis.GC, x0, y, x1, y);
+    cairo_move_to(pix_cr, x0, y);
+    cairo_line_to(pix_cr, x1, y);
     y += hgt;
   }
+  cairo_stroke(pix_cr);
 
   /*-- draw rectangles, 20 x 10 --*/
   y = ymargin + 10;
@@ -511,21 +506,21 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     draw_3drectangle (w, pix, x, y, 20, 10, gg);
     y += hgt;
   }
-
+  
   /*-- add the variable limits in the top margin --*/
   if (d && selected_var != -1) {
     gfloat min, max;
     gfloat val;
     gchar *str;
     PangoRectangle rect;
-    PangoLayout *layout = gtk_widget_create_pango_layout(da, NULL);
+    PangoLayout *layout = pango_cairo_create_layout(pix_cr);
 
     vt = vartable_element_get (selected_var, d);
     if (vt) {
       min = vt->lim_tform.min;
       max = vt->lim_tform.max;
 
-      gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb_accent);
+      cairo_set_source (scheme->rgb_accent);
       y = ymargin;
       for (k=0; k<scheme->n-1; k++) {
 
@@ -533,7 +528,8 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
         str = g_strdup_printf ("%3.3g", val);
         layout_text(layout, str, &rect);
         x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
-        gdk_draw_layout(pix, gg->wvis.GC, x - rect.width/2, y - 2 - rect.height, layout);
+        cairo_move_to(pix_cr, x - rect.width/2, y - 2 - rect.height);
+        pango_cairo_show_layout(pix_cr, layout);
         g_free (str);
       }
 
@@ -545,20 +541,16 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
         x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
         diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1]; 
         x -= diff/2 * (w->allocation.width - 2*xmargin);
-        gdk_draw_layout(pix, gg->wvis.GC, 
-          x - rect.width/2,
-          (w->allocation.height - ymargin) + 2,
-          layout);
+        cairo_move_to(pix_cr, x - rect.width/2,
+                      (w->allocation.height - ymargin) + 2);
+        pango_cairo_show_layout(pix_cr, layout);
         g_free (str);
       }
     }
     g_object_unref(G_OBJECT(layout));
   }
 
-  gdk_draw_pixmap (w->window, gg->wvis.GC, pix,
-                   0, 0, 0, 0,
-                   w->allocation.width,
-                   w->allocation.height);
+  show_buffer(cr, pix);
 }
 
 void
@@ -576,8 +568,7 @@ selection_made_cb (GtkTreeSelection *tree_sel, ggobid *gg)
   
   bin_boundaries_set (row, d, gg);  /*-- in case the method changed --*/
   bin_counts_reset (row, d, gg);
-  g_signal_emit_by_name(G_OBJECT (gg->wvis.da), "expose_event",
-    (gpointer) gg, (gpointer) &rval);
+  redraw_widget(gg->wvis.da);
 
   /*-- get the apply button, make it sensitive --*/
   btn = widget_find_by_name (gg->wvis.window, "WVIS:apply");
@@ -605,8 +596,7 @@ static void scale_apply_cb (GtkWidget *w, ggobid* gg)
     displays_plot (NULL, FULL, gg);
 
     bin_counts_reset (selected_var, d, gg);
-    g_signal_emit_by_name(G_OBJECT (gg->wvis.da), "expose_event",
-      (gpointer) gg, (gpointer) &rval);
+    redraw_widget (gg->wvis.da);
 
     symbol_window_redraw (gg);
     cluster_table_update (d, gg);
@@ -659,8 +649,8 @@ wvis_window_open (ggobid *gg)
                         G_CALLBACK(da_configure_cb),
                         (gpointer) gg);
     g_signal_connect (G_OBJECT (gg->wvis.da),
-                        "expose_event",
-                        G_CALLBACK(da_expose_cb),
+                        "draw",
+                        G_CALLBACK(da_draw_cb),
                         (gpointer) gg);
     g_signal_connect (G_OBJECT (gg->wvis.da),
                         "button_press_event",

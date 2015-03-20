@@ -184,41 +184,19 @@ record_bitmap_cb (GtkToggleButton  *w) {
 static gint
 ppda_configure_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
 {
-  gint wid = w->allocation.width, hgt = w->allocation.height;
-
   if (dsp->t1d_pp_pixmap != NULL)
-    gdk_pixmap_unref (dsp->t1d_pp_pixmap);
+    cairo_surface_destroy (dsp->t1d_pp_pixmap);
 
-  dsp->t1d_pp_pixmap = gdk_pixmap_new (dsp->t1d_ppda->window,
-    wid, hgt, -1);
+  dsp->t1d_pp_pixmap = create_buffer(dsp->t1d_ppda);
 
   return false;
 }
 
 static gint
-ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
+ppda_draw_cb (GtkWidget *w, cairo_t *cr, displayd *dsp)
 {
-  ggobid *gg = dsp->d->gg;
-/*
-  gint margin=10;
-  gint j;
-  gint xpos, ypos, xstrt, ystrt;
-  gchar *tickmk;
-  GtkStyle *style = gtk_widget_get_style (dsp->t1d_ppda);
-  GGobiData *d = dsp->d;
-*/
-  gint wid = w->allocation.width, hgt = w->allocation.height;
-  /*  static gboolean init = true;*/
-
-  /*  if (init) {
-    t1d_clear_ppda(dsp, gg);
-    init=false;
-    }*/
-
-  gdk_draw_pixmap (dsp->t1d_ppda->window, gg->plot_GC, dsp->t1d_pp_pixmap,
-                   0, 0, 0, 0,
-                   wid, hgt);
-
+  show_buffer(cr, dsp->t1d_pp_pixmap);
+  
   return false;
 }
 
@@ -470,8 +448,8 @@ tour1dpp_window_open (ggobid *gg) {
                         (gpointer) dsp);
 
     g_signal_connect (G_OBJECT (dsp->t1d_ppda),
-                        "expose_event",
-                        G_CALLBACK(ppda_expose_cb),
+                        "draw",
+                        G_CALLBACK(ppda_draw_cb),
                         (gpointer) dsp);
 
     gtk_container_add (GTK_CONTAINER (frame), dsp->t1d_ppda);

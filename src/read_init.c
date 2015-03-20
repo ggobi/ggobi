@@ -194,12 +194,8 @@ getPreferences (const xmlDocPtr doc, GGobiInitInfo * info)
   if (el) {
     el = getXMLElement (el, "color");
     if (el) {
-      info->bgColor = (GdkColor *) g_malloc (sizeof (GdkColor));
+      info->bgColor = (GdkRGBA *) g_malloc (sizeof (GdkRGBA));
       getColor (el, doc, NULL, info->bgColor);
-      if (gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                    info->bgColor, false, true) == false) {
-        g_printerr ("Can't allocate background color\n");
-      }
     }
   }
 
@@ -210,10 +206,6 @@ getPreferences (const xmlDocPtr doc, GGobiInitInfo * info)
     if (el) {
       info->fgColor = (GdkColor *) g_malloc (sizeof (GdkColor));
       getColor (el, doc, NULL, info->fgColor);
-      if (gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                    info->fgColor, false, true) == false) {
-        g_printerr ("Can't allocate foreground color\n");
-      }
     }
   }
 

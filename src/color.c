@@ -30,56 +30,29 @@ void
 colorscheme_init (colorschemed * scheme)
 {
   gint i;
-  gboolean writeable = false, best_match = true, *success;
+  gboolean writeable = false;
 
   if (!scheme || scheme->n <= 0) {
     g_printerr ("unable to init colorscheme: ncolors=%d\n", scheme->n);
     return;
   }
 
-  success = (gboolean *) g_malloc (scheme->n * sizeof (gboolean));
-
   scheme->rgb = (GdkColor *) g_realloc (scheme->rgb,
-                                        scheme->n * sizeof (GdkColor));
+                                        scheme->n * sizeof (cairo_pattern_t));
 
   /* this may have already been done; is there harm in doing it again? */
   for (i = 0; i < scheme->n; i++) {
-    scheme->rgb[i].red = (guint16) (scheme->data[i][0] * 65535.0);
-    scheme->rgb[i].green = (guint16) (scheme->data[i][1] * 65535.0);
-    scheme->rgb[i].blue = (guint16) (scheme->data[i][2] * 65535.0);
-  }
-
-  gdk_colormap_alloc_colors (gdk_colormap_get_system (),
-                             scheme->rgb, scheme->n, writeable, best_match,
-                             success);
-
-  /*
-   * Success[i] should always be true, since I'm allowing best_match,
-   * but this can't hurt.
-   */
-  for (i = 0; i < scheme->n; i++) {
-    if (!success[i]) {
-      scheme->rgb[i].red = (guint16) 65535;
-      scheme->rgb[i].green = (guint16) 65535;
-      scheme->rgb[i].blue = (guint16) 65535;
-      if (gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                    &scheme->rgb[i], writeable,
-                                    best_match) == false) {
-        g_printerr ("Unable to allocate colors, not even white!\n");
-        exit (0);
-      }
-    }
+    scheme->rgb[i] = cairo_pattern_create_rgb(scheme->data[i][0],
+                                              scheme->data[i][1],
+                                              scheme->data[i][2]);
   }
 
 /*
  * background color
 */
-  scheme->rgb_bg.red = (guint16) (scheme->bg[0] * 65535.0);
-  scheme->rgb_bg.green = (guint16) (scheme->bg[1] * 65535.0);
-  scheme->rgb_bg.blue = (guint16) (scheme->bg[2] * 65535.0);
-  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                 &scheme->rgb_bg, writeable, best_match))
-    g_printerr ("failure allocating background color\n");
+  scheme->rgb_bg = cairo_pattern_create_rgb(scheme->bg[0],
+                                            scheme->bg[1],
+                                            scheme->bg[2]);
 
 /*
  * color for showing hidden points and edges to preserve context
@@ -98,27 +71,16 @@ colorscheme_init (colorschemed * scheme)
       green = MIN (1.0, scheme->bg[1] + .3);
       blue = MIN (1.0, scheme->bg[2] + .3);
     }
-    scheme->rgb_hidden.red = (guint16) (red * 65535.0);
-    scheme->rgb_hidden.green = (guint16) (green * 65535.0);
-    scheme->rgb_hidden.blue = (guint16) (blue * 65535.0);
-    if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                   &scheme->rgb_hidden, writeable,
-                                   best_match))
-      g_printerr ("failure allocating hidden color\n");
+    scheme->rgb_hidden = cairo_pattern_create_rgb(red, green, blue);
   }
 
 /*
  * accent color:  that is, the color that's used for
  * axes and labels, and not for brushing.
 */
-  scheme->rgb_accent.red = (guint16) (scheme->accent[0] * 65535.0);
-  scheme->rgb_accent.green = (guint16) (scheme->accent[1] * 65535.0);
-  scheme->rgb_accent.blue = (guint16) (scheme->accent[2] * 65535.0);
-  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                 &scheme->rgb_accent, writeable, best_match))
-    g_printerr ("failure allocating background color\n");
-
-  g_free (success);
+  scheme->rgb_accent = cairo_pattern_create_rgb(scheme->accent[0],
+                                                scheme->accent[1],
+                                                scheme->accent[2]);
 }
 
 /*-- If gg->colorSchemes == NULL, then provide one and make it active --*/
@@ -221,9 +183,7 @@ getColorTable (ggobid * gg)
   colorschemed *scheme = gg->activeColorScheme;
 
   for (k = 0; k < MAXNCOLORS; k++) {
-    m[k][0] = scheme->rgb[k].red;
-    m[k][1] = scheme->rgb[k].green;
-    m[k][2] = scheme->rgb[k].blue;
+    cairo_pattern_get_rgb(scheme->rgb[k], m[k], m[k]+1, m[k]+2);
   }
 
   return (guint **) m;
@@ -234,109 +194,17 @@ getColorTable (ggobid * gg)
 void
 special_colors_init (ggobid * gg)
 {
-  GdkColormap *cmap = gdk_colormap_get_system ();
   gboolean writeable = false, best_match = true;
 
 /*
  * colors that show up in the variable circle panel
 */
-  gg->vcirc_manip_color.red = (guint16) 65535;
-  gg->vcirc_manip_color.green = (guint16) 0;
-  gg->vcirc_manip_color.blue = (guint16) 65535;
-  if (!gdk_colormap_alloc_color (cmap, &gg->vcirc_manip_color, writeable,
-                                 best_match))
-    g_printerr ("trouble allocating vcirc_manip_color\n");
-
-  gg->vcirc_freeze_color.red = (guint16) 0;
-  gg->vcirc_freeze_color.green = (guint16) 64435;
-  gg->vcirc_freeze_color.blue = (guint16) 0;
-  if (!gdk_colormap_alloc_color (cmap, &gg->vcirc_freeze_color, writeable,
-                                 best_match))
-    g_printerr ("trouble allocating vcirc_freeze_color\n");
-
-  gg->darkgray.red = gg->darkgray.blue = gg->darkgray.green =
-    (guint16) (.3 * 65535.0);
-  if (!gdk_colormap_alloc_color (cmap, &gg->darkgray, writeable, best_match))
-    g_printerr ("trouble allocating dark gray\n");
-  gg->mediumgray.red = gg->mediumgray.blue = gg->mediumgray.green =
-    (guint16) (.5 * 65535.0);
-  if (!gdk_colormap_alloc_color
-      (cmap, &gg->mediumgray, writeable, best_match))
-    g_printerr ("trouble allocating medium gray\n");
-  gg->lightgray.red = gg->lightgray.blue = gg->lightgray.green =
-    (guint16) (.7 * 65535.0);
-  if (!gdk_colormap_alloc_color (cmap, &gg->lightgray, writeable, best_match))
-    g_printerr ("trouble allocating light gray\n");
-}
-
-void
-init_plot_GC (GdkWindow * w, ggobid * gg)
-{
-  colorschemed *scheme = gg->activeColorScheme;
-
-  gg->plot_GC = gdk_gc_new (w);
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_gc_set_background (gg->plot_GC, &scheme->rgb_bg);
-  /* line_width, GdkLineStyle, GdkCapStyle, GdkJoinStyle */
-  gdk_gc_set_line_attributes (gg->plot_GC,
-                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-}
-
-void
-init_var_GCs (GtkWidget * w, ggobid * gg)
-{
-  GdkWindow *window = w->window;
-  GtkStyle *style = gtk_widget_get_style (w);
-  GdkColor white, black, bg, *bblack;
-
-  gdk_color_white (gdk_colormap_get_system (), &white);
-  gdk_color_black (gdk_colormap_get_system (), &black);
-
-/*
-  if(!sessionOptions->info->bgColor) {
-    gdk_color_black (gdk_colormap_get_system (), &black);
-    bblack = &black;
-  } else
-    bblack = sessionOptions->info->bgColor;
-*/
-  gdk_color_black (gdk_colormap_get_system (), &black);
-  bblack = &black;
-
-/*
- * the unselected variable GCs: thin lines
-*/
-  gg->unselvarbg_GC = gdk_gc_new (window);
-  bg = style->bg[GTK_STATE_NORMAL];
-  gdk_gc_set_foreground (gg->unselvarbg_GC, &bg);
-
-  gg->unselvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes (gg->unselvarfg_GC,
-                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (gg->unselvarfg_GC, bblack);
-
-
-/*
- * the selected variable GC: thick lines
-*/
-  gg->selvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes (gg->selvarfg_GC,
-                              2, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (gg->selvarfg_GC, &black);
-
-  gg->selvarbg_GC = gdk_gc_new (window);
-  gdk_gc_set_foreground (gg->selvarbg_GC, &white);
-
-/*
- * the manip variable GCs: thin purple lines
-*/
-  gg->manipvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes (gg->manipvarfg_GC,
-                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (gg->manipvarfg_GC, &gg->vcirc_manip_color);
+  gg->vcirc_manip_color = cairo_pattern_create_rgb(1.0, 0.0, 1.0);
+  gg->vcirc_freeze_color = cairo_pattern_create_rgb(0.0, 1.0, 0.0);
+  
+  gg->darkgray = cairo_pattern_create_rgb(0.3, 0.3, 0.3);
+  gg->mediumgray = cairo_pattern_create_rgb(0.5, 0.5, 0.5);
+  gg->lightgray = cairo_pattern_create_rgb(0.7, 0.7, 0.7);
 }
 
 gushort  /*-- returns the maximum color id --*/

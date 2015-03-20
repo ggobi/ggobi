@@ -120,6 +120,7 @@ void       arrays_zero (array_s *);
 void       ash_baseline_set (icoords *, splotd *sp);
 void       assign_points_to_bins (GGobiData *, splotd *, ggobid *);
 gboolean   bizarro_update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush, GGobiData *d, ggobid *gg);
+cairo_surface_t * create_buffer (GtkWidget *w);
 void       br_color_ids_add (GGobiData *d, ggobid *gg);
 void       br_color_ids_alloc (GGobiData *);
 void       br_color_ids_init (GGobiData *);
@@ -129,8 +130,8 @@ void       br_glyph_ids_alloc (GGobiData *);
 void       br_glyph_ids_init (GGobiData *);
 void       br_hidden_alloc (GGobiData *);
 void       br_hidden_init (GGobiData *);
-void       brush_draw_brush (splotd *, GdkDrawable *, GGobiData *, ggobid *);
-void       brush_draw_label (splotd *, GdkDrawable *, GGobiData *, ggobid *);
+void       brush_draw_brush (splotd *, cairo_t *, GGobiData *, ggobid *);
+void       brush_draw_label (splotd *, cairo_t *, GGobiData *, ggobid *);
 void       brush_event_handlers_toggle (splotd *, gboolean);
 void       brush_init (GGobiData *, ggobid *);
 gboolean   brush_motion (icoords *, gboolean, gboolean, cpaneld *, splotd *, ggobid *);
@@ -250,8 +251,11 @@ void       set_display_options(displayd *display, ggobid *gg);
 void	   set_display_option(gboolean active, guint action, displayd *display);
 gint       do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, gfloat *);
 void       do_last_increment (vector_f, vector_f, gfloat, gint);
-void       draw_3drectangle (GtkWidget *w, GdkDrawable *drawable, gint x, gint y, gint width, gint height, ggobid *gg);
-void       draw_glyph (GdkDrawable *, glyphd *, icoords *, gint, ggobid *);
+void       draw_3drectangle (GtkWidget *w, cairo_t *drawable, gint x, gint y, gint width, gint height, ggobid *gg);
+gboolean   point_in_triangle (GdkPoint p, GdkPoint a, GdkPoint b, GdkPoint c)
+void       draw_glyph (cairo_t *, glyphd *, icoords *, gint, ggobid *);
+void       draw_polygon (cairo_t *cr, GdkPoint *points, int npoints);
+void       draw_segments (cairo_t *cr, GdkSegment *segments, int nsegments);
 gint       dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
 
 /* pango utils */
@@ -316,7 +320,7 @@ gboolean   in_vector (gint k, gint *vec, gint nels);
 gint       include_hiddens (gboolean include, GGobiData *d, ggobid *gg);
 void       increment_tour(vector_f, vector_f, gfloat, gfloat, gfloat *, gint);
 void       initSessionOptions(int argc, char **argv);
-void       init_plot_GC (GdkWindow *, ggobid *);
+void       init_plot_cr (cairo_surface_t *, ggobid *);
 void       init_var_GCs (GtkWidget *, ggobid *);
 gdouble    inner_prod (gdouble *, gdouble *, gint);
 gboolean   isCrossed (gdouble, gdouble, gdouble, gdouble, gdouble, gdouble, gdouble, gdouble);
@@ -331,7 +335,7 @@ void       limits_set_by_var (GGobiData *, gint, gboolean do_raw, gboolean do_tf
 gint       lines_intersect (glong, glong, glong, glong, glong, glong, glong, glong);
 gint       lwidth_from_gsize(gint size);
 gint       ltype_from_gtype(gint type);
-gint       set_lattribute_from_ltype(gint, ggobid *);
+void       set_dash_from_ltype(gint, ggobid *);
 void       linkby_current_page_set (displayd *, GtkWidget *w, ggobid *);
 void       linking_method_set (displayd *, GGobiData *, ggobid *);
 void       make_ggobi (GGobiOptions *, gboolean, ggobid *);
@@ -386,6 +390,7 @@ gboolean   reached_target(gfloat, gfloat, gint, gfloat *, gfloat *);
 gint       realloc_optimize0_p(optimize0_param *, gint, vector_i);
 void       recenter_data (gint, GGobiData *, ggobid *);
 gboolean   record_add (eeMode, gint a, gint b, gchar *lbl, gchar *id, gchar **vals, GGobiData * d, GGobiData * e, ggobid *gg);
+void       redraw_widget (GtkWidget *w);
 void       reinit_transient_brushing (displayd *, ggobid *);
 void       rejitter (gint *, gint, GGobiData *, ggobid *);
 void       reset_pp(GGobiData *, gint, gint, ggobid *, void *);
@@ -402,7 +407,7 @@ void       scale_set_default_values (GtkScale *scale);
 void	   scale_zoom_reset (displayd *dsp);
 void	   scale_pan_reset (displayd *display);
 void       scale_update_set (gboolean, displayd *, ggobid *);
-void       scaling_visual_cues_draw (splotd *, GdkDrawable *, ggobid *);
+void       scaling_visual_cues_draw (splotd *, cairo_t *, ggobid *);
 void       scatmat_cpanel_init (cpaneld *, ggobid *);
 displayd*  scatmat_new (displayd *, gboolean, gboolean, gint, gint *, gint, gint *, GGobiData *, ggobid *);
 gboolean   scatmat_varsel (GtkWidget *, cpaneld *, splotd *, gint, gint, gint *, gint, gboolean, ggobid *);
@@ -420,6 +425,7 @@ void       scatterplot_show_vrule (displayd *, gboolean show);
 gboolean   scree_mapped_p (ggobid *);
 void       scree_plot_make (ggobid *);
 gint       selected_cols_get (gint *, GGobiData *d, ggobid *);
+void       show_buffer(cairo_t *cr, cairo_surface_t *buffer);
 void       showInputDescription(InputDescription *desc, ggobid *gg);
 void       smooth_window_open (ggobid *);
 void       sp_event_handlers_toggle (splotd *, gboolean, ProjectionMode, InteractionMode);
@@ -439,21 +445,21 @@ void       spherevars_set (ggobid *);
 void       spherize_data (vector_i *svars, vector_i *pcvars, GGobiData *, ggobid *);
 gboolean   spherize_set_pcvars (GGobiData *, ggobid *);
 void       splash_show (ggobid *gg);
-void       splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg);
-void       splot_add_edge_highlight_cue (splotd *, GdkDrawable *, gint k, gboolean nearest, ggobid *);
-void       splot_add_edge_label (splotd *, GdkDrawable *, gint k, gboolean nearest, ggobid *);
-void       splot_add_edgeedit_cues (splotd *, GdkDrawable *, gint k, gboolean nearest, ggobid *);
-void       splot_add_identify_edge_cues (splotd *sp, GdkDrawable *drawable, gint k, gboolean nearest, ggobid *gg);
-void       splot_add_point_label (gboolean, gint, gboolean, splotd *, GdkDrawable *, ggobid *);
-void       splot_connect_expose_handler (gint, splotd *);
+void       splot_add_diamond_cue (gint k, splotd *sp, cairo_t *drawable, ggobid *gg);
+void       splot_add_edge_highlight_cue (splotd *, cairo_t *, gint k, gboolean nearest, ggobid *);
+void       splot_add_edge_label (splotd *, cairo_t *, gint k, gboolean nearest, ggobid *);
+void       splot_add_edgeedit_cues (splotd *, cairo_t *, gint k, gboolean nearest, ggobid *);
+void       splot_add_identify_edge_cues (splotd *sp, cairo_t *cr, gint k, gboolean nearest, ggobid *gg);
+void       splot_add_point_label (gboolean, gint, gboolean, splotd *, cairo_t *, ggobid *);
+void       splot_connect_draw_handler (gint, splotd *);
 void       splot_cursor_set (gint jcursor, splotd *sp);
 void       splot_cursor_unset (splotd *sp);
 void       splot_dimension_set(splotd* sp, gint width, gint height);
-void       splot_draw_tour_axes(splotd *sp, GdkDrawable *, ggobid *);
-void       splot_edges_draw (splotd *sp, gboolean hiddens_p, GdkDrawable *drawable, ggobid *gg);
+void       splot_draw_tour_axes(splotd *sp, cairo_t *, ggobid *);
+void       splot_edges_draw (splotd *sp, gboolean hiddens_p, cairo_t *drawable, ggobid *gg);
 void       splot_edges_realloc (gint, splotd *, GGobiData *);
 gboolean   splot_event_handled (GtkWidget *, GdkEventKey *, cpaneld *, splotd *, ggobid *);
-void       splot_expose (splotd *);
+void       splot_draw (splotd *);
 void       splot_free (splotd *, displayd *, ggobid *);
 void       splot_get_dimensions (splotd *, gint *, gint *);
 splotd*    splot_new (displayd *, gint, gint, ggobid *);
@@ -716,9 +722,9 @@ void      subset_init (GGobiData *d, ggobid *gg);
 
 
 displayd *createBarchart(displayd *display, gboolean use_window, gboolean missing_p, splotd * sp, gint var, GGobiData * d,  ggobid * gg);
-void      barchart_scaling_visual_cues_draw (splotd *sp, GdkDrawable *drawable, ggobid *gg);
+void      barchart_scaling_visual_cues_draw (splotd *sp, cairo_t *drawable, ggobid *gg);
 gboolean  barchart_active_paint_points (splotd *sp, GGobiData *, ggobid *); 
-void      barchart_add_bar_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg);
+void      barchart_add_bar_cues (splotd *sp, cairo_t *drawable, ggobid *gg);
 void      barchart_clean_init (barchartSPlotd *sp);
 void      barchart_cpanel_init (cpaneld *, ggobid *);
 void      barchart_event_handlers_toggle (displayd *, splotd *, gboolean state, ProjectionMode, InteractionMode);
@@ -731,7 +737,7 @@ void      barchart_recalc_counts (barchartSPlotd *sp, GGobiData *d, ggobid *gg);
 void      barchart_recalc_dimensions (splotd *sp, GGobiData *d, ggobid *gg);
 void      barchart_recalc_group_dimensions (barchartSPlotd *sp, ggobid *gg);
 gboolean  barchart_redraw (splotd *sp, GGobiData *d, ggobid *gg, gboolean binned);
-void      barchart_splot_add_plot_labels (splotd *, GdkDrawable *, ggobid *);
+void      barchart_splot_add_plot_labels (splotd *, cairo_t *, ggobid *);
 GtkWidget* cpanel_barchart_make (ggobid *gg);
 void      cpanel_barchart_set (displayd *, cpaneld *, GtkWidget *panel, ggobid *gg);
 
@@ -758,8 +764,8 @@ void       varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active,
 GtkWidget *varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, GGobiData *d);
 
 void       display_plot (displayd *display, RedrawStyle type, ggobid *gg);
-void       scatterXYAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
-void       scatter1DAddPlotLabels(splotd *sp, GdkDrawable *drawable, GdkGC *gc);
+void       scatterXYAddPlotLabels(splotd *sp, cairo_t *drawable, GdkGC *gc);
+void       scatter1DAddPlotLabels(splotd *sp, cairo_t *drawable, GdkGC *gc);
 gboolean   processRestoreFile(const gchar * const fileName, ggobid *gg);
 void       scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventMotion *event, ggobid *gg);
 void       scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg);
@@ -791,10 +797,6 @@ void resetDataMode();
 vartabled *vartable_element_get(gint i, GGobiData *d);
 
 gboolean parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display);
-
-#ifdef ENABLE_CAIRO
-cairo_t*   create_cairo_glitz(GdkDrawable *drawable);
-#endif
 
 #endif
 
