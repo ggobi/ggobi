@@ -855,7 +855,12 @@ Characters (void *user_data, const xmlChar * ch, gint len)
   const xmlChar *c;
   XMLParserData *data = (XMLParserData *) user_data;
 
-  c = (const xmlChar *) skipWhiteSpace (ch, &dlen);
+  if(data->recordStringLength == 0) {
+    c = (const xmlChar *) skipWhiteSpace (ch, &dlen);
+  } else {
+    c = ch;
+  }
+  
   if (dlen < 1 || c[0] == '\n')
     return;
 
