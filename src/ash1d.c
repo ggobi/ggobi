@@ -47,7 +47,7 @@ do_ash1d (gfloat * vals, gint nvals, gint nbins, gint n_ashes,
           gfloat * ashed_vals, gfloat * lims_min, gfloat * lims_max,
           gfloat * mean)
 {
-  gint i, k, icheck;
+  gint i, k;
   gint *bins;
   gfloat min, max, ab[2];
   gfloat sum;
