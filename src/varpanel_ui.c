@@ -683,10 +683,10 @@ varpanel_tooltips_set (displayd * display, ggobid * gg)
           break;
         label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
 
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                              "Unable to plot without a display", NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                              "Unable to plot without a display", NULL);
+        gtk_widget_set_tooltip_text (wx,
+                              "Unable to plot without a display");
+        gtk_widget_set_tooltip_text (label,
+                              "Unable to plot without a display");
       }
     }
   }

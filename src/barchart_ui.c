@@ -72,9 +72,8 @@ cpanel_barchart_make (ggobid * gg)
   opt = gtk_combo_box_new_text ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
   gtk_widget_set_name (opt, "BARCHART:display_mode_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "switch between height (bars) and width (spines) to represent count",
-                        NULL);
+  gtk_widget_set_tooltip_text (opt,
+                        "switch between height (bars) and width (spines) to represent count");
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, display_mode_lbl, G_N_ELEMENTS (display_mode_lbl),
                       G_CALLBACK (display_mode_cb), gg);

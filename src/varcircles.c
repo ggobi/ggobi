@@ -392,9 +392,8 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gtk_widget_show (da);
 
   d->vcirc_ui.manip_btn = gtk_button_new_with_label ("Manip");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), d->vcirc_ui.manip_btn,
-                        "Click here, then click on the variable you wish to manipulate",
-                        NULL);
+  gtk_widget_set_tooltip_text (d->vcirc_ui.manip_btn,
+                        "Click here, then click on the variable you wish to manipulate");
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), d->vcirc_ui.manip_btn,
                       true, true, 2);
   g_signal_connect (G_OBJECT (d->vcirc_ui.manip_btn),
@@ -520,8 +519,8 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
                          | GDK_LEAVE_NOTIFY_MASK
                          | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), da,
-                        "Click left to select or deselect", NULL);
+  gtk_widget_set_tooltip_text (da,
+                        "Click left to select or deselect");
 
   g_signal_connect (G_OBJECT (da), "draw",
                     G_CALLBACK (da_draw_cb), GINT_TO_POINTER (j));
@@ -536,9 +535,7 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
   lbl = gtk_label_new (ggobi_data_get_col_name(d, j));
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, .5);  /*- x: left, y: middle --*/
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-                        lbl, "Click left on the circle to select or deselect",
-                        NULL);
+  gtk_widget_set_tooltip_text (lbl, "Click left on the circle to select or deselect");
   g_object_set_data (G_OBJECT (lbl), "datad", d);
   GGobi_widget_set (GTK_WIDGET (lbl), gg, true);
   /*gtk_container_add (GTK_CONTAINER (vb), lbl); */

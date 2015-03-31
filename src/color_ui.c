@@ -804,10 +804,8 @@ make_symbol_window (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (hbox), gg->color_ui.symbol_display,
                         true, true, 0);
 
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-                          gg->color_ui.symbol_display,
-                          "Click to select glyph type and size -- which also selects the line type",
-                          NULL);
+    gtk_widget_set_tooltip_text (gg->color_ui.symbol_display,
+                          "Click to select glyph type and size -- which also selects the line type");
 
     g_signal_connect (G_OBJECT (gg->color_ui.symbol_display),
                       "draw",
@@ -833,10 +831,9 @@ make_symbol_window (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (hbox), gg->color_ui.line_display,
                         true, true, 0);
 
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+    gtk_widget_set_tooltip_text (
                           gg->color_ui.line_display,
-                          "Shows the line type corresponding to the current glyph selection",
-                          NULL);
+                          "Shows the line type corresponding to the current glyph selection");
 
     g_signal_connect (G_OBJECT (gg->color_ui.line_display),
                       "draw",
@@ -872,9 +869,8 @@ make_symbol_window (ggobid * gg)
       gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.fg_da[k]),
                                    PSIZE, PSIZE);
 
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->color_ui.fg_da[k],
-                            "Click to select brushing color, double click to reset",
-                            NULL);
+      gtk_widget_set_tooltip_text (gg->color_ui.fg_da[k],
+                            "Click to select brushing color, double click to reset");
 
       gtk_widget_set_events (gg->color_ui.fg_da[k],
                              GDK_EXPOSURE_MASK
@@ -911,10 +907,9 @@ make_symbol_window (ggobid * gg)
 
     gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.bg_da),
                                  PSIZE, PSIZE);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+    gtk_widget_set_tooltip_text (
                           gg->color_ui.bg_da,
-                          "Double click to reset background color (Note: your color selection will have no visible effect unless the 'Value' is >>0; look to the right of the color wheel.)",
-                          NULL);
+                          "Double click to reset background color (Note: your color selection will have no visible effect unless the 'Value' is >>0; look to the right of the color wheel.)");
     gtk_widget_set_events (gg->color_ui.bg_da,
                            GDK_EXPOSURE_MASK
                            | GDK_ENTER_NOTIFY_MASK
@@ -943,10 +938,9 @@ make_symbol_window (ggobid * gg)
     gtk_widget_set_double_buffered (gg->color_ui.accent_da, false);
     gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.accent_da),
                                  PSIZE, PSIZE);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+    gtk_widget_set_tooltip_text (
                           gg->color_ui.accent_da,
-                          "Double click to reset color for labels and axes",
-                          NULL);
+                          "Double click to reset color for labels and axes");
     gtk_widget_set_events (gg->color_ui.accent_da,
                            GDK_EXPOSURE_MASK | GDK_ENTER_NOTIFY_MASK |
                            GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
@@ -974,10 +968,9 @@ make_symbol_window (ggobid * gg)
     gtk_widget_set_double_buffered (gg->color_ui.hidden_da, false);
     gtk_widget_set_size_request (GTK_WIDGET (gg->color_ui.hidden_da),
                                  PSIZE, PSIZE);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
+    gtk_widget_set_tooltip_text (
                           gg->color_ui.hidden_da,
-                          "Double click to reset color for labels and axes",
-                          NULL);
+                          "Double click to reset color for labels and axes");
     gtk_widget_set_events (gg->color_ui.hidden_da,
                            GDK_EXPOSURE_MASK | GDK_ENTER_NOTIFY_MASK |
                            GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);

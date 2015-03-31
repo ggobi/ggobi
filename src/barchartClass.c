@@ -325,10 +325,10 @@ barchartVarpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
                              GtkWidget * wy, GtkWidget * wz,
                              GtkWidget * label)
 {
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                        "Click to replace a variable", NULL);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                        "Click to replace a variable", NULL);
+  gtk_widget_set_tooltip_text (wx,
+                        "Click to replace a variable");
+  gtk_widget_set_tooltip_text (label,
+                        "Click to replace a variable");
 }
 
 

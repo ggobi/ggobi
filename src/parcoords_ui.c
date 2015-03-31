@@ -104,9 +104,8 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
   gtk_widget_set_name (opt, "PCPLOT:sel_mode_option_menu");
   //gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column",
-                        NULL);
+  gtk_widget_set_tooltip_text (opt,
+                        "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column");
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS (arrangement_lbl),
                       G_CALLBACK (arrangement_cb), gg);
@@ -122,9 +121,8 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   opt = gtk_combo_box_new_text ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "Display either textured dot plots or average shifted histograms",
-                        NULL);
+  gtk_widget_set_tooltip_text (opt,
+                        "Display either textured dot plots or average shifted histograms");
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, type_lbl, G_N_ELEMENTS (type_lbl),
                       G_CALLBACK (type_cb), gg);
@@ -147,8 +145,8 @@ cpanel_parcoords_make (ggobid * gg)
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), sbar);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-                        "Adjust ASH smoothness", NULL);
+  gtk_widget_set_tooltip_text (sbar,
+                        "Adjust ASH smoothness");
   gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
@@ -168,8 +166,8 @@ cpanel_parcoords_make (ggobid * gg)
 
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Show all visible cases, or show only labelled cases", NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Show all visible cases, or show only labelled cases");
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, showcases_lbl,
     sizeof (showcases_lbl) / sizeof (gchar *),
@@ -189,9 +187,8 @@ cpanel_parcoords_make (ggobid * gg)
 
   opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Scale variables (and variable groups) on a common scale, or independently",
-     NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Scale variables (and variable groups) on a common scale, or independently");
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, varscale_lbl,
     sizeof (varscale_lbl) / sizeof (gchar *),

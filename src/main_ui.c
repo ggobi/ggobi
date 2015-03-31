@@ -118,12 +118,24 @@ mode_panel_get_by_name (const gchar * name, ggobid * gg)
 }
 
 void
-tooltips_show (gboolean show, ggobid * gg)
+tooltips_show (gboolean show)
 {
+  int timeout;
   if (show)
-    gtk_tooltips_enable (gg->tips);
+    timeout = 500;
   else
-    gtk_tooltips_disable (gg->tips);
+    timeout = G_MAXINT;
+  
+  GtkSettings *settings = gtk_settings_get_default ();
+  g_object_set (G_OBJECT(settings), "gtk-tooltip-timeout", timeout);
+}
+
+gboolean
+tooltips_enabled () {
+  int timeout;
+  g_object_get (G_OBJECT(gtk_settings_get_default ()), "gtk-tooltip-timeout",
+                &timeout);
+  return timeout < G_MAXINT;
 }
 
 void
@@ -834,7 +846,7 @@ action_plugins_cb (GtkAction * action, ggobid * gg)
 static void
 action_toggle_tooltips_cb (GtkToggleAction * action, ggobid * gg)
 {
-  tooltips_show (gtk_toggle_action_get_active (action), gg);
+  tooltips_show (gtk_toggle_action_get_active (action));
 }
 static void
 action_toggle_cpanel_cb (GtkToggleAction * action, ggobid * gg)
@@ -1043,11 +1055,12 @@ static GtkRadioActionEntry imode_entries[] = {
 GtkActionGroup *
 ggobi_actions_create (ggobid * gg)
 {
+  
   GtkToggleActionEntry t_entries[] = {  /* not global because depends on gg state */
     {"ShowTooltips", NULL, "Show _Tooltips", NULL,
      "Toggle display of helpful tips like this one",
-     G_CALLBACK (action_toggle_tooltips_cb),
-     GTK_TOOLTIPS (gg->tips)->enabled},
+     G_CALLBACK (action_toggle_tooltips_cb), tooltips_enabled ()
+     },
     {"ShowControlPanel", NULL, "Show _Control Panel", NULL,
      "Toggle display of control panel",
      G_CALLBACK (action_toggle_cpanel_cb), true},

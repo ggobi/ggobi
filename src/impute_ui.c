@@ -232,9 +232,8 @@ impute_window_open (ggobid * gg)
     /*-- Add a toggle button, show missings or not --*/
     tgl = gtk_check_button_new_with_mnemonic ("Sh_ow missing values");
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (tgl), on);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-                          "Draw the missing values when plotting displays; if there are multiple datasets, this applies only to the current dataset",
-                          NULL);
+    gtk_widget_set_tooltip_text (tgl,
+                          "Draw the missing values when plotting displays; if there are multiple datasets, this applies only to the current dataset");
     g_signal_connect (G_OBJECT (tgl), "toggled",
                       G_CALLBACK (show_missings_cb), (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (vbox), tgl, false, false, 2);
@@ -245,9 +244,8 @@ impute_window_open (ggobid * gg)
     g_signal_connect (G_OBJECT (btn),
                       "clicked", G_CALLBACK (missings_datad_cb),
                       (gpointer) gg);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Generate a new dataset from the 1's and 0's representing missingness",
-                          NULL);
+    gtk_widget_set_tooltip_text (btn,
+                          "Generate a new dataset from the 1's and 0's representing missingness");
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
     /*-- add a frame to contain the "imputation" widgets --*/
@@ -271,9 +269,8 @@ impute_window_open (ggobid * gg)
 
     /* Random */
     radio = gtk_radio_button_new_with_mnemonic (NULL, "_Random");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
-                          "Assign to each missing value one of the existing variable values chosen at random",
-                          NULL);
+    gtk_widget_set_tooltip_text (radio,
+                          "Assign to each missing value one of the existing variable values chosen at random");
     g_signal_connect (G_OBJECT (radio), "toggled",
                       G_CALLBACK (set_random_cb), (gpointer) gg);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio), true);
@@ -283,9 +280,8 @@ impute_window_open (ggobid * gg)
                       1, 1);
     tgl =
       gtk_check_button_new_with_mnemonic ("Condition on symbol and _color");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-                          "Condition the random imputation on the symbol and color; these groups can be seen in the case clusters window",
-                          NULL);
+    gtk_widget_set_tooltip_text (tgl,
+                          "Condition the random imputation on the symbol and color; these groups can be seen in the case clusters window");
     g_signal_connect (G_OBJECT (tgl), "toggled", G_CALLBACK (group_cb),
                       (gpointer) gg);
     gtk_table_attach (GTK_TABLE (table), tgl, 1, 2, row, row + 1,
@@ -301,9 +297,8 @@ impute_window_open (ggobid * gg)
       gtk_radio_button_new_with_mnemonic (gtk_radio_button_get_group
                                           (GTK_RADIO_BUTTON (radio)),
                                           "Variable _mean");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
-                          "Assign the variable mean to each missing value",
-                          NULL);
+    gtk_widget_set_tooltip_text (radio,
+                          "Assign the variable mean to each missing value");
     g_signal_connect (G_OBJECT (radio), "toggled", G_CALLBACK (set_mean_cb),
                       (gpointer) gg);
     gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
@@ -317,9 +312,8 @@ impute_window_open (ggobid * gg)
       gtk_radio_button_new_with_mnemonic (gtk_radio_button_get_group
                                           (GTK_RADIO_BUTTON (radio)),
                                           "Variable m_edian");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
-                          "Assign the variable median to each missing value",
-                          NULL);
+    gtk_widget_set_tooltip_text (radio,
+                          "Assign the variable median to each missing value");
     g_signal_connect (G_OBJECT (radio), "toggled", G_CALLBACK (set_median_cb),
                       (gpointer) gg);
     gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
@@ -334,9 +328,8 @@ impute_window_open (ggobid * gg)
       gtk_radio_button_new_with_mnemonic (gtk_radio_button_get_group
                                           (GTK_RADIO_BUTTON (radio)),
                                           "_Fixed");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
-                          "Assign a fixed value to each missing variable value",
-                          NULL);
+    gtk_widget_set_tooltip_text (radio,
+                          "Assign a fixed value to each missing variable value");
     g_signal_connect (G_OBJECT (radio), "toggled", G_CALLBACK (set_fixed_cb),
                       (gpointer) gg);
     gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
@@ -357,9 +350,8 @@ impute_window_open (ggobid * gg)
       gtk_radio_button_new_with_mnemonic (gtk_radio_button_get_group
                                           (GTK_RADIO_BUTTON (radio)),
                                           "Percent _below min");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
-                          "Assign a fixed value which is some percentage below the minimum value for the variable",
-                          NULL);
+    gtk_widget_set_tooltip_text (radio,
+                          "Assign a fixed value which is some percentage below the minimum value for the variable");
     g_signal_connect (G_OBJECT (radio), "toggled",
                       G_CALLBACK (set_fixed_below_cb), (gpointer) gg);
     gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
@@ -380,9 +372,8 @@ impute_window_open (ggobid * gg)
       gtk_radio_button_new_with_mnemonic (gtk_radio_button_get_group
                                           (GTK_RADIO_BUTTON (radio)),
                                           "Percent ab_ove min");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio,
-                          "Assign a fixed value which is some percentage above the minimum value for the variable",
-                          NULL);
+    gtk_widget_set_tooltip_text (radio,
+                          "Assign a fixed value which is some percentage above the minimum value for the variable");
     g_signal_connect (G_OBJECT (radio), "toggled",
                       G_CALLBACK (set_fixed_above_cb), (gpointer) gg);
     gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
@@ -406,13 +397,13 @@ impute_window_open (ggobid * gg)
     btn = gtk_button_new_with_mnemonic ("_Impute");
     g_signal_connect (G_OBJECT (btn),
                       "clicked", G_CALLBACK (impute_cb), (gpointer) gg);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Impute or assign values to missings", NULL);
+    gtk_widget_set_tooltip_text (btn,
+                          "Impute or assign values to missings");
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
 
     btn = gtk_button_new_with_mnemonic ("Re_scale");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Rescale the data after imputing", NULL);
+    gtk_widget_set_tooltip_text (btn,
+                          "Rescale the data after imputing");
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (rescale_cb), (gpointer) gg);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
@@ -424,8 +415,8 @@ impute_window_open (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Close the window", NULL);
+    gtk_widget_set_tooltip_text (btn,
+                          "Close the window");
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (close_btn_cb), gg);

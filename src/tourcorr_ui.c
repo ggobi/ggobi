@@ -183,8 +183,8 @@ cpanel_ctour_make (ggobid *gg) {
 
   sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_widget_set_name (sbar, "COTOUR:speed_bar");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-    "Adjust speed of tour motion", NULL);
+  gtk_widget_set_tooltip_text (sbar,
+    "Adjust speed of tour motion");
   scale_set_default_values (GTK_SCALE (sbar));
 
   gtk_box_pack_start (GTK_BOX (panel->w), sbar,
@@ -197,8 +197,8 @@ cpanel_ctour_make (ggobid *gg) {
 
   btn = gtk_check_button_new_with_mnemonic ("_Pause");
   gtk_widget_set_name (btn, "COTOUR:pause_button");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Stop tour motion temporarily (keyboard shortcut: w)", NULL);
+  gtk_widget_set_tooltip_text (btn,
+    "Stop tour motion temporarily (keyboard shortcut: w)");
   g_signal_connect (G_OBJECT (btn), "toggled",
                      G_CALLBACK (tourcorr_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
@@ -211,15 +211,15 @@ cpanel_ctour_make (ggobid *gg) {
   box = gtk_hbox_new (true, 2);
 
   btn = gtk_button_new_with_mnemonic("_Reinit");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Reset projection", NULL);
+  gtk_widget_set_tooltip_text (btn,
+    "Reset projection");
   g_signal_connect (G_OBJECT (btn), "clicked",
                      G_CALLBACK (tourcorr_reinit_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   btn = gtk_button_new_with_mnemonic ("Scr_amble");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Reset projection to random value", NULL);
+  gtk_widget_set_tooltip_text (btn,
+    "Reset projection to random value");
   g_signal_connect (G_OBJECT (btn), "clicked",
                      G_CALLBACK (tourcorr_scramble_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
@@ -232,15 +232,15 @@ cpanel_ctour_make (ggobid *gg) {
   box = gtk_hbox_new (true, 2);
 
    btn = gtk_button_new_with_mnemonic ("_Snap");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Take a snapshot of this frame to re-generate plot outside ggobi", NULL);
+  gtk_widget_set_tooltip_text (btn,
+    "Take a snapshot of this frame to re-generate plot outside ggobi");
   g_signal_connect (G_OBJECT (btn), "clicked",
                      G_CALLBACK (tourcorr_snap_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   btn = gtk_check_button_new_with_mnemonic ("Vid_eo");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Save sequence of projection frames out to file", NULL);
+  gtk_widget_set_tooltip_text (btn,
+    "Save sequence of projection frames out to file");
   g_signal_connect (G_OBJECT (btn), "toggled",
                      G_CALLBACK (tourcorr_video_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
@@ -262,7 +262,7 @@ cpanel_ctour_make (ggobid *gg) {
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), manip_opt);
   gtk_widget_set_name (manip_opt, "COTOUR:manip");
   //gtk_container_set_border_width (GTK_CONTAINER (manip_opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), manip_opt,
+  gtk_widget_set_tooltip_text (manip_opt,
     "Set the manual manipulation method", NULL);
   gtk_container_add (GTK_CONTAINER (vb), manip_opt);
   populate_combo_box (manip_opt, manip_lbl, G_N_ELEMENTS(manip_lbl),
@@ -280,8 +280,8 @@ cpanel_ctour_make (ggobid *gg) {
 
   pathlen_opt = gtk_option_menu_new ();
   gtk_container_set_border_width (GTK_CONTAINER (pathlen_opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pathlen_opt,
-    "Set the path length", NULL);
+  gtk_widget_set_tooltip_text (pathlen_opt,
+    "Set the path length");
   gtk_container_add (GTK_CONTAINER (vb), pathlen_opt);
   populate_option_menu (pathlen_opt, pathlen_lbl,
     sizeof (pathlen_lbl) / sizeof (gchar *),
@@ -291,8 +291,8 @@ cpanel_ctour_make (ggobid *gg) {
  * Sync Axes toggle
 */
   /*  tgl = gtk_check_button_new_with_label ("Sync axes");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-    "Synchronize the horizontal and vertical axes", NULL);
+  gtk_widget_set_tooltip_text (tgl,
+    "Synchronize the horizontal and vertical axes");
   g_signal_connect (G_OBJECT (tgl), "toggled",
                       G_CALLBACK (syncaxes_cb), (gpointer) NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
@@ -302,8 +302,8 @@ cpanel_ctour_make (ggobid *gg) {
  * projection pursuit button
 */
   /*  btn = gtk_button_new_with_label ("Projection pursuit ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open panel for correlation tour projection pursuit", NULL);
+  gtk_widget_set_tooltip_text (btn,
+    "Open panel for correlation tour projection pursuit");
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   g_signal_connect (G_OBJECT (btn), "clicked",
@@ -313,8 +313,8 @@ cpanel_ctour_make (ggobid *gg) {
  * advanced features button
 */
   /*  btn = gtk_button_new_with_label ("Advanced features ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open panel for additional correlation tour features", NULL);
+  gtk_widget_set_tooltip_text (btn,
+    "Open panel for additional correlation tour features");
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   g_signal_connect (G_OBJECT (btn), "clicked",

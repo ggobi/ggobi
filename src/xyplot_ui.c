@@ -139,8 +139,8 @@ cpanel_xyplot_make (ggobid *gg) {
 
   cycle_tgl = gtk_check_button_new_with_mnemonic ("_Cycle");
   gtk_widget_set_name (cycle_tgl, "XYPLOT:cycle_toggle");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), cycle_tgl,
-    "Cycle through pairwise plots", NULL);
+  gtk_widget_set_tooltip_text (cycle_tgl,
+    "Cycle through pairwise plots");
   g_signal_connect (G_OBJECT (cycle_tgl), "toggled",
                      G_CALLBACK (cycle_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (vb), cycle_tgl,
@@ -151,8 +151,8 @@ cpanel_xyplot_make (ggobid *gg) {
 */
   opt = gtk_combo_box_new_text ();
   gtk_widget_set_name (opt, "XYPLOT:cycle_axis");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Fix one of the axes during plot cycling or let them both float", NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Fix one of the axes during plot cycling or let them both float");
   gtk_box_pack_start (GTK_BOX (vb), opt,
     false, false, 0);
   populate_combo_box (opt, (gchar**) fix_axis_lbl, G_N_ELEMENTS(fix_axis_lbl),
@@ -174,12 +174,12 @@ cpanel_xyplot_make (ggobid *gg) {
 
   gtk_box_pack_start (GTK_BOX (vb),
                       cycle_sbar, false, false, 1);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), cycle_sbar,
-    "Adjust cycling speed", NULL);
+  gtk_widget_set_tooltip_text (cycle_sbar,
+    "Adjust cycling speed");
 
   chdir_btn = gtk_button_new_with_mnemonic ("Change di_rection");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), chdir_btn,
-    "Change cycling direction", NULL);
+  gtk_widget_set_tooltip_text (chdir_btn,
+    "Change cycling direction");
   gtk_box_pack_start (GTK_BOX (vb),
                       chdir_btn, false, false, 1);
   g_signal_connect (G_OBJECT (chdir_btn), "clicked",

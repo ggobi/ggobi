@@ -129,9 +129,8 @@ writeall_window_open (ggobid *gg) {
   /*-- Format --*/
   j = 0;
   opt = gtk_combo_box_new_text ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Save the data in XML or CSV",
-    NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Save the data in XML or CSV");
   populate_combo_box (opt, format_lbl, G_N_ELEMENTS(format_lbl),
     G_CALLBACK(format_set_cb), gg);
   gtk_combo_box_set_active (GTK_COMBO_BOX (opt),
@@ -182,9 +181,8 @@ writeall_window_open (ggobid *gg) {
   /*-- Stage --*/
   j++;
   opt = gtk_combo_box_new_text ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Save raw or transformed data",
-    NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Save raw or transformed data");
   populate_combo_box (opt, stage_lbl, G_N_ELEMENTS(stage_lbl),
     G_CALLBACK(stage_set_cb), gg);
   gg->save.stage = TFORMDATA;
@@ -202,9 +200,8 @@ writeall_window_open (ggobid *gg) {
 /*
   j++;
   opt = gtk_option_menu_new ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Include any added jitter?",
-    NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Include any added jitter?");
   populate_option_menu (opt, jitter_lbl,
     sizeof (jitter_lbl) / sizeof (gchar *), jitterp_set_cb, "GGobi", gg);
   gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
@@ -220,9 +217,8 @@ writeall_window_open (ggobid *gg) {
   /*-- Which rows --*/
   j++;
   opt = gtk_combo_box_new_text ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Specify which rows should be written out",
-    NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Specify which rows should be written out");
   populate_combo_box (opt, rowdata_lbl, G_N_ELEMENTS(rowdata_lbl),
     G_CALLBACK(rowind_set_cb), gg);
   gg->save.row_ind = ALLROWS;
@@ -238,9 +234,8 @@ writeall_window_open (ggobid *gg) {
   /*-- Which columns --*/
   j++;
   opt = gtk_combo_box_new_text ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Specify which variables should be written out",
-    NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Specify which variables should be written out");
   populate_combo_box (opt, columndata_lbl, G_N_ELEMENTS(columndata_lbl),
     G_CALLBACK(columnind_set_cb), gg);
   gg->save.column_ind = ALLCOLS;
@@ -256,9 +251,8 @@ writeall_window_open (ggobid *gg) {
   /*-- Format for missings --*/
   j++;
   opt = gtk_combo_box_new_text ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Specify how to write out missing data",
-    NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Specify how to write out missing data");
   populate_combo_box (opt, missing_lbl, G_N_ELEMENTS(missing_lbl),
     G_CALLBACK(missingind_set_cb), gg);
   gg->save.missing_ind = MISSINGSNA;
@@ -274,9 +268,8 @@ writeall_window_open (ggobid *gg) {
   /*-- edges? --*/
   j++;
   opt = gtk_combo_box_new_text ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Include line segments?",
-    NULL);
+  gtk_widget_set_tooltip_text (opt,
+    "Include line segments?");
   populate_combo_box (opt, edges_lbl, G_N_ELEMENTS(edges_lbl),
     G_CALLBACK(edgesp_set_cb), gg);
   /*-- initialize variable corresponding to option menu --*/
@@ -299,8 +292,8 @@ writeall_window_open (ggobid *gg) {
  * Add a button to open a file selection box; see filename_get_w in io.c
 */
   btn = gtk_button_new_from_stock (GTK_STOCK_SAVE);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open file selection widget", NULL);
+  gtk_widget_set_tooltip_text (btn,
+    "Open file selection widget");
   gtk_box_pack_start (GTK_BOX (vbox), btn,
                       false, false, 3);
   g_signal_connect (G_OBJECT (btn), "clicked",

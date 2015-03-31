@@ -117,9 +117,8 @@ ctourpp_window_open (ggobid * gg)
  * Optimize toggle
 */
     tgl = gtk_check_button_new_with_mnemonic ("_Optimize");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-                          "Guide the tour using projection pursuit optimization or tour passively",
-                          NULL);
+    gtk_widget_set_tooltip_text (tgl,
+                          "Guide the tour using projection pursuit optimization or tour passively");
     g_signal_connect (G_OBJECT (tgl), "toggled",
                       G_CALLBACK (optimize_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vbc), tgl, false, false, 1);
@@ -137,9 +136,8 @@ ctourpp_window_open (ggobid * gg)
     entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (entry), 32);
     gtk_editable_set_editable (GTK_EDITABLE (entry), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-                          "The value of the projection pursuit index for the current projection",
-                          NULL);
+    gtk_widget_set_tooltip_text (entry,
+                          "The value of the projection pursuit index for the current projection");
     gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
 
 /*

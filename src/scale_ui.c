@@ -414,8 +414,8 @@ cpanel_scale_make (ggobid * gg)
   sbarx = gtk_hscale_new (GTK_ADJUSTMENT (adjx));
   gtk_widget_set_name (sbarx, "SCALE:x_zoom");
   scale_set_default_values (GTK_SCALE (sbarx));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbarx,
-                        "Zoom horizontally", NULL);
+  gtk_widget_set_tooltip_text (sbarx,
+                        "Zoom horizontally");
   gtk_box_pack_start (GTK_BOX (vb), sbarx, true, true, 0);
 
   adjy = (GtkAdjustment *)
@@ -426,14 +426,14 @@ cpanel_scale_make (ggobid * gg)
   sbary = gtk_hscale_new (GTK_ADJUSTMENT (adjy));
   gtk_widget_set_name (sbary, "SCALE:y_zoom");
   scale_set_default_values (GTK_SCALE (sbary));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbary,
-                        "Zoom vertically", NULL);
+  gtk_widget_set_tooltip_text (sbary,
+                        "Zoom vertically");
   gtk_box_pack_start (GTK_BOX (vb), sbary, true, true, 0);
 
   tgl = gtk_check_button_new_with_mnemonic ("Fixed _aspect");
   gtk_widget_set_name (tgl, "SCALE:aspect_ratio_tgl");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-                        "Fix the aspect ratio while zooming.", NULL);
+  gtk_widget_set_tooltip_text (tgl,
+                        "Fix the aspect ratio while zooming.");
   g_signal_connect (G_OBJECT (tgl), "toggled",
                     G_CALLBACK (aspect_ratio_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (vb), tgl, false, false, 3);
@@ -454,8 +454,8 @@ cpanel_scale_make (ggobid * gg)
   sbarx = gtk_hscale_new (GTK_ADJUSTMENT (adjx));
   gtk_widget_set_name (sbarx, "SCALE:x_pan");
   scale_set_default_values (GTK_SCALE (sbarx));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbarx,
-                        "Pan horizontally", NULL);
+  gtk_widget_set_tooltip_text (sbarx,
+                        "Pan horizontally");
   gtk_box_pack_start (GTK_BOX (vb), sbarx, true, true, 0);
 
   adjy = (GtkAdjustment *)
@@ -466,8 +466,8 @@ cpanel_scale_make (ggobid * gg)
   sbary = gtk_hscale_new (GTK_ADJUSTMENT (adjy));
   gtk_widget_set_name (sbary, "SCALE:y_pan");
   scale_set_default_values (GTK_SCALE (sbary));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbary,
-                        "Pan vertically", NULL);
+  gtk_widget_set_tooltip_text (sbary,
+                        "Pan vertically");
   gtk_box_pack_start (GTK_BOX (vb), sbary, true, true, 0);
 
 

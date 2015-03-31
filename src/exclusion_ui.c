@@ -568,9 +568,8 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
     /*-- add the row of titles --*/
 
     ebox = gtk_event_box_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-                          "Click to change the color/glyph of all members of the selected cluster to the current brushing color/glyph",
-                          NULL);
+    gtk_widget_set_tooltip_text (ebox,
+                          "Click to change the color/glyph of all members of the selected cluster to the current brushing color/glyph");
     lbl = gtk_label_new ("Symbol");
     gtk_container_add (GTK_CONTAINER (ebox), lbl);
     gtk_table_attach (GTK_TABLE (d->cluster_table), ebox, 0, 1, 0, 1,
@@ -578,67 +577,32 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
                       GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-                          "Shadow brush all cases with the corresponding symbol.",
-                          NULL);
+    gtk_widget_set_tooltip_text (ebox,
+                          "Shadow brush all cases with the corresponding symbol.");
     lbl = gtk_label_new ("Shadow");
     gtk_container_add (GTK_CONTAINER (ebox), lbl);
     gtk_table_attach (GTK_TABLE (d->cluster_table), ebox,
                       1, 2, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
-/*
-    ebox = gtk_event_box_new();
-    gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-      "Exclude all hidden cases with the corresponding symbol",
-      NULL);
-    lbl = gtk_label_new("Exclude");
-    gtk_container_add(GTK_CONTAINER(ebox), lbl);
-    gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-      2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
-*/
-
-/*
-    ebox = gtk_event_box_new();
-    gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-      "Show all cases with the corresponding symbol",
-      NULL);
-    lbl = gtk_label_new("Show");
-    gtk_container_add(GTK_CONTAINER(ebox), lbl);
-    gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-      2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
-
-    ebox = gtk_event_box_new();
-    gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), ebox,
-      "Complement: Show/hide all cases with the corresponding symbol that are hidden/shown",
-      NULL);
-    lbl = gtk_label_new("Comp");
-    gtk_container_add(GTK_CONTAINER(ebox), lbl);
-    gtk_table_attach(GTK_TABLE(d->cluster_table), ebox,
-      3, 4, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
-*/
-
     ebox = gtk_event_box_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-                          "The number of cases in shadow out of N with the corresponding symbol.",
-                          NULL);
+    gtk_widget_set_tooltip_text (ebox,
+                                 "The number of cases in shadow out of N with the corresponding symbol.");
     lbl = gtk_label_new ("Shadowed");
     gtk_container_add (GTK_CONTAINER (ebox), lbl);
     gtk_table_attach (GTK_TABLE (d->cluster_table), ebox,
                       2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-                          "The number of visible cases (cases not in shadow) out of N with the corresponding symbol.",
-                          NULL);
+    gtk_widget_set_tooltip_text (ebox,
+                          "The number of visible cases (cases not in shadow) out of N with the corresponding symbol.");
     lbl = gtk_label_new ("Shown");
     gtk_container_add (GTK_CONTAINER (ebox), lbl);
     gtk_table_attach (GTK_TABLE (d->cluster_table), ebox,
                       3, 4, 0, 1, GTK_FILL, GTK_FILL, 5, 2);
 
     ebox = gtk_event_box_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-                          "The number of cases with the corresponding symbol.  If sampling, the number of cases in the current subsample",
-                          NULL);
+    gtk_widget_set_tooltip_text (ebox,
+                          "The number of cases with the corresponding symbol.  If sampling, the number of cases in the current subsample");
     lbl = gtk_label_new ("N");
     gtk_container_add (GTK_CONTAINER (ebox), lbl);
     gtk_table_attach (GTK_TABLE (d->cluster_table), ebox,
@@ -668,27 +632,24 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
   /*-- Exclude button --*/
   btn = gtk_button_new_with_mnemonic ("E_xclude shadows");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Exclude all points in shadow, so that they're not drawn and they're ignored when scaling the view.",
-                        NULL);
+  gtk_widget_set_tooltip_text (btn,
+                        "Exclude all points in shadow, so that they're not drawn and they're ignored when scaling the view.");
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (exclude_hiddens_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
 
   /*-- Include button --*/
   btn = gtk_button_new_with_mnemonic ("_Include shadows");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Include all previously hidden and excluded points.",
-                        NULL);
+  gtk_widget_set_tooltip_text (btn,
+                        "Include all previously hidden and excluded points.");
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (include_hiddens_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
 
   /*-- Update button --*/
   btn = gtk_button_new_from_stock (GTK_STOCK_REFRESH);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Reset plots after brushing so that shadow and excluded status is consistent with this table; reset this table if necessary.",
-                        NULL);
+  gtk_widget_set_tooltip_text (btn,
+                        "Reset plots after brushing so that shadow and excluded status is consistent with this table; reset this table if necessary.");
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (update_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);

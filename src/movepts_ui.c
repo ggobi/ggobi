@@ -204,17 +204,16 @@ cpanel_movepts_make (ggobid * gg)
 
   opt = gtk_combo_box_new_text ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "Move freely, or constrain the motion vertically or horizontally",
-                        NULL);
+  gtk_widget_set_tooltip_text (opt,
+                        "Move freely, or constrain the motion vertically or horizontally");
   populate_combo_box (opt, mdir_lbl, G_N_ELEMENTS (mdir_lbl),
                       G_CALLBACK (mdir_cb), gg);
   gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
 
   /*-- Use group toggle --*/
   btn = gtk_check_button_new_with_mnemonic ("Move brush _group");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Move all points with the same symbol", NULL);
+  gtk_widget_set_tooltip_text (btn,
+                        "Move all points with the same symbol");
   g_signal_connect (G_OBJECT (btn), "toggled",
                     G_CALLBACK (move_cluster_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
@@ -223,15 +222,15 @@ cpanel_movepts_make (ggobid * gg)
   box = gtk_hbox_new (true, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Reset all");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Reset all points to their original positions", NULL);
+  gtk_widget_set_tooltip_text (btn,
+                        "Reset all points to their original positions");
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (reset_all_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, false, false, 1);
 
   btn = gtk_button_new_from_stock (GTK_STOCK_UNDO);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Undo the previous move", NULL);
+  gtk_widget_set_tooltip_text (btn,
+                        "Undo the previous move");
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (undo_last_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, false, false, 1);

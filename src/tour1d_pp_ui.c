@@ -295,9 +295,8 @@ tour1dpp_window_open (ggobid *gg) {
  * Optimize toggle
 */
     tgl = gtk_check_button_new_with_mnemonic ("_Optimize");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Guide the tour using projection pursuit optimization or tour passively",
-      NULL);
+    gtk_widget_set_tooltip_text (tgl,
+      "Guide the tour using projection pursuit optimization or tour passively");
     g_signal_connect (G_OBJECT (tgl), "toggled",
                         G_CALLBACK (t1d_optimz_cb), (gpointer) dsp);
     gtk_box_pack_start (GTK_BOX (vbc),
@@ -321,8 +320,8 @@ tour1dpp_window_open (ggobid *gg) {
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_widget_set_name (sbar, "TOUR1D:PP_TEMPST");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-    "Adjust starting temp of pp", NULL);
+    gtk_widget_set_tooltip_text (sbar,
+    "Adjust starting temp of pp");
     gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
@@ -346,8 +345,8 @@ tour1dpp_window_open (ggobid *gg) {
     sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_widget_set_name (sbar, "TOUR1D:PP_COOLING");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-    "Adjust cooling", NULL);
+    gtk_widget_set_tooltip_text (sbar,
+    "Adjust cooling");
     gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
@@ -368,17 +367,15 @@ tour1dpp_window_open (ggobid *gg) {
     dsp->t1d_pplabel = gtk_label_new ("PP index: (0.00) 0.0000 (0.00)");
     gtk_misc_set_alignment (GTK_MISC (dsp->t1d_pplabel), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (hb), dsp->t1d_pplabel, false, false, 0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), dsp->t1d_pplabel,
-      "The value of the projection pursuit index for the current projection",
-      NULL);
+    gtk_widget_set_tooltip_text (dsp->t1d_pplabel,
+      "The value of the projection pursuit index for the current projection");
 
     /*    entry = gtk_entry_new_with_max_length (32);
     gtk_entry_set_editable (GTK_ENTRY (entry), false);
     gtk_entry_set_text (GTK_ENTRY (entry), "0");
     gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-      "The value of the projection pursuit index for the current projection",
-      NULL);
+    gtk_widget_set_tooltip_text (entry,
+      "The value of the projection pursuit index for the current projection");
     g_signal_connect (G_OBJECT (entry), "value_changed",
     G_CALLBACK (t1d_writeindx_cb), gg);*/
     /*    g_signal_connect (G_OBJECT (dsp->t1d.ppval), "value_changed",
@@ -401,8 +398,8 @@ tour1dpp_window_open (ggobid *gg) {
 /*
     gtk_misc_set_alignment (opt, 0, 0.5);
 */
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Set the projection pursuit index", NULL);
+    gtk_widget_set_tooltip_text (opt,
+      "Set the projection pursuit index");
     gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
     /*  gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);*/
     populate_combo_box (opt, t1d_pp_func_lbl, G_N_ELEMENTS(t1d_pp_func_lbl),
@@ -420,8 +417,8 @@ tour1dpp_window_open (ggobid *gg) {
                                                       1.0, 30.0,
                                                       1.0, 1.0, 0.0);
     param_scale = gtk_hscale_new (GTK_ADJUSTMENT (param_adj));
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), param_scale,
-      "Set number of terms in the expansion for some indices; bandwidth for others", NULL);
+    gtk_widget_set_tooltip_text (param_scale,
+      "Set number of terms in the expansion for some indices; bandwidth for others");
     gtk_range_set_update_policy (GTK_RANGE (param_scale),
                                  GTK_UPDATE_CONTINUOUS);
     gtk_scale_set_digits (GTK_SCALE (param_scale), 0);

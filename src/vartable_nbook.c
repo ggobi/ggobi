@@ -391,18 +391,9 @@ vartable_subwindow_init (GGobiData *d, ggobid *gg)
 
   gtk_container_add (GTK_CONTAINER (sw), d->vartable_tree_view[real]);
   wlbl = gtk_label_new_with_mnemonic("_Real");
-/*
-This works for showing tooltips in the tabs, but unfortunately it
-interferes with the normal operation of the widget -- I can't switch
-pages any more!
-  GtkWidget *ebox;
-  ebox = gtk_event_box_new ();
-  gtk_container_add (GTK_CONTAINER (ebox), wlbl);
-  gtk_widget_show(wlbl);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-    "Table of statistics for real, integer and counter variables", NULL);
-  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
-*/
+  
+  gtk_widget_set_tooltip_text (wlbl,
+    "Table of statistics for real, integer and counter variables");
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), sw, wlbl);
 
   sw = gtk_scrolled_window_new (NULL, NULL);
@@ -426,14 +417,8 @@ pages any more!
   gtk_container_add (GTK_CONTAINER (sw),
     d->vartable_tree_view[categorical]);
   wlbl = gtk_label_new_with_mnemonic("_Categorical");
-/*
-  ebox = gtk_event_box_new ();
-  gtk_container_add (GTK_CONTAINER (ebox), wlbl);
-  gtk_widget_show(wlbl);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-    "Table of statistics for categorical variables", NULL);
-  gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
-*/
+  gtk_widget_set_tooltip_text (wlbl,
+    "Table of statistics for categorical variables");
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), sw, wlbl);
 
   /*-- 3 = COLUMN_INSET --*/

@@ -155,9 +155,8 @@ jitter_window_open (ggobid * gg)
 
       /*-- option menu --*/
       opt = gtk_combo_box_new_text ();
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                            "The jittering is either distributed uniform or normal",
-                            NULL);
+      gtk_widget_set_tooltip_text (opt,
+                            "The jittering is either distributed uniform or normal");
       gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
       populate_combo_box (opt, type_lbl, G_N_ELEMENTS (type_lbl),
                           G_CALLBACK (type_cb), gg);
@@ -175,8 +174,8 @@ jitter_window_open (ggobid * gg)
                         G_CALLBACK (degree_cb), (gpointer) gg);
 
       sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-                            "Set the degree of jitter", NULL);
+      gtk_widget_set_tooltip_text (sbar,
+                            "Set the degree of jitter");
       gtk_scale_set_draw_value (GTK_SCALE (sbar), false);
       gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
       gtk_scale_set_digits (GTK_SCALE (sbar), 2);
@@ -187,8 +186,8 @@ jitter_window_open (ggobid * gg)
 
       /*-- Rejitter button --*/
       btn = gtk_button_new_with_mnemonic ("_Jitter");
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                            "Rejitter the data", NULL);
+      gtk_widget_set_tooltip_text (btn,
+                            "Rejitter the data");
       g_signal_connect (G_OBJECT (btn), "clicked",
                         G_CALLBACK (jitter_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);

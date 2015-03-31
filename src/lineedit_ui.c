@@ -243,9 +243,8 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
 
   /*-- ok button --*/
   w = gtk_button_new_from_stock (GTK_STOCK_APPLY);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), w,
-                        "Add the point or edge.  To avoid seeing this dialog, use the left button.",
-                        NULL);
+  gtk_widget_set_tooltip_text (w,
+                        "Add the point or edge.  To avoid seeing this dialog, use the left button.");
   g_signal_connect (G_OBJECT (w), "clicked",
                     G_CALLBACK (add_record_dialog_apply), dsp);
   gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
@@ -513,9 +512,8 @@ cpanel_edgeedit_make (ggobid * gg)
   if (adding_edges)
     GTK_TOGGLE_BUTTON (radio1)->active = true;
 
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
-                        "Add new edges using the mouse. The right or middle button opens a dialog window; the left button adds an edge using defaults.",
-                        NULL);
+  gtk_widget_set_tooltip_text (radio1,
+                        "Add new edges using the mouse. The right or middle button opens a dialog window; the left button adds an edge using defaults.");
   g_signal_connect (G_OBJECT (radio1), "toggled",
                     G_CALLBACK (add_edges_or_points_cb), gg);
   gtk_box_pack_start (GTK_BOX (vb), radio1, false, false, 0);
@@ -524,9 +522,8 @@ cpanel_edgeedit_make (ggobid * gg)
 
   radio2 = gtk_radio_button_new_with_mnemonic (group, "Add _points");
   gtk_widget_set_name (radio2, "EDGEEDIT:add_points_radio_button");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
-                        "Add points using the mouse.  The right or button opens a dialog window; the left button adds a point using defaults.",
-                        NULL);
+  gtk_widget_set_tooltip_text (radio2,
+                        "Add points using the mouse.  The right or button opens a dialog window; the left button adds a point using defaults.");
   gtk_box_pack_start (GTK_BOX (vb), radio2, false, false, 0);
 
   w = gtk_label_new (tip_edges);
@@ -537,8 +534,8 @@ cpanel_edgeedit_make (ggobid * gg)
   /*-- Undo --*/
   /*   not implemented
      btn = gtk_button_new_with_label ("Undo");
-     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-     "Undo last action", NULL);
+     gtk_widget_set_tooltip_text (btn,
+     "Undo last action");
      gtk_box_pack_start (GTK_BOX (panel->w),
      btn, false, false, 1);
      g_signal_connect (G_OBJECT (btn), "clicked",

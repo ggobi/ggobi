@@ -143,15 +143,12 @@ add_xml_tsplot_variables(xmlNodePtr node, GList *plots, displayd *dpy)
 void
 tsplotVarpanelTooltipsSet(displayd *dpy, ggobid *gg, GtkWidget *wx, GtkWidget *wy, GtkWidget *wz, GtkWidget *label)
 {
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-    "Select to replace the horizontal (time) variable.",
-    NULL);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-    "Select to delete or append a Y variable; drag plots to reorder.",
-    NULL);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-    "Click left to replace the horizontal (time) variable.  Click middle or right to append or delete a Y variable; drag plots to reorder.",
-    NULL);
+  gtk_widget_set_tooltip_text (wx,
+    "Select to replace the horizontal (time) variable.");
+  gtk_widget_set_tooltip_text (wy,
+    "Select to delete or append a Y variable; drag plots to reorder.");
+  gtk_widget_set_tooltip_text (label,
+    "Click left to replace the horizontal (time) variable.  Click middle or right to append or delete a Y variable; drag plots to reorder.");
 }
 
 

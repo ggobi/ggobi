@@ -201,13 +201,6 @@ parcoords_new (displayd *display, gboolean use_window, gboolean missing_p,
     display->menubar = create_menu_bar(display->menu_manager, parcoords_ui,
 			     GGOBI_WINDOW_DISPLAY(display)->window);
 
-    /*-- add a tooltip to the file menu --*/
-    /* - tooltips are generally not done for toplevel menus
-	w = gtk_item_factory_get_widget (factory, "<main>/File");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-			  gtk_menu_get_attach_widget (GTK_MENU(w)),
-			  "File menu for this display", NULL);
-	*/
     /*
      * After creating the menubar, and populating the file menu,
      * add the Options and Link menus another way

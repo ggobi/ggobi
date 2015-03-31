@@ -379,9 +379,8 @@ svis_window_open (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (hb), label, true, true, 0);
     gg->svis.entry_applied = gtk_entry_new ();
     gtk_editable_set_editable (GTK_EDITABLE (gg->svis.entry_applied), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->svis.entry_applied,
-                          "The name of the currently active color scheme.",
-                          NULL);
+    gtk_widget_set_tooltip_text (gg->svis.entry_applied,
+                          "The name of the currently active color scheme.");
     gtk_box_pack_start (GTK_BOX (hb), gg->svis.entry_applied, true, true, 0);
      /**/
       /* preview scheme */
@@ -393,9 +392,8 @@ svis_window_open (ggobid * gg)
 
     gg->svis.entry_preview = gtk_entry_new ();
     gtk_editable_set_editable (GTK_EDITABLE (gg->svis.entry_preview), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->svis.entry_preview,
-                          "The name of the color scheme whose colors are displayed below.",
-                          NULL);
+    gtk_widget_set_tooltip_text (gg->svis.entry_preview,
+                          "The name of the color scheme whose colors are displayed below.");
     gtk_box_pack_start (GTK_BOX (hb), gg->svis.entry_preview, true, true, 0);
 
 
@@ -425,16 +423,15 @@ svis_window_open (ggobid * gg)
 
     /* Apply button */
     btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Make this the current color scheme for brushing in ggobi, preserving current color groups.  If the number of colors in the new scheme is less than the number of colors currently in use, this won't work.",
-                          NULL);
+    gtk_widget_set_tooltip_text (btn,
+                          "Make this the current color scheme for brushing in ggobi, preserving current color groups.  If the number of colors in the new scheme is less than the number of colors currently in use, this won't work.");
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (scale_set_cb), gg);
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Close the window", NULL);
+    gtk_widget_set_tooltip_text (btn,
+                          "Close the window");
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (close_btn_cb), gg);

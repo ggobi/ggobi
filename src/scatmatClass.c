@@ -125,12 +125,10 @@ static void
 varpanelTooltipsSet (displayd * display, ggobid * gg, GtkWidget * wx,
                      GtkWidget * wy, GtkWidget * wz, GtkWidget * label)
 {
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                        "Toggle to append or delete; drag along the plot diagonal to reorder",
-                        NULL);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                        "Toggle to append or delete; drag along the plot diagonal to reorder",
-                        NULL);
+  gtk_widget_set_tooltip_text (wx,
+                        "Toggle to append or delete; drag along the plot diagonal to reorder");
+  gtk_widget_set_tooltip_text (label,
+                        "Toggle to append or delete; drag along the plot diagonal to reorder");
 }
 
 static gint

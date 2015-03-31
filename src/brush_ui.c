@@ -474,8 +474,7 @@ cpanel_brush_make (ggobid * gg)
 
  /*-- button: open symbol panel --*/
   btn = gtk_button_new_with_mnemonic ("_Choose color & glyph...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Open panel for choosing color and glyph", NULL);
+  gtk_widget_set_tooltip_text (btn, "Open panel for choosing color and glyph");
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (open_symbol_window_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
@@ -489,8 +488,7 @@ cpanel_brush_make (ggobid * gg)
   /*-- this was an option menu but was changed to allow accelerators in GTK2 */
   check_btn = gtk_check_button_new_with_mnemonic ("_Persistent");
   gtk_widget_set_name (check_btn, "BRUSH:mode_check_btn");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), check_btn,
-                        "Persistent or transient brushing", NULL);
+  gtk_widget_set_tooltip_text (check_btn, "Persistent or transient brushing");
   g_signal_connect (G_OBJECT (check_btn), "clicked",
                     G_CALLBACK (brush_mode_cb), gg);
   gtk_box_pack_start (GTK_BOX (hb), check_btn, false, false, 0);
@@ -498,9 +496,7 @@ cpanel_brush_make (ggobid * gg)
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check_btn), false);
 
   btn = gtk_button_new_from_stock (GTK_STOCK_UNDO);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Undo the most recent persistent brushing changes, from button down to button up",
-                        NULL);
+  gtk_widget_set_tooltip_text (btn, "Undo the most recent persistent brushing changes, from button down to button up");
   gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 0);
   g_signal_connect (G_OBJECT (btn), "clicked", G_CALLBACK (brush_undo_cb),
                     gg);
@@ -517,9 +513,7 @@ cpanel_brush_make (ggobid * gg)
   option_menu = gtk_combo_box_new_text ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), option_menu);
   gtk_widget_set_name (option_menu, "BRUSH:point_targets_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), option_menu,
-                        "Brushing points: what characteristics, if any, should respond?",
-                        NULL);
+  gtk_widget_set_tooltip_text (option_menu, "Brushing points: what characteristics, if any, should respond?");
   gtk_box_pack_start (GTK_BOX (vb), option_menu, false, false, 0);
   populate_combo_box (option_menu, point_targets_lbl,
                       G_N_ELEMENTS (point_targets_lbl), NULL, NULL);
@@ -541,9 +535,7 @@ cpanel_brush_make (ggobid * gg)
   option_menu = gtk_combo_box_new_text ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), option_menu);
   gtk_widget_set_name (option_menu, "BRUSH:edge_targets_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), option_menu,
-                        "Brushing edges: what characteristics, if any, should respond?",
-                        NULL);
+  gtk_widget_set_tooltip_text (option_menu, "Brushing edges: what characteristics, if any, should respond?");
   gtk_box_pack_start (GTK_BOX (vb), option_menu, false, false, 0);
   populate_combo_box (option_menu, edge_targets_lbl,
                       G_N_ELEMENTS (edge_targets_lbl),
@@ -552,18 +544,6 @@ cpanel_brush_make (ggobid * gg)
   /*-- Define the linking rule --*/
   notebook = create_linkby_notebook (panel->w, gg);
   gtk_widget_set_name (notebook, "BRUSH:linkby_notebook");
-
-  /*
-  btn = gtk_check_button_new_with_mnemonic("_Brush on");
-  gtk_widget_set_name(btn, "BRUSH:brush_on_button");
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(gg->tips), btn,
-    "Make the brush active or inactive.  Drag the left button to brush and the right or middle button  to resize the brush.",
-    NULL);
-  g_signal_connect(G_OBJECT(btn), "toggled",
-    G_CALLBACK(brush_on_cb), (gpointer) gg);
-  gtk_box_pack_start(GTK_BOX(panel->w), btn, false,
-     false, 0);
-  */
 
   gtk_widget_show_all (panel->w);
 }
