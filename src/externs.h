@@ -54,9 +54,8 @@ void pt_world_to_raw_by_var (gint j, greal *world, greal *raw, GGobiData *d);
 /* sort -t":" -k1.12 */
 gboolean   array_contains (gint* arr, gint n, gint el);
 void       edgeedit_init (ggobid * gg);
-GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GtkSignalFunc, gpointer, gboolean, ggobid *);
-GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *) ;
-GtkWidget* CreateMenuItemWithCheck (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GtkSignalFunc, gpointer, ggobid *, GSList *, gboolean check) ;
+GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GCallback, gpointer, ggobid *) ;
+GtkWidget* CreateMenuItemWithCheck (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GCallback, gpointer, ggobid *, GSList *, gboolean check) ;
 ggobid*    GGobiFromDisplay (displayd *display);
 ggobid*    GGobiFromSPlot (splotd *sp);
 ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);
@@ -197,9 +196,9 @@ void       cpanel_xyplot_init (cpaneld *, ggobid *);
 void       cpanel_xyplot_make (ggobid *);
 void       cpanel_xyplot_set (displayd *, cpaneld *, ggobid *);
 displayd * createDisplayFromDescription (ggobid *, GGobiDisplayDescription *desc);
-GtkWidget* create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, vartyped vtype, datatyped dtype, GtkSignalFunc func, gpointer func_data, ggobid *);
+GtkWidget* create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, vartyped vtype, datatyped dtype, GCallback func, gpointer func_data, ggobid *);
 typedef const gchar ** (*GGobiVariableNotebookPrefixFunc) (GtkWidget *notebook, GGobiData *d, gint *sel_prefix, gint *n_prefices);
-GtkWidget* create_prefixed_variable_notebook (GtkWidget *box, GtkSelectionMode mode, vartyped vtype, datatyped dtype, GtkSignalFunc func, gpointer func_data, ggobid *, GGobiVariableNotebookPrefixFunc prefix_func);
+GtkWidget* create_prefixed_variable_notebook (GtkWidget *box, GtkSelectionMode mode, vartyped vtype, datatyped dtype, GCallback func, gpointer func_data, ggobid *, GGobiVariableNotebookPrefixFunc prefix_func);
 void       ctour_event_handlers_toggle (splotd *, gboolean);
 void       ctourpp_window_open (ggobid *);
 colorschemed* default_scheme_init ();
@@ -252,10 +251,10 @@ void	   set_display_option(gboolean active, guint action, displayd *display);
 gint       do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, gfloat *);
 void       do_last_increment (vector_f, vector_f, gfloat, gint);
 void       draw_3drectangle (GtkWidget *w, cairo_t *drawable, gint x, gint y, gint width, gint height, ggobid *gg);
-gboolean   point_in_triangle (GdkPoint p, GdkPoint a, GdkPoint b, GdkPoint c)
+gboolean   point_in_triangle (GdkPoint p, GdkPoint a, GdkPoint b, GdkPoint c);
 void       draw_glyph (cairo_t *, glyphd *, icoords *, gint, ggobid *);
 void       draw_polygon (cairo_t *cr, GdkPoint *points, int npoints);
-void       draw_segments (cairo_t *cr, GdkSegment *segments, int nsegments);
+void       draw_segments (cairo_t *cr, isegments *segments, int nsegments);
 gint       dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
 
 /* pango utils */
@@ -593,7 +592,6 @@ gboolean   update_color_vectors (gint i, gboolean changed, gboolean *hit_by_brus
 gboolean   update_glyph_vectors (gint i, gboolean changed, gboolean *hit_by_brush, GGobiData *d, ggobid *gg);
 gboolean   update_hidden_vectors (gint i, gboolean changed, gboolean *hit_by_brush, GGobiData *d, ggobid *gg);
 void       varcircle_label_set (gint jvar, GGobiData *d);
-void       varcircle_label_set (gint, GGobiData *);
 void       varcircles_add (gint ncols, GGobiData *, ggobid *);
 void       varcircles_cursor_set_default (GGobiData *d);
 void       varcircles_delete_nth (gint j, GGobiData *);
@@ -603,7 +601,7 @@ void       varcircles_show (gboolean, GGobiData *, displayd *, ggobid *);
 void       varcircles_visibility_set (displayd *display, ggobid *gg);
 void       variable_notebook_handlers_disconnect (GtkWidget *notebook, ggobid *gg);
 void       variable_notebook_list_changed_cb(ggobid *gg, GGobiData *d, void *notebook);
-void       variable_notebook_subwindow_add (GGobiData *d, GtkSignalFunc func, gpointer func_data, GtkWidget *notebook, vartyped, datatyped, ggobid *gg);
+void       variable_notebook_subwindow_add (GGobiData *d, GCallback func, gpointer func_data, GtkWidget *notebook, vartyped, datatyped, ggobid *gg);
 void       variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which, GGobiData *, void *notebook);
 void       varpanel_clear (GGobiData *, ggobid *);
 void       varpanel_delete_nth (gint jvar, GGobiData *d);
@@ -764,8 +762,8 @@ void       varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active,
 GtkWidget *varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show, GGobiData *d);
 
 void       display_plot (displayd *display, RedrawStyle type, ggobid *gg);
-void       scatterXYAddPlotLabels(splotd *sp, cairo_t *drawable, GdkGC *gc);
-void       scatter1DAddPlotLabels(splotd *sp, cairo_t *drawable, GdkGC *gc);
+void       scatterXYAddPlotLabels(splotd *sp, cairo_t *drawable);
+void       scatter1DAddPlotLabels(splotd *sp, cairo_t *drawable);
 gboolean   processRestoreFile(const gchar * const fileName, ggobid *gg);
 void       scatterplotMovePointsMotionCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventMotion *event, ggobid *gg);
 void       scatterplotMovePointsButtonCb(displayd *display, splotd *sp, GtkWidget *w, GdkEventButton *event, ggobid *gg);

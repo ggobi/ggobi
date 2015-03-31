@@ -151,7 +151,6 @@ struct _ggobid {
   GtkAccelGroup *main_accel_group, *pmode_accel_group, *imode_accel_group;
   GtkWidget *pmode_item, *imode_item;
   GtkWidget *imode_frame;  /* this should be cpanel_frame, actually */
-  GtkTooltips *tips;
   gboolean firsttime;
   guint mode_merge_id;
 
@@ -341,7 +340,7 @@ struct _ggobid {
     GtkWidget *scree_da;
     cairo_surface_t *scree_pixmap;
 
-    GtkObject *npcs_adj;
+    GtkAdjustment *npcs_adj;
     GtkWidget *stdized_entry, *variance_entry, *condnum_entry;
     GtkWidget *apply_btn, *restore_btn;
     GtkWidget *tree_view;
@@ -594,12 +593,6 @@ GSList *GGOBI(getExtendedDisplayTypes)();
 #ifdef __cplusplus
 }
 #endif
-
-void gtk_marshal_NONE__INT_POINTER_POINTER_POINTER(GtkObject * object,
-                                                   GtkSignalFunc func,
-                                                   gpointer func_data,
-                                                   GtkArg * args);
-
 
 extern GSList *ExtendedDisplayTypes;
 typedef GType(*GTypeLoad) (void);

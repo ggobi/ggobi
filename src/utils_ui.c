@@ -24,7 +24,7 @@ GtkWidget *CreateMenuItemWithCheck (GtkWidget * menu,
                                     gchar * szName, gchar * szAccel,
                                     gchar * szTip, GtkWidget * win_main,
                                     GtkAccelGroup * accel_group,
-                                    GtkSignalFunc func, gpointer data,
+                                    GCallback func, gpointer data,
                                     ggobid * gg, GSList * radiogroup,
                                     gboolean check);
 
@@ -51,7 +51,7 @@ GtkWidget *
 CreateMenuItem (GtkWidget * menu,
                 gchar * szName, gchar * szAccel, gchar * szTip,
                 GtkWidget * win_main, GtkAccelGroup * accel_group,
-                GtkSignalFunc func, gpointer data, ggobid * gg)
+                GCallback func, gpointer data, ggobid * gg)
 {
   return (CreateMenuItemWithCheck (menu, szName, szAccel, szTip,
                                    win_main, accel_group, func, data, gg,
@@ -62,7 +62,7 @@ GtkWidget *
 CreateMenuItemWithCheck (GtkWidget * menu,
                          gchar * szName, gchar * szAccel, gchar * szTip,
                          GtkWidget * win_main, GtkAccelGroup * accel_group,
-                         GtkSignalFunc func, gpointer data, ggobid * gg,
+                         GCallback func, gpointer data, ggobid * gg,
                          GSList * RadioGroup, gboolean check)
 {
   GtkWidget *menuitem;
@@ -121,7 +121,7 @@ CreateMenuItemWithCheck (GtkWidget * menu,
 
   /* --- If there was a tool tip --- */
   if (szTip && strlen (szTip))
-    gtk_tooltips_set_tip (gg->tips, menuitem, szTip, NULL);
+    gtk_widget_set_tooltip_text (menuitem, szTip);
 
   return (menuitem);
 }
@@ -147,7 +147,7 @@ CreateMenuItemWithCheck (GtkWidget * menu,
 GtkWidget *
 CreateMenuCheck (GtkWidget * menu,
                  gchar * szName,
-                 GtkSignalFunc func,
+                 GCallback func,
                  gpointer data, gboolean state, ggobid * gg)
 {
   GtkWidget *menuitem;
@@ -573,7 +573,7 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
      GtkWidget *create_variable_notebook (GtkWidget * box,
                                           GtkSelectionMode mode,
                                           vartyped vtype, datatyped dtype,
-                                          GtkSignalFunc func,
+                                          GCallback func,
                                           gpointer func_data, ggobid * gg)
 {
   GtkWidget *notebook;
@@ -722,7 +722,7 @@ prefixed_variable_notebook_current_page_set (displayd *display,
 GtkWidget *
 create_prefixed_variable_notebook (GtkWidget * box,
                                    GtkSelectionMode mode, vartyped vtype,
-                                   datatyped dtype, GtkSignalFunc func,
+                                   datatyped dtype, GCallback func,
                                    gpointer func_data, ggobid * gg,
                                    GGobiVariableNotebookPrefixFunc
                                    prefix_func)

@@ -543,7 +543,7 @@ CHECK_EVENT_SIGNATURE (linkby_notebook_adddata_cb, datad_added_f)
 
      static void
        linkby_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook,
-                                   GtkSignalFunc func)
+                                   GCallback func)
 {
   if (g_slist_length (d->vartable)) {
     linkby_notebook_subwindow_add (d, notebook, gg);

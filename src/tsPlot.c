@@ -29,8 +29,8 @@ static void tsWithinPlaneToScreen(splotd *sp, displayd *display, GGobiData *d, g
 static gboolean tsDrawEdge_p(splotd *sp, gint m, GGobiData *d, GGobiData *e, ggobid *gg);
 static gboolean tsDrawCase_p(splotd *sp, gint m, GGobiData *d, ggobid *gg);
 static void tsAddPlotLabels(splotd *sp, cairo_t *cr, ggobid *gg) ;
-static void tsWithinDrawBinned(splotd *sp, gint m, cairo_t *cr, GdkGC *gc);
-static void tsShowWhiskers(splotd *sp, gint m, cairo_t *cr, GdkGC *gc);
+static void tsWithinDrawBinned(splotd *sp, gint m, cairo_t *cr);
+static void tsShowWhiskers(splotd *sp, gint m, cairo_t *cr);
 static isegments * tsAllocWhiskers(isegments *, splotd *sp, gint nrows, GGobiData *d);
 static gchar *tsTreeLabel(splotd *sp, GGobiData *d, ggobid *gg);
 

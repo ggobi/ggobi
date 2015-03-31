@@ -100,7 +100,7 @@ void draw_polygon(cairo_t *cr, GdkPoint *points, int npoints) {
   cairo_close_path(cr);
 }
 
-void draw_segments(cairo_t *cr, GdkSegment *segments, int nsegments) {
+void draw_segments(cairo_t *cr, isegments *segments, int nsegments) {
   for (int i = 0; i < nsegments; i++) {
     cairo_move_to(cr, segments[i].x1, segments[i].y1);
     cairo_line_to(cr, segments[i].x2, segments[i].y2);
