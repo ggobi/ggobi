@@ -129,8 +129,8 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
   display->menu_manager = display_menu_manager_create (display);
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->window) {
-    GtkActionGroup *actions = gtk_action_group_new ("BarchartActions");
-    gtk_action_group_add_toggle_actions (actions, toggle_entries,
+    GActionMap *actions = g_simple_action_group_new ("BarchartActions");
+    g_action_map_add_action_entries (actions, toggle_entries,
                                          n_toggle_entries, display);
     gtk_ui_manager_insert_action_group (display->menu_manager, actions, 0);
     g_object_unref (G_OBJECT (actions));

@@ -53,20 +53,39 @@ scatterplot_mode_ui_get (displayd * display)
 /*--------------------------------------------------------------------*/
 
 static const gchar *edge_ui =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='Edges'>"
-  "			<menu action='Edgesets'/>" "		</menu>" "	</menubar>" "</ui>";
+  "<interface>"
+  "	<menu id='menubar'>"
+  "	     <submenu>"
+  "                <attribute name='label'>Edges</attribute>"
+  "                <submenu>"
+  "			<attribute name='label'>Edgesets</attribute>"
+  "                </submenu>"
+  "	     </submenu>"
+  "	</menu>"
+  "</interface>";
 
 static const gchar *edge_option_ui =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='Edges'>"
+  "<interface>"
+  "	<menu id='menubar'>"
+  "		<submenu><attribute name='label'>Edges</attribute>"
   "			<separator/>"
-  "			<menuitem action='ShowUndirectedEdges'/>"
-  "			<menuitem action='ShowDirectedEdges'/>"
-  "			<menuitem action='ShowArrowheadsOnly'/>"
-  "			<menuitem action='HideEdges'/>" "		</menu>" "	</menubar>" "</ui>";
+  "			<section>"
+  "				<item>"
+  "                    <attribute name='action'>ShowUndirectedEdges</attribute>"
+  "                             </item>"
+  "				<item>"
+  "                    <attribute name='action'>ShowDirectedEdges</attribute>"
+  "                             </item>"
+  "				<item>"
+  "                    <attribute name='action'>ShowArrowheadsOnly</attribute>"
+  "                             </item>"
+  "				<item>"
+  "                    <attribute name='action'>HideEdges</attribute>"
+  "                             </item>"
+  "			</section>"
+  "		</submenu>"
+  "	</menu>"
+  "</interface>";
 
 /*
  * This handles the initialization of the edge menu item and menu,
@@ -114,10 +133,10 @@ scatterplot_display_edge_menu_update (displayd * display,
 
   /*-- then build the new menu if appropriate --*/
   if (ne) {
-    GtkAction *action = NULL;
+    GAction *action = NULL;
     GSList *group = NULL;
     const gchar *tooltip = "Attach this edge dataset";
-    GtkActionGroup *actions = gtk_action_group_new ("Edge Datasets");
+    GActionGroup *actions = g_simple_action_group_new ("Edge Datasets");
 
     if (display->edgeset_action_group) {
       gtk_ui_manager_remove_action_group (display->menu_manager,
@@ -129,9 +148,9 @@ scatterplot_display_edge_menu_update (displayd * display,
 
     /*-- build the menu --*/
     display->edge_merge =
-      gtk_ui_manager_add_ui_from_string (display->menu_manager, edge_ui, -1,
-                                         NULL);
-
+      gtk_builder_add_objects_from_string (display->menu_manager, edge_ui, -1,
+                                           NULL);
+            
     if (display->e) {
       gtk_ui_manager_ensure_update (display->menu_manager);
       display->edge_option_merge =

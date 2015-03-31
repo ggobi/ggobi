@@ -116,3 +116,5 @@
 /plugins/ggvis/ltmain.sh
 /plugins/ggvis/missing
 *~
+*.lo
+.libs
