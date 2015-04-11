@@ -1639,6 +1639,8 @@ barchart_cpanel_init (cpaneld * cpanel, ggobid * gg)
 }
 
 void
-barchartRulerRangesSet ( ) {
+barchartRulerRangesSet (gboolean force, displayd * display, splotd * sp,
+                        ggobid * gg)
+{
   // Do nothing!
 }
