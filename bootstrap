@@ -1,3 +1,6 @@
 #!/bin/sh
+case `uname` in
+  Darwin*) export PATH=/usr/local/opt/gettext/bin:$PATH && export ACLOCAL_PATH=/usr/local/opt/gettext/share/aclocal:/usr/local/opt/pkgconfig/share/aclocal ;;
+  *) ;; esac
 autoreconf -iv --force
 autopoint -f
