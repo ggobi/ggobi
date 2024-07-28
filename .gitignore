@@ -133,3 +133,5 @@
 /src/ggobiMain.o
 /src/libggobi.la
 /tmpwrk92595/archive/ABOUT-NLS
+/README
+/po/remove-potcdate.sed

@@ -1,12 +1,12 @@
 \documentclass{article}
 
-\input{pstricks}
+\usepackage{xcolor}
 
 % Taken from omegahat/Docs/WebMacros.tex
 \def\strip#1>{}
 \def\Escape#1{\def\next{#1}%
   {\frenchspacing\expandafter\strip\meaning\next}}
-\def\Env#1{{\gray\texttt{\Escape{#1}}}}
+\def\Env#1{{\textcolor{gray}{\texttt{\Escape{#1}}}}}
 \def\file#1{\HREF{#1}{\textbf{\Escape{#1}}}}
 \def\dir#1{\textbf{\Escape{#1/}}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
