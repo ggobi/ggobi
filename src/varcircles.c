@@ -205,7 +205,7 @@ varcircles_delete_nth (gint jvar, GGobiData * d)
 
   w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.vb, jvar);
   if (w != NULL) {
-    if (w->parent) {            // If it has been packed, unpack it.
+    if (gtk_widget_get_parent (w) != NULL) {            // If it has been packed, unpack it.
       g_object_ref (G_OBJECT (w));  // so it isn't destroyed when removed
       gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
     }
@@ -229,8 +229,11 @@ varcircle_label_set (gint j, GGobiData * d)
 void
 varcircles_cursor_set_default (GGobiData * d)
 {
-  GdkWindow *window = GTK_WIDGET (d->varpanel_ui.hpane)->window;
-  gdk_cursor_destroy (d->vcirc_ui.cursor);
+  GdkWindow *window = gtk_widget_get_window (GTK_WIDGET (d->varpanel_ui.hpane));
+  if (d->vcirc_ui.cursor != NULL) {
+    g_object_unref (d->vcirc_ui.cursor);
+    d->vcirc_ui.cursor = NULL;
+  }
   d->vcirc_ui.jcursor = 0;
   gdk_window_set_cursor (window, NULL);
 }
@@ -238,7 +241,7 @@ varcircles_cursor_set_default (GGobiData * d)
 static gint
 manip_select_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
-  GdkWindow *window = GTK_WIDGET (d->varpanel_ui.hpane)->window;
+  GdkWindow *window = gtk_widget_get_window (GTK_WIDGET (d->varpanel_ui.hpane));
 
   d->vcirc_ui.cursor = gdk_cursor_new (GDK_HAND2);
   gdk_window_set_cursor (window, d->vcirc_ui.cursor);
@@ -261,17 +264,19 @@ da_manip_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
 #ifdef ENABLE_CAIRO
-  cairo_t *c = gdk_cairo_create (w->window);
+  cairo_t *c = gdk_cairo_create (gtk_widget_get_window (w));
   gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
-  cairo_rectangle (c, 0, 0, w->allocation.width, w->allocation.height);
+  cairo_rectangle (c, 0, 0, gtk_widget_get_allocated_width (w),
+    gtk_widget_get_allocated_height (w));
   cairo_fill (c);
   cairo_destroy (c);
 #else
-  GdkGC *gc = gdk_gc_new (w->window);
+  GdkGC *gc = gdk_gc_new (gtk_widget_get_window (w));
 
   gdk_gc_set_foreground (gc, &gg->vcirc_manip_color);
-  gdk_draw_rectangle (w->window, gc,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle ((GdkDrawable *) gtk_widget_get_window (w), gc,
+                      true, 0, 0, gtk_widget_get_allocated_width (w),
+                      gtk_widget_get_allocated_height (w));
   gdk_gc_destroy (gc);
 #endif
 
@@ -284,17 +289,19 @@ da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
 #ifdef ENABLE_CAIRO
-  cairo_t *c = gdk_cairo_create (w->window);
+  cairo_t *c = gdk_cairo_create (gtk_widget_get_window (w));
   gdk_cairo_set_source_color (c, &gg->vcirc_freeze_color);
-  cairo_rectangle (c, 0, 0, w->allocation.width, w->allocation.height);
+  cairo_rectangle (c, 0, 0, gtk_widget_get_allocated_width (w),
+    gtk_widget_get_allocated_height (w));
   cairo_fill (c);
   cairo_destroy (c);
 #else
-  GdkGC *gc = gdk_gc_new (w->window);
+  GdkGC *gc = gdk_gc_new (gtk_widget_get_window (w));
 
   gdk_gc_set_foreground (gc, &gg->vcirc_freeze_color);
-  gdk_draw_rectangle (w->window, gc,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle ((GdkDrawable *) gtk_widget_get_window (w), gc,
+                      true, 0, 0, gtk_widget_get_allocated_width (w),
+                      gtk_widget_get_allocated_height (w));
 
   gdk_gc_destroy (gc);
 #endif
@@ -309,7 +316,7 @@ varcircles_show (gboolean show, GGobiData * d, displayd * display,
                  ggobid * gg)
 {
   GtkWidget *basement = widget_find_by_name (gg->main_window, "BASEMENT");
-  GtkWidget *parent = (d->vcirc_ui.ebox)->parent;
+  GtkWidget *parent = gtk_widget_get_parent (d->vcirc_ui.ebox);
 
   if (show) {
     /*
@@ -665,7 +672,7 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
   if ((len = g_slist_length (d->vcirc_ui.da_pix)) < d->ncols) {
     for (k = len; k < d->ncols; k++) {
       d->vcirc_ui.da_pix = g_slist_append (d->vcirc_ui.da_pix,
-                                           gdk_pixmap_new (da->window,
+                                           gdk_pixmap_new (gtk_widget_get_window (da),
                                                            VAR_CIRCLE_DIAM +
                                                            1,
                                                            VAR_CIRCLE_DIAM +
@@ -748,7 +755,7 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
   /*
    * copy the pixmap to the window
    */
-  gdk_draw_drawable (da->window, gg->unselvarfg_GC,
+  gdk_draw_drawable ((GdkDrawable *) gtk_widget_get_window (da), gg->unselvarfg_GC,
                      da_pix, 0, 0, 0, 0,
                      VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
 }
@@ -779,7 +786,7 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     varcircle_draw (j, d, gg);
   }
   else {
-    gdk_draw_pixmap (da->window, gg->unselvarfg_GC,
+    gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (da), gg->unselvarfg_GC,
                      da_pix, 0, 0, 0, 0,
                      VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
   }

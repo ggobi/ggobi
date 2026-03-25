@@ -138,20 +138,27 @@ fshuffle (gfloat * x, gint n)
 /*                     Missing data routines                            */
 /* ---------------------------------------------------------------------*/
 
-GtkTableChild *
+GtkWidget *
 gtk_table_get_child (GtkWidget * w, gint left, gint top)
 {
-  GtkTable *table = GTK_TABLE (w);
-  GtkTableChild *ch, *child = NULL;
+  GtkWidget *child = NULL;
+  GList *children;
   GList *l;
 
-  for (l = table->children; l; l = l->next) {
-    ch = (GtkTableChild *) l->data;
-    if (ch->left_attach == left && ch->top_attach == top) {
-      child = ch;
+  children = ggobi_gtk_table_children (w);
+  for (l = children; l; l = l->next) {
+    guint left_attach = 0, top_attach = 0;
+
+    child = GTK_WIDGET (l->data);
+    ggobi_gtk_table_get_attachments (w, child,
+                                     &left_attach, NULL,
+                                     &top_attach, NULL);
+    if ((gint) left_attach == left && (gint) top_attach == top) {
       break;
     }
+    child = NULL;
   }
+  g_list_free (children);
   return child;
 }
 
@@ -281,16 +288,23 @@ widget_find_by_name (GtkWidget * parent, gchar * name)
 void
 print_attachments (ggobid * gg)
 {
+  GList *children;
   GList *l;
-  GtkTableChild *child;
 
   g_printerr ("attachments:\n");
-  for (l = (GTK_TABLE (gg->current_display->table))->children; l; l = l->next) {
-    child = (GtkTableChild *) l->data;
+  children = ggobi_gtk_table_children (gg->current_display->table);
+  for (l = children; l; l = l->next) {
+    guint left_attach = 0, right_attach = 0, top_attach = 0, bottom_attach = 0;
+
+    ggobi_gtk_table_get_attachments (gg->current_display->table,
+                                     GTK_WIDGET (l->data),
+                                     &left_attach, &right_attach,
+                                     &top_attach, &bottom_attach);
     g_printerr (" %d %d, %d %d\n",
-                child->left_attach, child->right_attach,
-                child->top_attach, child->bottom_attach);
+                left_attach, right_attach,
+                top_attach, bottom_attach);
   }
+  g_list_free (children);
 }
 
 gint

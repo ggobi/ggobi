@@ -28,6 +28,18 @@ static gchar *tip_edges =
 static gchar *tip_points =
   "Click to add points.\nRight-click for more\noptions.";
 
+static GtkWidget *
+add_record_dialog_content_area (GtkWidget *dialog)
+{
+  return gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+}
+
+static GtkWidget *
+add_record_dialog_action_area (GtkWidget *dialog)
+{
+  return gtk_dialog_get_action_area (GTK_DIALOG (dialog));
+}
+
 /*--------------------------------------------------------------------*/
 /*                 Dialog for adding records                          */
 /*--------------------------------------------------------------------*/
@@ -62,32 +74,42 @@ add_record_dialog_apply (GtkWidget * w, displayd * display)
 
   dtarget = (cpanel->ee_mode == ADDING_EDGES) ? e : d;
   if (dtarget->ncols) {
+    GList *children;
     GList *list;
-    GtkTableChild *child;
     GtkWidget *entry;
     gchar *lbl;
-    GtkWidget *table = widget_find_by_name (GTK_DIALOG (dialog)->vbox,
+    GtkWidget *table = widget_find_by_name (add_record_dialog_content_area (dialog),
                                             "EE:tablev");
 
     vals = (gchar **) g_malloc (d->ncols * sizeof (gchar *));
 
-    for (list = GTK_TABLE (table)->children; list; list = list->next) {
-      child = (GtkTableChild *) list->data;
-      if (child->left_attach == 1) {
-        entry = child->widget;
+    children = gtk_container_get_children (GTK_CONTAINER (table));
+    for (list = children;
+         list != NULL; list = list->next) {
+      guint left_attach = 0;
+      guint top_attach = 0;
+
+      entry = GTK_WIDGET (list->data);
+      gtk_container_child_get (GTK_CONTAINER (table), entry,
+                               "left-attach", &left_attach,
+                               "top-attach", &top_attach,
+                               NULL);
+      if (left_attach == 1) {
         lbl = gtk_editable_get_chars (GTK_EDITABLE (entry), 0, -1);
-        vals[child->top_attach] = g_strdup (lbl);
+        vals[top_attach] = g_strdup (lbl);
+        g_free (lbl);
       }
     }
+    g_list_free (children);
   }
 
 
-  if ((label_entry = widget_find_by_name (GTK_DIALOG (dialog)->vbox,
+  if ((label_entry = widget_find_by_name (add_record_dialog_content_area (dialog),
                                           "EE:rowlabel"))) {
     label = gtk_editable_get_chars (GTK_EDITABLE (label_entry), 0, -1);
   }
 
-  if ((id_entry = widget_find_by_name (GTK_DIALOG (dialog)->vbox,
+  if ((id_entry = widget_find_by_name (add_record_dialog_content_area (dialog),
                                        "EE:recordid"))) {
     id = gtk_editable_get_chars (GTK_EDITABLE (id_entry), 0, -1);
   }
@@ -137,7 +159,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   gtk_window_set_title (GTK_WINDOW (dialog), "Add a Record");
 
   table = gtk_table_new (5, 2, false);
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox),
+  gtk_box_pack_start (GTK_BOX (add_record_dialog_content_area (dialog)),
                       table, false, false, 5);
 
   w = gtk_label_new ("Record number");
@@ -222,7 +244,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
 
     tablev = gtk_table_new (dtarget->ncols, 2, false);
     gtk_widget_set_name (tablev, "EE:tablev");
-    gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox),
+    gtk_box_pack_start (GTK_BOX (add_record_dialog_content_area (dialog)),
                         tablev, false, false, 5);
 
     for (j = 0; j < dtarget->ncols; j++) {
@@ -249,13 +271,13 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
                         NULL);
   g_signal_connect (G_OBJECT (w), "clicked",
                     G_CALLBACK (add_record_dialog_apply), dsp);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
+  gtk_container_add (GTK_CONTAINER (add_record_dialog_action_area (dialog)), w);
 
   /*-- cancel button --*/
   w = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
   g_signal_connect (G_OBJECT (w), "clicked",
                     G_CALLBACK (add_record_dialog_cancel), gg);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->action_area), w);
+  gtk_container_add (GTK_CONTAINER (add_record_dialog_action_area (dialog)), w);
 
 
   gtk_widget_show_all (dialog);
@@ -279,7 +301,7 @@ add_edges_or_points_cb (GtkToggleButton * button, ggobid * gg)
 
   w = widget_find_by_name (panel, "EDGEEDIT:tip_label");
 
-  if (button->active) {
+  if (gtk_toggle_button_get_active (button)) {
     cpanel->ee_mode = ADDING_EDGES;
     splot_cursor_unset (gg->current_splot);
     gtk_label_set_text (GTK_LABEL (w), tip_edges);
@@ -512,7 +534,7 @@ cpanel_edgeedit_make (ggobid * gg)
   radio1 = gtk_radio_button_new_with_mnemonic (NULL, "Add _edges");
   gtk_widget_set_name (radio1, "EDGEEDIT:add_edges_radio_button");
   if (adding_edges)
-    GTK_TOGGLE_BUTTON (radio1)->active = true;
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio1), true);
 
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
                         "Add new edges using the mouse. The right or middle button opens a dialog window; the left button adds an edge using defaults.",

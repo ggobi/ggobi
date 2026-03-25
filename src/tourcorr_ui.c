@@ -78,13 +78,14 @@ static void ctouradv_window_open (void);
 
 static void speedcorr_set_cb (GtkAdjustment *adj, ggobid *gg) {
 
-  tourcorr_speed_set(adj->value, gg);
+  tourcorr_speed_set(gtk_adjustment_get_value (adj), gg);
 }
 
 static void tourcorr_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
 
-  tourcorr_pause (&gg->current_display->cpanel, button->active, gg);
+  tourcorr_pause (&gg->current_display->cpanel,
+    gtk_toggle_button_get_active (button), gg);
 }
 
 static void tourcorr_reinit_cb (GtkWidget *w, ggobid *gg) {
@@ -160,7 +161,7 @@ void
 cpanel_ctour_make (ggobid *gg) {
   modepaneld *panel;
   GtkWidget *box, *btn, *sbar, *vb, *lbl;
-  GtkObject *adj;
+  GtkAdjustment *adj;
   GtkWidget *manip_opt;
   /* GtkWidget *pathlen_opt, *tgl; */
   
@@ -177,11 +178,13 @@ cpanel_ctour_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (sessionOptions->defaultTourSpeed, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
+  adj = GTK_ADJUSTMENT (gtk_adjustment_new (sessionOptions->defaultTourSpeed,
+                                            0.0, MAX_TOUR_SPEED,
+                                            1.0, 1.0, 0.0));
   g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (speedcorr_set_cb), (gpointer) gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  sbar = gtk_hscale_new (adj);
   gtk_widget_set_name (sbar, "COTOUR:speed_bar");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of tour motion", NULL);
@@ -450,7 +453,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   GdkModifierType state;
 
-  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
+  gdk_window_get_pointer (gtk_widget_get_window (w),
+    &sp->mousepos.x, &sp->mousepos.y, &state);
 
   tourcorr_manip_end(sp);
 
@@ -483,5 +487,4 @@ ctour_event_handlers_toggle (splotd *sp, gboolean state) {
     disconnect_button_release_signal (sp);
   }
 }
-
 

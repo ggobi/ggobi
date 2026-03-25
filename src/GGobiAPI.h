@@ -238,14 +238,14 @@ extern const gfloat** GGobi_getTFormData(GGobiData *, ggobid *);
   argument of display_free, but this needs
   a little more finessing.
  */
-extern void GGobi_destroyCurrentDisplay();
+extern void GGobi_destroyCurrentDisplay(ggobid *gg);
 
 
 /**
     Returns a reference to the names of the observations
     used by GGobi to identify the rows in the data.
   */
-extern const gchar ** GGobi_getCaseNames();
+extern const gchar ** GGobi_getCaseNames(GGobiData *d, ggobid *gg);
 
 /**
  */
@@ -1046,4 +1046,3 @@ extern MissingValue_p GGobiMissingValue;
 
 
 #endif /* End of conditional inclusion of entire file.*/
-

@@ -46,7 +46,7 @@ enum { TOUR_STEP_SIGNAL,
 
 typedef struct _GGobiDisplayClass
 {
-  GtkVBoxClass parent_class;
+  GtkBoxClass parent_class;
   guint signals[MAX_GGOBI_DISPLAY_SIGNALS];
 
 } GGobiDisplayClass;
@@ -55,7 +55,7 @@ typedef struct _GGobiDisplayClass
 
  */
 struct _displayd {
-  GtkVBox vbox;
+  GtkBox vbox;
 
 /*
  * Used by all displays

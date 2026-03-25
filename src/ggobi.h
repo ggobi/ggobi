@@ -343,7 +343,7 @@ struct _ggobid {
     GtkWidget *scree_da;
     GdkPixmap *scree_pixmap;
 
-    GtkObject *npcs_adj;
+    GtkAdjustment *npcs_adj;
     GtkWidget *stdized_entry, *variance_entry, *condnum_entry;
     GtkWidget *apply_btn, *restore_btn;
     GtkWidget *tree_view;

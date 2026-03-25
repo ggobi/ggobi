@@ -213,6 +213,8 @@ ggobi_display_class_init (GGobiDisplayClass * klass)
 static void
 display_init (displayd * display)
 {
+  gtk_orientable_set_orientation (GTK_ORIENTABLE (display),
+                                  GTK_ORIENTATION_VERTICAL);
 
   display->e = NULL;
 
@@ -251,7 +253,7 @@ ggobi_display_get_type (void)
     };
 
     display_type =
-      g_type_register_static (GTK_TYPE_VBOX, "GGobiDisplay", &display_info,
+      g_type_register_static (GTK_TYPE_BOX, "GGobiDisplay", &display_info,
                               0);
   }
 
@@ -338,11 +340,13 @@ ggobi_splot_init (splotd * sp)
 #endif
 */
 
+static GObjectClass *splot_parent_class = NULL;
+
 static void
-splotDestroy (GtkObject * obj)
+splot_finalize (GObject *obj)
 {
-  GtkObjectClass *klass;
   splotd *sp = GGOBI_SPLOT (obj);
+
   /* Can't we just do this in the extended display class, or even the displayd class itself. */
   if (sp->whiskers) {
     g_free ((gpointer) sp->whiskers);
@@ -359,16 +363,16 @@ splotDestroy (GtkObject * obj)
 
   sp->da = NULL;
 
-  klass = GTK_OBJECT_CLASS (g_type_class_peek (GTK_TYPE_DRAWING_AREA));
-  if (klass->destroy)
-    klass->destroy (obj);
+  if (splot_parent_class->finalize)
+    splot_parent_class->finalize (obj);
 }
 
 static void
 splotClassInit (GGobiSPlotClass * klass)
 {
   klass->redraw = QUICK;
-  GTK_OBJECT_CLASS (klass)->destroy = splotDestroy;
+  splot_parent_class = g_type_class_peek_parent (klass);
+  G_OBJECT_CLASS (klass)->finalize = splot_finalize;
 }
 
 

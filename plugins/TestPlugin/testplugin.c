@@ -5,6 +5,8 @@
 
 #include "GGStructSizes.c"
 
+extern GGobiOptions *GGOBI_getSessionOptions(void);
+
 gboolean
 init(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
@@ -13,7 +15,7 @@ init(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 }
 
 gboolean
-close(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
+testplugin_close(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
     fprintf(stderr, "closing the test plugin instance\n");fflush(stderr);
     return(true);

@@ -185,7 +185,8 @@ tsplotCPanelWidget(displayd *dpy, gchar **modeName, ggobid *gg)
 void
 start_timeSeries_drag(GtkWidget *src, GdkDragContext *ctxt, GtkSelectionData *data, guint info, guint time, gpointer udata)
 {
-   gtk_selection_data_set(data, data->target, 8, (guchar *) src, sizeof(splotd *)); 
+   gtk_selection_data_set(data, gtk_selection_data_get_target (data), 8,
+     (guchar *) src, sizeof(splotd *)); 
 }
 
 void

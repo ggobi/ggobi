@@ -44,7 +44,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   GList *l;
   GtkWidget *frame, *w;
   splotd *sp;
-  gint x, y, width, height, depth;
+  gint x, y, width, height;
   gint wframe, hframe;
   GdkWindow *window;
 
@@ -57,11 +57,11 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
     gtk_container_remove (GTK_CONTAINER (gg->parcoords.arrangement_box), w);
   }
 
-  frame = gg->parcoords.arrangement_box->parent;
+  frame = gtk_widget_get_parent (gg->parcoords.arrangement_box);
 
   // Resize the enclosing window according to the new arrangement.
   window = gtk_widget_get_parent_window (frame);
-  gdk_window_get_geometry(window, &x, &y, &width, &height, &depth);
+  gdk_window_get_geometry (window, &x, &y, &width, &height);
   wframe = (arrangement == ARRANGE_ROW) ? MAX(width,height) : 
     MIN(width,height);
   hframe = (arrangement == ARRANGE_ROW) ? MIN(width,height) :
@@ -363,7 +363,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
 
     sp_new = ggobi_parcoords_splot_new (display, gg);
     sp_new->p1dvar = jvar; 
-    box = (sp->da)->parent;
+    box = gtk_widget_get_parent (sp->da);
     gtk_box_pack_start (GTK_BOX (box), sp_new->da, true, true, 0);
     display->splots = g_list_append (display->splots,
       (gpointer) sp_new);

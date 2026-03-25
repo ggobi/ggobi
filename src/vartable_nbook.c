@@ -92,8 +92,8 @@ tree_view_get_type (GGobiData *d, GtkWidget *tree_view)
  * variable types within a datad.
 */
 void
-vartable_switch_page_cb (GtkNotebook *notebook, GtkNotebookPage *page,
-  gint page_num, ggobid *gg)
+vartable_switch_page_cb (GtkNotebook *notebook, GtkWidget *page,
+  guint page_num, ggobid *gg)
 {
   gint prev_page = gtk_notebook_get_current_page (notebook);
   GtkWidget *swin, *tree_view;
@@ -194,7 +194,7 @@ vartable_show_page (GGobiData *d, ggobid *gg)
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
+      if (strcmp (gtk_label_get_text (GTK_LABEL (tab_label)), d->name) == 0) {
         if (page != page_new) {
           gtk_notebook_set_current_page (nb, page_new);
           break;

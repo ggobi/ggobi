@@ -23,8 +23,6 @@
 #include "vars.h"
 #include "externs.h"
 
-#include "ggobi-renderer-factory.h"
-
 /*--------------------------------------------------------------------*/
 /*                             Events                                 */
 /*--------------------------------------------------------------------*/
@@ -36,8 +34,9 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
   displayd *display = (displayd *) sp->displayptr; 
   cpaneld *cpanel = &display->cpanel;
   GGobiData *d = display->d;
-  GGobiRendererFactory *factory = ggobi_renderer_factory_new();
-  GGobiRenderer *renderer; 
+  GdkWindow *window = gtk_widget_get_window (w);
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
 
   /*
    * Somehow when a new splot is added to a table, the initial
@@ -45,7 +44,7 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
    * drawing_area has been properly sized.  Maybe I'm not executing
    * calls in the proper order?  This protects me in the meantime.
   */
-  if (w->allocation.width < 2 || w->allocation.height < 2) {
+  if (width < 2 || height < 2) {
     return false;
   }
 
@@ -70,26 +69,23 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
     w->allocation.width, w->allocation.height, -1);
 */
 
-  renderer = ggobi_renderer_factory_create(factory, w->window);
-  sp->pixmap0 = GDK_DRAWABLE(renderer);
-  renderer = ggobi_renderer_factory_create(factory, w->window);
-  sp->pixmap1 = GDK_DRAWABLE(renderer);
-  g_object_unref(G_OBJECT(factory));
+  sp->pixmap0 = gdk_pixmap_new (window, width, height, -1);
+  sp->pixmap1 = gdk_pixmap_new (window, width, height, -1);
   
   if (cpanel->imode == BRUSH) {
     sp->brush_pos.x1 = (gint) ((gfloat) sp->brush_pos.x1 *
-      (gfloat) (w->allocation.width) / (gfloat) (sp->max.x));
+      (gfloat) width / (gfloat) (sp->max.x));
     sp->brush_pos.x2 = (gint) ((gfloat) sp->brush_pos.x2 *
-      (gfloat) (w->allocation.width) / (gfloat) (sp->max.x));
+      (gfloat) width / (gfloat) (sp->max.x));
 
     sp->brush_pos.y1 = (gint) ((gfloat) sp->brush_pos.y1 *
-      (gfloat) (w->allocation.height)/ (gfloat) (sp->max.y));
+      (gfloat) height / (gfloat) (sp->max.y));
     sp->brush_pos.y2 = (gint) ((gfloat) sp->brush_pos.y2 *
-      (gfloat) (w->allocation.height) / (gfloat) (sp->max.y));
+      (gfloat) height / (gfloat) (sp->max.y));
   }
 
-  sp->max.x = w->allocation.width;
-  sp->max.y = w->allocation.height;
+  sp->max.x = width;
+  sp->max.y = height;
 
   splot_plane_to_screen (display, cpanel, sp, gg);
 
@@ -125,7 +121,8 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
   /*-- sanity checks --*/
   if (sp->pixmap0 == NULL || sp->pixmap1 == NULL)
     return retval;
-  if (w->allocation.width < 2 || w->allocation.height < 2)
+  if (gtk_widget_get_allocated_width (w) < 2 ||
+      gtk_widget_get_allocated_height (w) < 2)
     return retval;
 
   splot_redraw (sp, sp->redraw_style, gg);
@@ -535,8 +532,8 @@ sp->pmid.x = sp->pmid.y = sp->max.x = sp->max.y = 0;
 
 void
 splot_get_dimensions (splotd *sp, gint *width, gint *height) {
-  *width = sp->da->allocation.width;
-  *height = sp->da->allocation.height;
+  *width = gtk_widget_get_allocated_width (sp->da);
+  *height = gtk_widget_get_allocated_height (sp->da);
 }
 
 /*----------------------------------------------------------------------*/
@@ -923,14 +920,14 @@ disconnect_scroll_signal (splotd *sp) {
 void
 splot_cursor_unset (splotd *sp)
 {
-  GdkWindow *window = sp->da->window;
+  GdkWindow *window = gtk_widget_get_window (sp->da);
 
   if (!GTK_WIDGET_REALIZED(sp->da))
     return;
 
   sp->jcursor = 0;
   if (sp->cursor != NULL)
-    gdk_cursor_destroy (sp->cursor);
+    g_object_unref (sp->cursor);
   sp->cursor = NULL;
   gdk_window_set_cursor (window, NULL);
 }
@@ -938,11 +935,14 @@ splot_cursor_unset (splotd *sp)
 void
 splot_cursor_set (GdkCursorType jcursor, splotd *sp)
 {
-  GdkWindow *window = sp->da->window;
+  GdkWindow *window = gtk_widget_get_window (sp->da);
 
   if (!GTK_WIDGET_REALIZED(sp->da))
     return;
 
+  sp->jcursor = jcursor;
+  if (sp->cursor != NULL)
+    g_object_unref (sp->cursor);
   sp->cursor = gdk_cursor_new (sp->jcursor);
   gdk_window_set_cursor (window, sp->cursor);
 }

@@ -378,7 +378,7 @@ show_display_control_panel (displayd * display)
 {
   ggobid *gg = GGobiFromDisplay (display);
   /* gtk_window_present(GTK_WINDOW(gg->main_window())); */
-  gdk_window_raise (gg->main_window->window);
+  gdk_window_raise (gtk_widget_get_window (gg->main_window));
 }
 
 

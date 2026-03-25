@@ -26,7 +26,7 @@ The authors can be contacted at the following email addresses:
 
 gint alloc_optimize0_p (optimize0_param *op, gint nrows, gint ncols, gint ndim);
 gint free_optimize0_p (optimize0_param *op);
-gboolean iszero (array_f *data);
+gboolean tour_pp_iszero (array_f *data);
 
 void initrandom(gfloat start);
 gfloat uniformrandom(void);

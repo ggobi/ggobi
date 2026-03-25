@@ -69,10 +69,12 @@ scale_adjustment_find_by_name (gchar * name, ggobid * gg)
 static void
 increment_adjustment (GtkAdjustment * adj, gdouble step, gdouble eps)
 {
-  gdouble value = adj->value + step;
-  value = MAX (value, adj->lower);
-  value = MIN (value, adj->upper);
-  if (fabs (value - adj->value) > eps)
+  gdouble current = gtk_adjustment_get_value (adj);
+  gdouble value = current + step;
+
+  value = MAX (value, gtk_adjustment_get_lower (adj));
+  value = MIN (value, gtk_adjustment_get_upper (adj));
+  if (fabs (value - current) > eps)
     gtk_adjustment_set_value (adj, value);
 }
 
@@ -87,7 +89,8 @@ zoom_cb (GtkAdjustment * adj, ggobid * gg)
   GtkAdjustment *adj_other;
   // step and eps are in the space of the adjustment values;
   // exp_eps is in the space of the scaling values.
-  gdouble expvalue = pow (10., adj->value), step = 0.0; // exp10
+  gdouble adj_value = gtk_adjustment_get_value (adj);
+  gdouble expvalue = pow (10., adj_value), step = 0.0; // exp10
   gdouble eps = .0001, exp_eps = .001;
 
   /* this unappealing case arises when cpanel_scale_set is resetting
@@ -96,22 +99,22 @@ zoom_cb (GtkAdjustment * adj, ggobid * gg)
     return;
 
   if (strcmp (name, "SCALE:x_zoom_adj") == 0) {
-    cpanel->scale.zoomval.x = adj->value;
-    step = adj->value - log10 (sp->scale.x);
+    cpanel->scale.zoomval.x = adj_value;
+    step = adj_value - log10 (sp->scale.x);
     sp->scale.x = expvalue;
     if (cpanel->scale.fixAspect_p && fabs (step) > eps) {
       adj_other = scale_adjustment_find_by_name ("SCALE:y_zoom", gg);
-      sp->scale.y = pow (10., adj_other->value + step);
+      sp->scale.y = pow (10., gtk_adjustment_get_value (adj_other) + step);
       increment_adjustment (adj_other, step, eps);
     }
   }
   else {
-    cpanel->scale.zoomval.y = adj->value;
-    step = adj->value - log10 (sp->scale.y);
+    cpanel->scale.zoomval.y = adj_value;
+    step = adj_value - log10 (sp->scale.y);
     sp->scale.y = expvalue;
     if (cpanel->scale.fixAspect_p && fabs (step) > eps) {
       adj_other = scale_adjustment_find_by_name ("SCALE:x_zoom", gg);
-      sp->scale.x = pow (10.0, adj_other->value + step);
+      sp->scale.x = pow (10.0, gtk_adjustment_get_value (adj_other) + step);
       increment_adjustment (adj_other, step, eps);
     }
   }
@@ -138,12 +141,12 @@ pan_cb (GtkAdjustment * adj, ggobid * gg)
     return;
 
   if (strcmp (name, "SCALE:x_pan_adj") == 0) {
-    cpanel->scale.panval.x = adj->value;
-    sp->pmid.x = -1 * adj->value;
+    cpanel->scale.panval.x = gtk_adjustment_get_value (adj);
+    sp->pmid.x = -1 * gtk_adjustment_get_value (adj);
   }
   else {
-    cpanel->scale.panval.y = adj->value;
-    sp->pmid.y = -1 * adj->value;
+    cpanel->scale.panval.y = gtk_adjustment_get_value (adj);
+    sp->pmid.y = -1 * gtk_adjustment_get_value (adj);
   }
 
   splot_plane_to_screen (display, cpanel, sp, gg);
@@ -209,7 +212,7 @@ aspect_ratio_cb (GtkToggleButton * button, ggobid * gg)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
-  cpanel->scale.fixAspect_p = button->active;
+  cpanel->scale.fixAspect_p = gtk_toggle_button_get_active (button);
 }
 
 /*--------------------------------------------------------------------*/
@@ -328,8 +331,8 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 
   gg->buttondown = 0;
 
-  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y,
-                          &state);
+  gdk_window_get_pointer (gtk_widget_get_window (w),
+                          &sp->mousepos.x, &sp->mousepos.y, &state);
 
   gdk_pointer_ungrab (event->time);
   disconnect_motion_signal (sp);

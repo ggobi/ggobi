@@ -19,6 +19,7 @@
 #define GGOBI_DEFINES_H
 
 #include <gtk/gtk.h> /* Needed for ViewTypes. Can be moved. */
+#include "gtk3compat.h"
 
 /* defines.h */
 

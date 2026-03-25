@@ -93,7 +93,7 @@ rescale_cb (GtkButton * button, ggobid * gg)
 static void
 group_cb (GtkToggleButton * button, ggobid * gg)
 {
-  gg->impute.bgroup_p = button->active;
+  gg->impute.bgroup_p = gtk_toggle_button_get_active (button);
 }
 static void
 show_missings_cb (GtkToggleButton * button, ggobid * gg)
@@ -101,7 +101,7 @@ show_missings_cb (GtkToggleButton * button, ggobid * gg)
   GtkWidget *tv = get_tree_view_from_object (G_OBJECT (gg->impute.window));
   GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (tv), "datad");
 
-  d->missings_show_p = button->active;
+  d->missings_show_p = gtk_toggle_button_get_active (button);
   displays_tailpipe (FULL, gg);
 }
 
@@ -434,5 +434,5 @@ impute_window_open (ggobid * gg)
   }
 
   gtk_widget_show_all (gg->impute.window);
-  gdk_window_raise (gg->impute.window->window);
+  gdk_window_raise (gtk_widget_get_window (gg->impute.window));
 }

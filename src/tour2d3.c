@@ -571,7 +571,8 @@ void tour2d3_func (gboolean state, displayd *dsp, ggobid *gg)
   if (state) {
     if (dsp->t2d3.idled == 0) {
       dsp->t2d3.idled = g_idle_add_full (G_PRIORITY_LOW,
-                                   (GtkFunction) tour2d3_idle_func, dsp, NULL);
+                                         (GSourceFunc) tour2d3_idle_func,
+                                         dsp, NULL);
     }
     gg->tour2d3.idled = 1;
   } else {
@@ -1106,4 +1107,3 @@ tour2d3_manip_end(splotd *sp)
 
 #undef T2D3ON
 #undef T2D3OFF
-

@@ -55,7 +55,7 @@ static void cycle_cb (GtkToggleButton *button, ggobid *gg)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
-  cpanel->xyplot.cycle_p = button->active;
+  cpanel->xyplot.cycle_p = gtk_toggle_button_get_active (button);
   xyplot_cycle_activate (cpanel->xyplot.cycle_p, cpanel, gg);
 }
 
@@ -63,7 +63,7 @@ static void cycle_speed_cb (GtkAdjustment *adj, ggobid *gg) {
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
-  cpanel->xyplot.cycle_delay = -1 * (guint32) adj->value;
+  cpanel->xyplot.cycle_delay = -1 * (guint32) gtk_adjustment_get_value (adj);
   if (cpanel->xyplot.cycle_p) {
     g_source_remove (gg->xyplot.cycle_id);
     gg->xyplot.cycle_id = g_timeout_add (cpanel->xyplot.cycle_delay,

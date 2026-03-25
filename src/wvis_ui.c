@@ -56,7 +56,7 @@ wvis_variable_notebook_adddata_cb (ggobid *gg, GGobiData *d, void *notebook)
     GtkSelectionMode mode = GTK_SELECTION_SINGLE;
     GCallback func = G_CALLBACK(selection_made_cb);
 
-    tree_view = GTK_BIN (swin)->child;
+    tree_view = gtk_bin_get_child (GTK_BIN (swin));
     if (tree_view) {
       GtkTreeSelection *tree_sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
       mode = gtk_tree_selection_get_mode(tree_sel);
@@ -224,11 +224,11 @@ motion_notify_cb (GtkWidget *w, GdkEventMotion *event, ggobid *gg)
     selected_var = get_one_selection_from_tree_view (tree_view, d);
   }
 
-  gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
+  gdk_window_get_pointer (gtk_widget_get_window (w), &pos.x, &pos.y, &state);
 
   if (pos.x != mousepos->x) {
     val = (gfloat) (pos.x - xmargin) /
-          (gfloat) (w->allocation.width - 2*xmargin);
+          (gfloat) (gtk_widget_get_allocated_width (w) - 2*xmargin);
 
     /*-- don't allow it to cross its neighbors' boundaries --*/
     if ((color == 0 && val <= gg->wvis.pct[color+1] && val >= 0) ||
@@ -263,22 +263,23 @@ button_press_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
   GdkModifierType state;
   icoords pos;
   gint k, x, y, nearest = -1, d;
-  gint dist = w->allocation.width*w->allocation.width +
-              w->allocation.height*w->allocation.height;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
+  gint dist = width * width + height * height;
   colorschemed *scheme = gg->activeColorScheme;
 
   gfloat *pct = gg->wvis.pct;
   gint *nearest_color = &gg->wvis.nearest_color;
   gint hgt;
 
-  hgt = (w->allocation.height - 2*ymargin) / (scheme->n - 1);
+  hgt = (height - 2*ymargin) / (scheme->n - 1);
 
-  gdk_window_get_pointer (w->window, &pos.x, &pos.y, &state);
+  gdk_window_get_pointer (gtk_widget_get_window (w), &pos.x, &pos.y, &state);
 
   /*-- find nearest slider --*/
   y = ymargin + 10;
   for (k=0; k<scheme->n - 1; k++) {
-    x = xmargin + pct[k] * (w->allocation.width - 2*xmargin);
+    x = xmargin + pct[k] * (width - 2*xmargin);
     d = (pos.x-x)*(pos.x-x) + (pos.y-y)*(pos.y-y);
     if (d < 100 && d < dist) {
       nearest = k;
@@ -326,11 +327,14 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, ggobid *gg)
 static gint
 da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
 {
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
+
   /*-- Create new backing pixmaps of the appropriate size --*/
   if (gg->wvis.pix != NULL)
     gdk_pixmap_unref (gg->wvis.pix);
-  gg->wvis.pix = gdk_pixmap_new (w->window,
-    w->allocation.width, w->allocation.height, -1);
+  gg->wvis.pix = gdk_pixmap_new (gtk_widget_get_window (w),
+    width, height, -1);
 
   gtk_widget_queue_draw (w);
 
@@ -440,7 +444,9 @@ static void alloc_pct (ggobid *gg)
 static void
 da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 {
-  gint height = w->allocation.height - 2*ymargin;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint full_height = gtk_widget_get_allocated_height (w);
+  gint height = full_height - 2*ymargin;
   gint x0, x1, k, hgt;
   gint x = xmargin;
   gint y = ymargin;
@@ -465,7 +471,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   }
 
   if (gg->wvis.GC == NULL)
-    gg->wvis.GC = gdk_gc_new (w->window);
+    gg->wvis.GC = gdk_gc_new (gtk_widget_get_window (w));
 
   hgt = height / (scheme->n - 1);
 
@@ -482,13 +488,13 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- clear the pixmap --*/
   gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb_bg);
   gdk_draw_rectangle (pix, gg->wvis.GC, TRUE,
-                      0, 0, w->allocation.width, w->allocation.height);
+                      0, 0, width, full_height);
 
 
   /*-- draw the color bars --*/
   x0 = xmargin;
   for (k=0; k<scheme->n; k++) {
-    x1 = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
+    x1 = xmargin + gg->wvis.pct[k] * (width - 2*xmargin);
     gdk_gc_set_foreground (gg->wvis.GC, &scheme->rgb[k]);
     gdk_draw_rectangle (pix, gg->wvis.GC,
                         TRUE, x0, ymargin, x1 - x0, height);
@@ -497,7 +503,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
 
   /*-- draw the horizontal lines --*/
   x0 = xmargin; y = ymargin + 10;
-  x1 = xmargin + (w->allocation.width - 2*xmargin) - 1;
+  x1 = xmargin + (width - 2*xmargin) - 1;
   gdk_gc_set_foreground (gg->wvis.GC, &gg->mediumgray);
   for (k=0; k<scheme->n-1; k++) {
     gdk_draw_line (pix, gg->wvis.GC, x0, y, x1, y);
@@ -507,7 +513,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
   /*-- draw rectangles, 20 x 10 --*/
   y = ymargin + 10;
   for (k=0; k<scheme->n-1; k++) {
-    x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
+    x = xmargin + gg->wvis.pct[k] * (width - 2*xmargin);
     draw_3drectangle (w, pix, x, y, 20, 10, gg);
     y += hgt;
   }
@@ -532,7 +538,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
         val = min + gg->wvis.pct[k] * (max - min);
         str = g_strdup_printf ("%3.3g", val);
         layout_text(layout, str, &rect);
-        x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
+        x = xmargin + gg->wvis.pct[k] * (width - 2*xmargin);
         gdk_draw_layout(pix, gg->wvis.GC, x - rect.width/2, y - 2 - rect.height, layout);
         g_free (str);
       }
@@ -542,12 +548,12 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
         val = min + gg->wvis.pct[k] * (max - min);
         str = g_strdup_printf ("%d", gg->wvis.n[k]);
         layout_text(layout, str, &rect);
-        x = xmargin + gg->wvis.pct[k] * (w->allocation.width - 2*xmargin);
+        x = xmargin + gg->wvis.pct[k] * (width - 2*xmargin);
         diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1]; 
-        x -= diff/2 * (w->allocation.width - 2*xmargin);
+        x -= diff/2 * (width - 2*xmargin);
         gdk_draw_layout(pix, gg->wvis.GC, 
           x - rect.width/2,
-          (w->allocation.height - ymargin) + 2,
+          (full_height - ymargin) + 2,
           layout);
         g_free (str);
       }
@@ -555,10 +561,10 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     g_object_unref(G_OBJECT(layout));
   }
 
-  gdk_draw_pixmap (w->window, gg->wvis.GC, pix,
+  gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (w), gg->wvis.GC, pix,
                    0, 0, 0, 0,
-                   w->allocation.width,
-                   w->allocation.height);
+                   width,
+                   full_height);
 }
 
 void
@@ -727,6 +733,5 @@ wvis_window_open (ggobid *gg)
   }
 
   gtk_widget_show_all (gg->wvis.window);
-  gdk_window_raise (gg->wvis.window->window);
+  gdk_window_raise (gtk_widget_get_window (gg->wvis.window));
 }
-

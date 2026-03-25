@@ -37,8 +37,8 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
   gfloat dst, val;
   gint textheight = 0, textheight2;
   gchar *varlab, *varval;
-  gint dawidth = sp->da->allocation.width;
-  gint daheight = sp->da->allocation.height;
+  gint dawidth = gtk_widget_get_allocated_width (sp->da);
+  gint daheight = gtk_widget_get_allocated_height (sp->da);
   gint axindent = 20;
   vartabled *vt;
   colorschemed *scheme = gg->activeColorScheme;
@@ -61,7 +61,7 @@ splot_draw_tour_axes (splotd * sp, GdkDrawable * drawable, ggobid * gg)
   metrics = pango_context_get_metrics (ctx,
                                        pango_context_get_font_description
                                        (ctx), NULL);
-  if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
+  if (sp != NULL && sp->da != NULL && gtk_widget_get_window (sp->da) != NULL) {
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     switch (proj) {
     case TOUR1D:

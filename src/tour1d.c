@@ -824,7 +824,8 @@ void tour1d_func (gboolean state, displayd *dsp, ggobid *gg)
   if (state) {
     if (dsp->t1d.idled == 0) {
       dsp->t1d.idled = g_idle_add_full (G_PRIORITY_LOW,
-                                     (GtkFunction) tour1d_idle_func, dsp, NULL);
+                                        (GSourceFunc) tour1d_idle_func,
+                                        dsp, NULL);
     }
     gg->tour1d.idled = 1;
   } else {
@@ -1071,4 +1072,3 @@ tour1d_manip_end(splotd *sp)
 
 #undef T1DON
 #undef T1DOFF
-

@@ -169,20 +169,23 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
   gint i;
   glyphd g;
   icoords pos;
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
   gint margin, spacing;
   colorschemed *scheme = gg->activeColorScheme;
 
-  gg->color_ui.spacing = w->allocation.width / NGLYPHTYPES;
+  gg->color_ui.spacing = width / NGLYPHTYPES;
 
   margin = gg->color_ui.margin;
   spacing = gg->color_ui.spacing;
 
   if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
+    init_plot_GC (window, gg);
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle (drawable, gg->plot_GC, true, 0, 0, width, height);
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
 
   /*
@@ -191,7 +194,7 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
    */
   pos.y = margin + 3 / 2;
   pos.x = spacing / 2;
-  gdk_draw_point (w->window, gg->plot_GC, pos.x, pos.y);
+  gdk_draw_point (drawable, gg->plot_GC, pos.x, pos.y);
 
   pos.y = 0;
   for (i = 0; i < NGLYPHSIZES; i++) {
@@ -200,27 +203,27 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
     pos.x = spacing + spacing / 2;
 
     g.type = PLUS;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (drawable, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = X;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (drawable, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = OC;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (drawable, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = OR;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (drawable, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = FC;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (drawable, &g, &pos, 0, gg);
 
     pos.x += spacing;
     g.type = FR;
-    draw_glyph (w->window, &g, &pos, 0, gg);
+    draw_glyph (drawable, &g, &pos, 0, gg);
   }
 
   if (!gg->mono_p) {
@@ -233,7 +236,7 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
     gdk_gc_set_line_attributes (gg->plot_GC,
                                 2, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-    gdk_draw_arc (w->window, gg->plot_GC, false, p.x - radius, p.y - radius,
+    gdk_draw_arc (drawable, gg->plot_GC, false, p.x - radius, p.y - radius,
                   2 * radius, 2 * radius, 0, (gshort) 23040);
     gdk_gc_set_line_attributes (gg->plot_GC, 0, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
@@ -301,6 +304,10 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
 {
   gint i, linewidth;
   icoords pos;
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
   gint margin, spacing;
   gint8 dash_list[2];
   colorschemed *scheme = gg->activeColorScheme;
@@ -309,11 +316,10 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
   spacing = gg->color_ui.spacing;
 
   if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
+    init_plot_GC (window, gg);
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle (drawable, gg->plot_GC, true, 0, 0, width, height);
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
 
   pos.y = 0;
@@ -328,7 +334,7 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
     gdk_gc_set_line_attributes (gg->plot_GC, linewidth,
                                 GDK_LINE_ON_OFF_DASH, GDK_CAP_BUTT,
                                 GDK_JOIN_ROUND);
-    gdk_draw_line (w->window, gg->plot_GC, pos.x, pos.y, pos.x + spacing,
+    gdk_draw_line (drawable, gg->plot_GC, pos.x, pos.y, pos.x + spacing,
                    pos.y);
 
     pos.x += (2 * spacing);
@@ -338,13 +344,13 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
     dash_list[0] = 8;
     dash_list[1] = 2;
     gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
-    gdk_draw_line (w->window, gg->plot_GC,
+    gdk_draw_line (drawable, gg->plot_GC,
                    pos.x, pos.y, pos.x + spacing, pos.y);
 
     pos.x += (2 * spacing);
     gdk_gc_set_line_attributes (gg->plot_GC, linewidth,
                                 GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-    gdk_draw_line (w->window, gg->plot_GC,
+    gdk_draw_line (drawable, gg->plot_GC,
                    pos.x, pos.y, pos.x + spacing, pos.y);
   }
 
@@ -356,7 +362,7 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
     find_line_selection_pos (&p, gg);
 
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-    gdk_draw_rectangle (w->window, gg->plot_GC, false,
+    gdk_draw_rectangle (drawable, gg->plot_GC, false,
                         p.x - spacing / 2 - margin / 2,
                         p.y - (NGLYPHSIZES + 1) / 2 - margin / 2,
                         spacing + margin, (NGLYPHSIZES + 1) + margin);
@@ -438,25 +444,27 @@ set_color_id (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 static void
 redraw_fg (GtkWidget * w, gint k, ggobid * gg)
 {
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
   colorschemed *scheme = gg->activeColorScheme;
 
   if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
+    init_plot_GC (window, gg);
 
   gdk_gc_set_foreground (gg->plot_GC, &gg->activeColorScheme->rgb[k]);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle (drawable, gg->plot_GC, true, 0, 0, width, height);
 
   /*
    * Draw a background border around the box containing the selected color
    */
   if (k == gg->color_id) {
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-    gdk_draw_rectangle (w->window, gg->plot_GC,
-                        false, 0, 0, w->allocation.width - 1,
-                        w->allocation.height - 1);
-    gdk_draw_rectangle (w->window, gg->plot_GC, false, 1, 1,
-                        w->allocation.width - 2, w->allocation.height - 2);
+    gdk_draw_rectangle (drawable, gg->plot_GC, false, 0, 0, width - 1,
+                        height - 1);
+    gdk_draw_rectangle (drawable, gg->plot_GC, false, 1, 1,
+                        width - 2, height - 2);
   }
 }
 
@@ -475,14 +483,17 @@ color_expose_fg (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
 static void
 redraw_bg (GtkWidget * w, ggobid * gg)
 {
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
   colorschemed *scheme = gg->activeColorScheme;
 
   if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
+    init_plot_GC (window, gg);
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle (drawable, gg->plot_GC, true, 0, 0, width, height);
 }
 
 static gint
@@ -495,14 +506,17 @@ color_expose_bg (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
 static void
 redraw_accent (GtkWidget * w, ggobid * gg)
 {
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
   colorschemed *scheme = gg->activeColorScheme;
 
   if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
+    init_plot_GC (window, gg);
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle (drawable, gg->plot_GC, true, 0, 0, width, height);
 }
 
 static gint
@@ -515,14 +529,17 @@ color_expose_accent (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
 static void
 redraw_hidden (GtkWidget * w, ggobid * gg)
 {
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
   colorschemed *scheme = gg->activeColorScheme;
 
   if (gg->plot_GC == NULL)
-    init_plot_GC (w->window, gg);
+    init_plot_GC (window, gg);
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle (drawable, gg->plot_GC, true, 0, 0, width, height);
 }
 
 static gint
@@ -654,9 +671,8 @@ static gint
 open_colorsel_dialog (GtkWidget * w, ggobid * gg)
 {
   gint handled = FALSE;
-  GtkWidget *colorsel, *ok_button, *cancel_button, *help_button;
+  GtkWidget *colorsel;
   gint i;
-  GtkColorSelectionDialog *colordlg;
   colorschemed *scheme = gg->activeColorScheme;
 
   /* Check if we've received a button pressed event */
@@ -669,9 +685,8 @@ open_colorsel_dialog (GtkWidget * w, ggobid * gg)
       gtk_color_selection_dialog_new ("Select color");
 
     /* Get the ColorSelection widget */
-    colordlg = GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg);
-    colorsel =
-      GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
+    colorsel = gtk_color_selection_dialog_get_color_selection
+      (GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg));
 
     /*
      * Connect to the "color_changed" signal, set the client-data
@@ -696,8 +711,8 @@ open_colorsel_dialog (GtkWidget * w, ggobid * gg)
     */
   }
   else {
-    colorsel =
-      GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg)->colorsel;
+    colorsel = gtk_color_selection_dialog_get_color_selection
+      (GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg));
   }
 
   if (w == gg->color_ui.bg_da) {

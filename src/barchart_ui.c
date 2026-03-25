@@ -201,7 +201,8 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 
   gg->buttondown = 0;
 
-  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y,
+  gdk_window_get_pointer (gtk_widget_get_window (w),
+                          &sp->mousepos.x, &sp->mousepos.y,
                           &state);
 
   gdk_pointer_ungrab (event->time);

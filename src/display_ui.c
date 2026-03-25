@@ -26,10 +26,12 @@ display_set_position (windowDisplayd * display, ggobid * gg)
 {
   gint x, y, width, height;
   gint posx, posy;
+  GdkWindow *main_window;
 
   /*-- get the size and position of the gg->main_window) --*/
-  gdk_window_get_root_origin (gg->main_window->window, &x, &y);
-  gdk_window_get_size (gg->main_window->window, &width, &height);
+  main_window = gtk_widget_get_window (gg->main_window);
+  gdk_window_get_root_origin (main_window, &x, &y);
+  gdk_window_get_geometry (main_window, NULL, NULL, &width, &height);
 
   gtk_widget_realize (display->window);
   if (x == 0 && y == 0) {

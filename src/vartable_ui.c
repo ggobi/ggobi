@@ -66,13 +66,14 @@ delete_vars_cb (GtkWidget *w, ggobid *gg)
 static void
 limits_type_cb (GtkToggleButton *w, ggobid *gg) 
 {
-  gg->lims_use_visible = w->active;
+  gg->lims_use_visible = gtk_toggle_button_get_active (w);
 }
 
 static void
 dialog_range_set (GtkWidget *w, ggobid *gg) 
 {
   GtkWidget *dialog = w;
+  GtkWidget *content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   GtkWidget *umin_entry, *umax_entry;
   GtkTreeModel *model;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
@@ -84,12 +85,12 @@ dialog_range_set (GtkWidget *w, ggobid *gg)
   gboolean min_p = false, max_p = false;
   vartabled *vt;
 
-  umin_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "umin_entry");
+  umin_entry = widget_find_by_name (content, "umin_entry");
   if (umin_entry == NULL || !GTK_IS_ENTRY(umin_entry)) {
     g_printerr ("found the wrong widget; bail out\n");
     return;
   }
-  umax_entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "umax_entry");
+  umax_entry = widget_find_by_name (content, "umax_entry");
   if (umax_entry == NULL || !GTK_IS_ENTRY(umax_entry)) {
     g_printerr ("found the wrong widget; bail out\n");
     return;
@@ -178,6 +179,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *frame, *vb, *hb, *btn, *lbl;
   GtkWidget *dialog, *umin, *umax;
+  GtkWidget *content;
   GtkWidget *radio1, *radio2;
   GSList *group;
   gint k;
@@ -205,18 +207,19 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
 
   dialog = gtk_dialog_new_with_buttons ("Range Dialog", NULL, 0, 
   			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
   /*-- frame for a pair of radio buttons --*/
   frame = gtk_frame_new ("Define rescaling behavior");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
+  gtk_container_add (GTK_CONTAINER (content), frame);
 
   vb = gtk_vbox_new (true, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
   radio1 = gtk_radio_button_new_with_mnemonic (NULL, "Use _visible points");
-  GTK_TOGGLE_BUTTON (radio1)->active = TRUE;
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio1), TRUE);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
     "When rescaling, use only the cases that are visible: ie, not hidden by brushing and not excluded by subsampling",
     NULL);
@@ -236,7 +239,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   /*-- frame for setting the user-specified limits --*/
   frame = gtk_frame_new ("Override default limits");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
+  gtk_container_add (GTK_CONTAINER (content), frame);
 
   vb = gtk_vbox_new (true, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
@@ -279,7 +282,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   /*-- frame for the unset range button --*/
   frame = gtk_frame_new ("Restore default limits");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-  gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), frame);
+  gtk_container_add (GTK_CONTAINER (content), frame);
   vb = gtk_vbox_new (true, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
@@ -292,7 +295,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
                       G_CALLBACK (range_unset_cb), gg);
   /*-- --*/
 
-  gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
+  gtk_widget_show_all(content);
   
   if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	  dialog_range_set(dialog, gg);
@@ -343,13 +346,14 @@ static void
 dialog_newvar_add (GtkWidget *w, ggobid *gg) 
 {
   GtkWidget *dialog = w;
+  GtkWidget *content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   GtkWidget *entry, *radio_brush;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint vtype;
   gchar *vname;
 
   /*-- retrieve the radio button for the brushing groups --*/
-  radio_brush = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "radio_brush");
+  radio_brush = widget_find_by_name (content, "radio_brush");
   if (radio_brush == NULL || !GTK_IS_RADIO_BUTTON(radio_brush)) {
     g_printerr ("found the wrong widget; bail out\n");
     return;
@@ -360,7 +364,7 @@ dialog_newvar_add (GtkWidget *w, ggobid *gg)
     vtype = ADDVAR_ROWNOS;
 
   /*-- retrieve the entry widget and variable name --*/
-  entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "newvar_entry");
+  entry = widget_find_by_name (content, "newvar_entry");
   if (entry == NULL || !GTK_IS_ENTRY(entry)) {
     g_printerr ("found the wrong widget; bail out\n");
 /**/return;
@@ -391,6 +395,7 @@ static void
 open_newvar_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog;
+  GtkWidget *content;
   GtkWidget *frame, *vb, *hb, *lbl;
   GtkWidget *radio1, *radio2, *entry;
   GSList *radio_group;
@@ -398,9 +403,10 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
   dialog = gtk_dialog_new_with_buttons ("Add New Variable", NULL, 0, 
     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, 
     NULL);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   frame = gtk_frame_new ("Variable values");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), frame,
+  gtk_box_pack_start (GTK_BOX (content), frame,
     false, false, 2);
 
   /*-- make a vb to hold the radio buttons --*/
@@ -434,10 +440,10 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
 
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
 
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), hb,
+  gtk_box_pack_start (GTK_BOX (content), hb,
     false, false, 2);
 
-	gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
+	gtk_widget_show_all(content);
 	
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 		dialog_newvar_add(dialog, gg);
@@ -454,6 +460,7 @@ static void
 dialog_rename_var (GtkWidget *w, ggobid *gg) 
 {
   GtkWidget *dialog = w;
+  GtkWidget *content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   GtkWidget *entry;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gchar *vname;
@@ -467,7 +474,7 @@ dialog_rename_var (GtkWidget *w, ggobid *gg)
     return;
 
   /*-- retrieve the entry widget and variable name --*/
-  entry = widget_find_by_name (GTK_DIALOG(dialog)->vbox, "rename_entry");
+  entry = widget_find_by_name (content, "rename_entry");
   if (entry == NULL || !GTK_IS_ENTRY(entry)) {
     g_printerr ("found the wrong widget; bail out\n");
     return;
@@ -487,6 +494,7 @@ static void
 open_rename_dialog (GtkWidget *w, ggobid *gg)
 {
   GtkWidget *dialog, *hb, *entry, *lbl;
+  GtkWidget *content;
   GGobiData *d = datad_get_from_notebook (gg->vartable_ui.notebook, gg);
   gint *selected_vars, nselected_vars = 0;
 
@@ -503,6 +511,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
 
   dialog = gtk_dialog_new_with_buttons ("Rename One Variable", NULL, 0, 
   			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+  content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
  
   /*-- label and entry --*/
   hb = gtk_hbox_new (false, 2);
@@ -517,10 +526,10 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
 
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
 
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), hb,
+  gtk_box_pack_start (GTK_BOX (content), hb,
     false, false, 2);
 	
-  gtk_widget_show_all(GTK_DIALOG(dialog)->vbox);
+  gtk_widget_show_all(content);
 
   if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	  dialog_rename_var(dialog, gg);

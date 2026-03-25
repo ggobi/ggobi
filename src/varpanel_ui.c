@@ -84,7 +84,7 @@ varpanel_label_set (gint j, GGobiData * d)
   if (!label || !GTK_IS_BIN (label))
     return;
 
-  labelw = GTK_BIN (label)->child;
+  labelw = gtk_bin_get_child (GTK_BIN (label));
 
   if (!labelw)
     return;
@@ -142,7 +142,7 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active,
 
     if (w && GTK_WIDGET_REALIZED (w)) {
 
-      active_prev = GTK_TOGGLE_BUTTON (w)->active;
+      active_prev = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (w));
 
       if (active != active_prev) {
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (w), active);
@@ -233,7 +233,7 @@ varpanel_show_page (displayd * display, ggobid * gg)
     child = l->data;
     tab_label = (GtkWidget *) gtk_notebook_get_tab_label (nb, child);
     if (tab_label && GTK_IS_LABEL (tab_label)) {
-      if (strcmp (GTK_LABEL (tab_label)->label, d->name) == 0) {
+      if (strcmp (gtk_label_get_text (GTK_LABEL (tab_label)), d->name) == 0) {
         if (page != page_new) {
 
           // Set the buttons on 'page' to be insensitive
@@ -257,8 +257,8 @@ varpanel_show_page (displayd * display, ggobid * gg)
 }
 
 void
-varpanel_switch_page_cb (GtkNotebook * notebook, GtkNotebookPage * page,
-                         gint page_num, ggobid * gg)
+varpanel_switch_page_cb (GtkNotebook * notebook, GtkWidget * page,
+                         guint page_num, ggobid * gg)
 {
   varpanel_reinit (gg);
   gdk_flush ();

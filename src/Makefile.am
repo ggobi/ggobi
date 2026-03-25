@@ -1,5 +1,5 @@
 lib_LTLIBRARIES     = libggobi.la
-libggobi_la_GOBS = data.gob renderer.gob renderer-factory.gob renderer-cairo.gob
+libggobi_la_GOBS = data.gob
 libggobi_la_GOBSOURCES = $(libggobi_la_GOBS:%.gob=ggobi-%.c)
 libggobi_la_GOBHEADERS = $(libggobi_la_GOBS:%.gob=ggobi-%.h)
 libggobi_la_GOBOBJECTS = $(libggobi_la_GOBS:%.gob=ggobi-%.lo)
@@ -22,8 +22,8 @@ libggobi_la_BUILT = array.c ash1d.c barchart.c barchartClass.c \
   tour1d_pp.c tour1d_pp_ui.c tour1d_ui.c tour2d.c tour2d3.c tour2d3_ui.c \
   tour2d_pp.c tour2d_pp_ui.c tour2d_ui.c tourcorr.c tourcorr_ui.c tour_pp.c \
   transform.c transform_ui.c tsdisplay.c tsPlot.c utils.c utils_gdk.c \
-  utils_pango.c utils_ui.c varchange.c varcircles.c varpanel_ui.c vartable.c \
-  vartable_nbook.c vartable_ui.c vector.c win32_draw.c writedata_ui.c \
+  utils_pango.c utils_ui.c gtk3compat.c varchange.c varcircles.c varpanel_ui.c vartable.c \
+  vartable_nbook.c vartable_ui.c vector.c writedata_ui.c \
   write_csv.c write_xml.c wvis.c wvis_ui.c xlines.c xyplot.c \
   xyplot_ui.c $(libggobi_la_GOBSOURCES)
 libggobi_la_SOURCES = $(libggobi_la_BUILT) $(libggobi_la_GOBSTAMPS)
@@ -58,6 +58,7 @@ EXTRA_DIST = $(libggobi_la_GOBS)
 
 # Windows specific
 if OS_WIN32
+libggobi_la_BUILT+=win32_draw.c
 libggobi_la_DEPENDENCIES+=libggobi.def
 libggobi_la_LDFLAGS+=-Wc,-s -no-undefined -export-symbols libggobi.def
 ggobi_LDFLAGS = -mwindows -s
@@ -70,4 +71,3 @@ libggobi.def: $(libggobi_la_BUILT:%.c=.libs/%.o)
 	nm -g --defined-only $(libggobi_la_BUILT:%.c=.libs/%.o) > tmp
 	sed -n '/^........ [T|C] _/s/^........ [T|C] _/ /p' tmp >> $@
 	rm tmp
-

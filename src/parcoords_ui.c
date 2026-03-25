@@ -28,7 +28,7 @@ ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   cpanel->p1d.nASHes = (gint)
-    ((gfloat) cpanel->p1d.nbins * (adj->value / 2.0));
+    ((gfloat) cpanel->p1d.nbins * (gtk_adjustment_get_value (adj) / 2.0));
 
   display_tailpipe (gg->current_display, FULL, gg);
 }
@@ -81,7 +81,7 @@ cpanel_parcoords_make (ggobid * gg)
 {
   modepaneld *panel;
   GtkWidget *vbox, *vb, *lbl, *sbar, *opt;
-  GtkObject *adj;
+  GtkAdjustment *adj;
 
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
@@ -141,11 +141,11 @@ cpanel_parcoords_make (ggobid * gg)
     gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vbox), lbl, false, false, 0);
 
-  adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
+  adj = GTK_ADJUSTMENT (gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0));
   g_signal_connect (G_OBJECT (adj), "value_changed",
                     G_CALLBACK (ash_smoothness_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  sbar = gtk_hscale_new (adj);
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), sbar);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
                         "Adjust ASH smoothness", NULL);

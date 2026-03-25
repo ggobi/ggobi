@@ -109,12 +109,14 @@ close_wmgr_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 static gint
 da_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 {
+  GdkWindow *window = gtk_widget_get_window (w);
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
+
   /*-- Create new backing pixmaps of the appropriate size --*/
   if (gg->svis.pix != NULL)
     gdk_pixmap_unref (gg->svis.pix);
-  gg->svis.pix = gdk_pixmap_new (w->window,
-                                 w->allocation.width, w->allocation.height,
-                                 -1);
+  gg->svis.pix = gdk_pixmap_new (window, width, height, -1);
 
   gtk_widget_queue_draw (w);
 
@@ -143,7 +145,10 @@ bin_boundaries_set (GGobiData * d, ggobid * gg)
 static void
 da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
 {
-  gint height = w->allocation.height - 2 * ymargin;
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w) - 2 * ymargin;
   gint x0, x1, k, hgt;
   colorschemed *scheme = (gg->svis.scheme != NULL) ?
     gg->svis.scheme : gg->activeColorScheme;
@@ -151,7 +156,7 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
   GdkPixmap *pix = gg->svis.pix;
 
   if (gg->svis.GC == NULL)
-    gg->svis.GC = gdk_gc_new (w->window);
+    gg->svis.GC = gdk_gc_new (window);
 
   hgt = height / (scheme->n - 1);
 
@@ -165,20 +170,20 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
   /*-- clear the pixmap --*/
   gdk_gc_set_foreground (gg->svis.GC, &scheme->rgb_bg);
   gdk_draw_rectangle (pix, gg->svis.GC, TRUE,
-                      0, 0, w->allocation.width, w->allocation.height);
+                      0, 0, width, gtk_widget_get_allocated_height (w));
 
 
   /*-- draw the color bars --*/
   x0 = xmargin;
   for (k = 0; k < scheme->n; k++) {
-    x1 = xmargin + gg->svis.pct[k] * (w->allocation.width - 2 * xmargin);
+    x1 = xmargin + gg->svis.pct[k] * (width - 2 * xmargin);
     gdk_gc_set_foreground (gg->svis.GC, &scheme->rgb[k]);
     gdk_draw_rectangle (pix, gg->svis.GC, TRUE, x0, ymargin, x1 - x0, height);
     x0 = x1;
   }
 
-  gdk_draw_pixmap (w->window, gg->svis.GC, pix,
-                   0, 0, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_pixmap (drawable, gg->svis.GC, pix,
+                   0, 0, 0, 0, width, gtk_widget_get_allocated_height (w));
 }
 
 
@@ -446,7 +451,7 @@ svis_window_open (ggobid * gg)
   }
 
   gtk_widget_show_all (gg->svis.window);
-  gdk_window_raise (gg->svis.window->window);
+  gdk_window_raise (gtk_widget_get_window (gg->svis.window));
 }
 
 GtkWidget *createSchemeColorsTree (colorschemed * scheme);

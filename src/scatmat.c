@@ -211,20 +211,25 @@ static gint
 scatmat_var_selected (gint jvar, displayd * display)
 {
   gint pos = -1;
+  GList *children;
   GList *l;
-  GtkTableChild *child;
   GtkWidget *da;
   splotd *sp;
 
-  for (l = (GTK_TABLE (display->table))->children; l; l = l->next) {
-    child = (GtkTableChild *) l->data;
-    da = child->widget;
+  children = ggobi_gtk_table_children (display->table);
+  for (l = children; l; l = l->next) {
+    guint left_attach = 0;
+
+    da = GTK_WIDGET (l->data);
     sp = (splotd *) g_object_get_data (G_OBJECT (da), "splotd");
+    ggobi_gtk_table_get_attachments (display->table, da,
+                                     &left_attach, NULL, NULL, NULL);
     if (sp->p1dvar == jvar) {
-      pos = child->left_attach;
+      pos = left_attach;
       break;
     }
   }
+  g_list_free (children);
 
   return pos;
 }
@@ -262,10 +267,10 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
   gboolean redraw = true;
   gboolean Delete = false;
   gint k;
+  GList *children;
   GList *l;
   splotd *s, *sp_new;
   GtkWidget *da;
-  GtkTableChild *child;
   displayd *display = gg->current_display;
   gint jpos, *vars, nvars;
   GGobiData *d = display->d;
@@ -274,25 +279,34 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
      otherwise, append it */
 
   if ((jpos = scatmat_var_selected (jvar, display)) >= 0) {
-    l = (GTK_TABLE (display->table))->children;
-    while (l) {
-      Delete = false;
-      child = (GtkTableChild *) l->data;
-      l = l->next;
-      da = child->widget;
+    children = ggobi_gtk_table_children (display->table);
+    for (l = children; l; l = l->next) {
+      guint left_attach = 0, right_attach = 0, top_attach = 0, bottom_attach = 0;
 
-      if (child->left_attach == jpos)
+      Delete = false;
+      da = GTK_WIDGET (l->data);
+      ggobi_gtk_table_get_attachments (display->table, da,
+                                       &left_attach, &right_attach,
+                                       &top_attach, &bottom_attach);
+
+      if (left_attach == jpos)
         Delete = true;
-      else if (child->left_attach > jpos) {
-        child->left_attach--;
-        child->right_attach--;
+      else if (left_attach > jpos) {
+        left_attach--;
+        right_attach--;
       }
-      if (child->top_attach == jpos) {
+      if (top_attach == jpos) {
         Delete = true;
       }
-      else if (child->top_attach > jpos) {
-        child->top_attach--;
-        child->bottom_attach--;
+      else if (top_attach > jpos) {
+        top_attach--;
+        bottom_attach--;
+      }
+
+      if (!Delete) {
+        ggobi_gtk_table_set_attachments (display->table, da,
+                                         left_attach, right_attach,
+                                         top_attach, bottom_attach);
       }
 
       if (Delete) {
@@ -312,6 +326,7 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
         splot_free (s, display, gg);
       }
     }
+    g_list_free (children);
 
     vars = (gint *) g_malloc (d->ncols * sizeof (gint));
     nvars =

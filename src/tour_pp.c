@@ -130,7 +130,7 @@ gint realloc_optimize0_p (optimize0_param *op, gint ncols, vector_i pcols)
   return 0;
 }
 
-gboolean iszero (array_f *data)
+gboolean tour_pp_iszero (array_f *data)
 { 
   gfloat sum = 0;
   gint i, j;
@@ -243,7 +243,7 @@ gint optimize0 (optimize0_param *op,
     g_printerr ("index_work %f index_best %f \n",index_work, op->index_best);*/
   /* This adds random noise to existing projection and orthonormalize, 
      if the current projection is null */
-  if (iszero(proj))
+  if (tour_pp_iszero(proj))
   { /* sprintf (msg, "zero projection matrix"); print(); */
     normal_fill (proj, 1.0, proj);
     orthonormal (proj);
@@ -1144,4 +1144,3 @@ gint cartentropy (array_f *pdata, void *param, gfloat *val, gpointer unused)
   return(0);
 
 }
-

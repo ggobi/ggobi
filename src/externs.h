@@ -316,7 +316,7 @@ gboolean   in_vector (gint k, gint *vec, gint nels);
 gint       include_hiddens (gboolean include, GGobiData *d, ggobid *gg);
 void       increment_tour(vector_f, vector_f, gfloat, gfloat, gfloat *, gint);
 void       initSessionOptions(int argc, char **argv);
-void       init_plot_GC (GdkWindow *, ggobid *);
+void       init_plot_GC (gpointer, ggobid *);
 void       init_var_GCs (GtkWidget *, ggobid *);
 gdouble    inner_prod (gdouble *, gdouble *, gint);
 gboolean   isCrossed (gdouble, gdouble, gdouble, gdouble, gdouble, gdouble, gdouble, gdouble);
@@ -374,6 +374,7 @@ void       pipeline_init (GGobiData *, ggobid *);
 gint       plotted_cols_get (gint *, GGobiData *, ggobid *);
 gboolean   point_in_which_bin (gint, gint, gint *, gint *, GGobiData *, splotd *);
 void       populate_combo_box (GtkWidget *, gchar **, gint, GCallback, gpointer);
+void       populate_option_menu (GtkWidget *, gchar **, gint, GCallback, gpointer);
 void       populate_tree_view(GtkWidget *tree_view, gchar **lbl, gint nitems, gboolean headers, GtkSelectionMode mode, GCallback func, gpointer obj);
 gboolean   processRestoreFile(const gchar * const fileName, ggobid *gg);
 void       procs_activate(gboolean state, ProjectionMode pmode, displayd *display, ggobid *gg);
@@ -797,4 +798,3 @@ cairo_t*   create_cairo_glitz(GdkDrawable *drawable);
 #endif
 
 #endif
-

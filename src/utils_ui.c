@@ -244,6 +244,13 @@ populate_combo_box (GtkWidget * combo_box, gchar ** lbl, gint nitems,
                       obj);
 }
 
+void
+populate_option_menu (GtkWidget * option_menu, gchar ** lbl, gint nitems,
+                      GCallback func, gpointer obj)
+{
+  populate_combo_box (option_menu, lbl, nitems, func, obj);
+}
+
 /* adds columns to the tree_view labeled by lbl. If headers is true,
    the headers are displayed, otherwise they are not and the
    labels are ignored. Columns are only added for non-NULL labels
@@ -422,7 +429,7 @@ get_tree_view_from_object (GObject * obj)
       page = gtk_notebook_get_current_page (GTK_NOTEBOOK (notebook));
       swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
       if (swin) {
-        tree_view = GTK_BIN (swin)->child;
+        tree_view = gtk_bin_get_child (GTK_BIN (swin));
       }
     }
   }
@@ -542,7 +549,7 @@ variable_notebook_varchange_cb (ggobid * gg, vartabled * vt, gint which,
     vartabled *vt;
     GtkTreeModel *model;
     GtkTreeIter iter;
-    tree_view = GTK_BIN (swin)->child;
+    tree_view = gtk_bin_get_child (GTK_BIN (swin));
     model = gtk_tree_view_get_model (GTK_TREE_VIEW (tree_view));
 
     gtk_list_store_clear (GTK_LIST_STORE (model));
@@ -637,7 +644,7 @@ variable_notebook_page_add_prefices (GtkWidget * notebook, gint page)
   if (!nth_page)
     return;
   d = g_object_get_data (G_OBJECT (nth_page), "datad");
-  GtkWidget *view = GTK_BIN (nth_page)->child;
+  GtkWidget *view = gtk_bin_get_child (GTK_BIN (nth_page));
   GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (view));
   GGobiVariableNotebookPrefixFunc p_func =
     g_object_get_data (G_OBJECT (notebook), "prefix_func");
@@ -858,6 +865,5 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
 
   return d;
 }
-
 
 

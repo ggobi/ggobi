@@ -55,7 +55,7 @@ tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
     gtk_container_remove (GTK_CONTAINER (gg->tsplot.arrangement_box), w);
   }
 
-  frame = gg->tsplot.arrangement_box->parent;
+  frame = gtk_widget_get_parent (gg->tsplot.arrangement_box);
   gtk_widget_destroy (gg->tsplot.arrangement_box);
 
 /*    if (arrangement == ARRANGE_ROW) */
@@ -362,7 +362,7 @@ tsplot_varsel (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 
       display->splots = g_list_append (display->splots, (gpointer) sp_new);
 
-      box = (sp->da)->parent;
+      box = gtk_widget_get_parent (sp->da);
       gtk_box_pack_end (GTK_BOX (box), sp_new->da, true, true, 0);
       gtk_widget_show (sp_new->da);
       //gg->current_splot = sp->displayptr->current_splot = sp_new;

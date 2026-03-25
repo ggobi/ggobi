@@ -36,7 +36,8 @@ destroyit (gboolean kill, ggobid * gg)
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
     if (d->cluster_table) {
-      nrows = GTK_TABLE (d->cluster_table)->nrows;
+      gtk_table_get_size (GTK_TABLE (d->cluster_table), (guint *) &nrows,
+                          NULL);
       for (n = 0; n < nrows - 1; n++)
         cluster_free (n, d, gg);
     }
@@ -49,7 +50,9 @@ destroyit (gboolean kill, ggobid * gg)
   else {
     /*-- kill all the children of the window --*/
     GList *gl, *children =
-      gtk_container_get_children (GTK_CONTAINER(GTK_DIALOG(gg->cluster_ui.window)->vbox));
+      gtk_container_get_children
+      (GTK_CONTAINER (gtk_dialog_get_content_area
+                      (GTK_DIALOG (gg->cluster_ui.window))));
     for (gl = children; gl; gl = gl->next) {
       child = (GtkWidget *) gl->data;
       gtk_widget_destroy (child);
@@ -76,6 +79,10 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 {
   gint k = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget (w, true);
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint width = gtk_widget_get_allocated_width (w);
+  gint height = gtk_widget_get_allocated_height (w);
   icoords pos;
   glyphd g;
   GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
@@ -83,17 +90,16 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 
   /*-- fill in the background color --*/
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (w->window, gg->plot_GC,
-                      true, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_rectangle (drawable, gg->plot_GC, true, 0, 0, width, height);
 
   /*-- draw the appropriate symbol in the appropriate color --*/
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[d->clusv[k].color]);
   g.type = d->clusv[k].glyphtype;
   g.size = d->clusv[k].glyphsize;
 
-  pos.x = w->allocation.width / 2;
-  pos.y = w->allocation.height / 2;
-  draw_glyph (w->window, &g, &pos, 0, gg);
+  pos.x = width / 2;
+  pos.y = height / 2;
+  draw_glyph (drawable, &g, &pos, 0, gg);
 
   return FALSE;
 }
@@ -141,7 +147,8 @@ hide_cluster_cb (GtkToggleButton * btn, gpointer cbd)
     if (d->sampled.els[i]) {
       if (d->clusterid.els[i] == k) {
         prev = d->hidden.els[i];
-        d->hidden.els[i] = d->hidden_now.els[i] = btn->active;
+        d->hidden.els[i] = d->hidden_now.els[i] =
+          gtk_toggle_button_get_active (btn);
         if ((prev != d->hidden.els[i]) && !gg->linkby_cv) {
           changed = symbol_link_by_id (true, i, d, gg) || changed;
         }
@@ -457,12 +464,13 @@ nclusters_changed (ggobid * gg)
   gint nd = g_slist_length (gg->d);
 
   for (k = 0; k < nd; k++) {
-    nrows = 0;
+      nrows = 0;
     page = gtk_notebook_get_nth_page (GTK_NOTEBOOK (gg->cluster_ui.notebook),
                                       k);
     if (page) {
       d = (GGobiData *) g_object_get_data (G_OBJECT (page), "datad");
-      nrows = GTK_TABLE (d->cluster_table)->nrows;
+      gtk_table_get_size (GTK_TABLE (d->cluster_table), (guint *) &nrows,
+                          NULL);
 
       if (nrows != d->nclusters + 1) {/*-- add one for the titles --*/
         changed = true;
@@ -507,6 +515,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   GtkWidget *tebox, *btn, *hbox, *lbl;
   GtkWidget *ebox;
   GtkWidget *dialog;
+  GtkWidget *content_area;
   gint k;
   GSList *l;
   GGobiData *d;
@@ -533,9 +542,10 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   }
 
   dialog = gg->cluster_ui.window;
+  content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   
   tebox = gtk_event_box_new ();
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), tebox, true, true, 2);
+  gtk_box_pack_start (GTK_BOX (content_area), tebox, true, true, 2);
 
   /* Create a notebook, set the position of the tabs */
   gg->cluster_ui.notebook = gtk_notebook_new ();
@@ -666,7 +676,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
 
   /*-- horizontal box to hold a few buttons --*/
   hbox = gtk_hbox_new (false, 2);
-  gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), hbox, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (content_area), hbox, false, false, 0);
 
   /*-- Exclude button --*/
   btn = gtk_button_new_with_mnemonic ("E_xclude shadows");
@@ -708,5 +718,5 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
                    d);
   }
 
-  gdk_window_raise (gg->cluster_ui.window->window);
+  gdk_window_raise (gtk_widget_get_window (gg->cluster_ui.window));
 }

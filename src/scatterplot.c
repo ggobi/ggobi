@@ -149,23 +149,27 @@ ruler_ranges_set (gboolean force, displayd * display, splotd * sp,
    * ranges have changed.  Force when initializing display.
    */
   if (force || GTK_WIDGET_VISIBLE (display->hrule)) {
-    if (((gfloat) GTK_RULER (display->hrule)->lower != tfmin.x) ||
-        ((gfloat) GTK_RULER (display->hrule)->upper != tfmax.x)) {
+    gdouble lower, upper;
+
+    ggobi_gtk_ruler_get_range (display->hrule, &lower, &upper, NULL, NULL);
+    if (((gfloat) lower != tfmin.x) || ((gfloat) upper != tfmax.x)) {
       /* What should the final 2 arguments be. */
-      gtk_ruler_set_range (GTK_RULER (display->hrule),
-                           (gdouble) tfmin.x, (gdouble) tfmax.x,
-                           (gdouble) (tfmax.x - tfmin.x) / 2 + tfmin.x,
-                           tfmax.x);
+      ggobi_gtk_ruler_set_range (display->hrule,
+                                 (gdouble) tfmin.x, (gdouble) tfmax.x,
+                                 (gdouble) (tfmax.x - tfmin.x) / 2 + tfmin.x,
+                                 tfmax.x);
     }
   }
 
   if (force || GTK_WIDGET_VISIBLE (display->vrule)) {
-    if (((gfloat) GTK_RULER (display->vrule)->upper != tfmin.y) ||
-        ((gfloat) GTK_RULER (display->vrule)->lower != tfmax.y)) {
-      gtk_ruler_set_range (GTK_RULER (display->vrule),
-                           (gdouble) tfmin.y, (gdouble) tfmax.y,
-                           (gdouble) (tfmax.y - tfmin.y) / 2 + tfmin.y,
-                           tfmax.y);
+    gdouble lower, upper;
+
+    ggobi_gtk_ruler_get_range (display->vrule, &lower, &upper, NULL, NULL);
+    if (((gfloat) upper != tfmin.y) || ((gfloat) lower != tfmax.y)) {
+      ggobi_gtk_ruler_set_range (display->vrule,
+                                 (gdouble) tfmin.y, (gdouble) tfmax.y,
+                                 (gdouble) (tfmax.y - tfmin.y) / 2 + tfmin.y,
+                                 tfmax.y);
     }
   }
 }
@@ -478,20 +482,20 @@ ruler_motion_cb (GtkWidget * ruler, GdkEventMotion * event, GtkWidget * da)
   gint x, y;
   GdkModifierType state;
 
-  gdk_window_get_pointer (da->window, &x, &y, &state);
+  gdk_window_get_pointer (gtk_widget_get_window (da), &x, &y, &state);
 
-  if (GTK_IS_HRULER (ruler)) {
+  if (ggobi_gtk_ruler_is_horizontal (ruler)) {
     pos = x;
-    max = da->allocation.width;
+    max = gtk_widget_get_allocated_width (da);
   }
   else {
     pos = y;
-    max = da->allocation.height;
+    max = gtk_widget_get_allocated_height (da);
   }
 
-  gtk_ruler_get_range (GTK_RULER (ruler), &lower, &upper, NULL, NULL);
+  ggobi_gtk_ruler_get_range (ruler, &lower, &upper, NULL, NULL);
   position = lower + pos * (upper - lower) / max;
-  g_object_set (G_OBJECT (ruler), "position", position, NULL);
+  ggobi_gtk_ruler_set_position (ruler, position);
 
   return (false);
 }

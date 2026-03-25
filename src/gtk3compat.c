@@ -1,0 +1,750 @@
+#include "gtk3compat.h"
+
+#if GTK_MAJOR_VERSION >= 3
+
+#include <math.h>
+
+#undef gdk_cairo_create
+
+typedef struct _GGobiRulerState {
+  gdouble lower;
+  gdouble upper;
+  gdouble position;
+  gdouble max_size;
+  GtkOrientation orientation;
+} GGobiRulerState;
+
+static GQuark ggobi_ruler_state_quark (void);
+static GGobiRulerState *ggobi_gtk_ruler_state_ensure (GtkWidget *widget);
+
+static GQuark
+ggobi_ruler_state_quark (void)
+{
+  return g_quark_from_static_string ("ggobi-gtk3-ruler-state");
+}
+
+static GGobiRulerState *
+ggobi_gtk_ruler_state_ensure (GtkWidget *widget)
+{
+  GGobiRulerState *state;
+
+  state = g_object_get_qdata (G_OBJECT (widget), ggobi_ruler_state_quark ());
+  if (state != NULL)
+    return state;
+
+  state = g_new0 (GGobiRulerState, 1);
+  state->upper = 1.0;
+  state->max_size = 1.0;
+  if (GTK_IS_ORIENTABLE (widget))
+    state->orientation = gtk_orientable_get_orientation (GTK_ORIENTABLE (widget));
+  else
+    state->orientation = GTK_ORIENTATION_HORIZONTAL;
+
+  g_object_set_qdata_full (G_OBJECT (widget), ggobi_ruler_state_quark (),
+                           state, g_free);
+  return state;
+}
+
+static gboolean
+ggobi_point_in_polygon (const GdkPoint *points, gint npoints, gint x, gint y)
+{
+  gboolean inside = FALSE;
+  gint i;
+  gint j;
+
+  for (i = 0, j = npoints - 1; i < npoints; j = i++) {
+    gboolean intersects;
+
+    intersects =
+      ((points[i].y > y) != (points[j].y > y)) &&
+      (x < (points[j].x - points[i].x) * (y - points[i].y) /
+       (gdouble) (points[j].y - points[i].y) + points[i].x);
+    if (intersects)
+      inside = !inside;
+  }
+
+  return inside;
+}
+
+static void
+ggobi_gdk_color_to_rgba (const GdkColor *color, GdkRGBA *rgba)
+{
+  rgba->red = color->red / 65535.0;
+  rgba->green = color->green / 65535.0;
+  rgba->blue = color->blue / 65535.0;
+  rgba->alpha = 1.0;
+}
+
+static cairo_t *
+ggobi_drawable_begin (GdkDrawable *drawable)
+{
+  if (drawable == NULL)
+    return NULL;
+
+  if (drawable->is_window)
+    return gdk_cairo_create (drawable->window);
+
+  if (drawable->surface)
+    return cairo_create (drawable->surface);
+
+  return NULL;
+}
+
+static void
+ggobi_gc_apply (cairo_t *cr, GdkGC *gc)
+{
+  GdkRGBA rgba;
+
+  if (cr == NULL || gc == NULL)
+    return;
+
+  ggobi_gdk_color_to_rgba (&gc->foreground, &rgba);
+  gdk_cairo_set_source_rgba (cr, &rgba);
+  cairo_set_line_width (cr, MAX (1, gc->line_width));
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+  cairo_set_line_join (cr, CAIRO_LINE_JOIN_ROUND);
+}
+
+GtkTooltips *
+ggobi_gtk_tooltips_new (void)
+{
+  GtkTooltips *tips = g_new0 (GtkTooltips, 1);
+
+  tips->enabled = TRUE;
+  return tips;
+}
+
+void
+ggobi_gtk_tooltips_set_tip (GtkWidget *widget, const gchar *tip_text)
+{
+  gtk_widget_set_tooltip_text (widget, tip_text);
+}
+
+void
+ggobi_gtk_tooltips_enable (GtkTooltips *tips)
+{
+  if (tips != NULL)
+    tips->enabled = TRUE;
+}
+
+void
+ggobi_gtk_tooltips_disable (GtkTooltips *tips)
+{
+  if (tips != NULL)
+    tips->enabled = FALSE;
+}
+
+cairo_t *
+ggobi_gdk_cairo_create (gpointer target)
+{
+  if (target == NULL)
+    return NULL;
+
+  if (GDK_IS_WINDOW (target))
+    return gdk_cairo_create (GDK_WINDOW (target));
+
+  return ggobi_drawable_begin ((GdkDrawable *) target);
+}
+
+GdkGC *
+gdk_gc_new (GdkWindow *window)
+{
+  GdkGC *gc = g_new0 (GdkGC, 1);
+
+  (void) window;
+  gc->foreground.red = 0;
+  gc->foreground.green = 0;
+  gc->foreground.blue = 0;
+  gc->background.red = 65535;
+  gc->background.green = 65535;
+  gc->background.blue = 65535;
+  gc->line_width = 1;
+  gc->line_style = GDK_LINE_SOLID;
+  gc->cap_style = GDK_CAP_ROUND;
+  gc->join_style = GDK_JOIN_ROUND;
+
+  return gc;
+}
+
+void
+gdk_gc_destroy (GdkGC *gc)
+{
+  g_free (gc);
+}
+
+void
+gdk_gc_set_foreground (GdkGC *gc, const GdkColor *color)
+{
+  if (gc && color)
+    gc->foreground = *color;
+}
+
+void
+gdk_gc_set_background (GdkGC *gc, const GdkColor *color)
+{
+  if (gc && color)
+    gc->background = *color;
+}
+
+void
+gdk_gc_set_line_attributes (GdkGC *gc, gint line_width, gint line_style,
+                            gint cap_style, gint join_style)
+{
+  if (gc == NULL)
+    return;
+
+  gc->line_width = line_width;
+  gc->line_style = line_style;
+  gc->cap_style = cap_style;
+  gc->join_style = join_style;
+}
+
+void
+gdk_gc_set_dashes (GdkGC *gc, gint dash_offset, const gchar *dash_list, gint n)
+{
+  if (gc == NULL)
+    return;
+
+  gc->dashes_offset = dash_offset;
+  gc->ndashes = MIN (n, (gint) G_N_ELEMENTS (gc->dashes));
+  if (dash_list && gc->ndashes > 0)
+    memcpy (gc->dashes, dash_list, gc->ndashes);
+}
+
+void
+gdk_gc_get_values (GdkGC *gc, GdkGCValues *values)
+{
+  if (gc == NULL || values == NULL)
+    return;
+
+  memset (values, 0, sizeof (*values));
+  values->foreground = gc->foreground;
+  values->background = gc->background;
+  values->line_width = gc->line_width;
+  values->line_style = gc->line_style;
+  values->cap_style = gc->cap_style;
+  values->join_style = gc->join_style;
+}
+
+GdkColormap *
+gdk_gc_get_colormap (GdkGC *gc)
+{
+  (void) gc;
+  return NULL;
+}
+
+GdkPixmap *
+gdk_pixmap_new (gpointer parent, gint width, gint height, gint depth)
+{
+  GdkPixmap *pixmap = g_new0 (GdkPixmap, 1);
+
+  (void) parent;
+  (void) depth;
+  pixmap->is_window = FALSE;
+  pixmap->width = width;
+  pixmap->height = height;
+  pixmap->surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+                                                MAX (1, width),
+                                                MAX (1, height));
+  return pixmap;
+}
+
+void
+gdk_pixmap_unref (GdkPixmap *pixmap)
+{
+  if (pixmap == NULL)
+    return;
+
+  if (pixmap->surface)
+    cairo_surface_destroy (pixmap->surface);
+  g_free (pixmap);
+}
+
+void
+gdk_drawable_get_size (GdkDrawable *drawable, gint *width, gint *height)
+{
+  if (drawable == NULL)
+    return;
+
+  if (drawable->is_window && drawable->window) {
+    if (width || height)
+      gdk_window_get_geometry (drawable->window, NULL, NULL, width, height);
+    return;
+  }
+
+  if (width)
+    *width = drawable->width;
+  if (height)
+    *height = drawable->height;
+}
+
+GdkVisual *
+gdk_drawable_get_visual (GdkDrawable *drawable)
+{
+  if (drawable && drawable->is_window && drawable->window)
+    return gdk_window_get_visual (drawable->window);
+  return NULL;
+}
+
+void
+gdk_draw_rectangle (GdkDrawable *drawable, GdkGC *gc, gboolean filled,
+                    gint x, gint y, gint width, gint height)
+{
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  ggobi_gc_apply (cr, gc);
+  cairo_rectangle (cr, x, y, width, height);
+  if (filled)
+    cairo_fill_preserve (cr);
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_line (GdkDrawable *drawable, GdkGC *gc,
+               gint x1, gint y1, gint x2, gint y2)
+{
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  ggobi_gc_apply (cr, gc);
+  cairo_move_to (cr, x1, y1);
+  cairo_line_to (cr, x2, y2);
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_arc (GdkDrawable *drawable, GdkGC *gc, gboolean filled,
+              gint x, gint y, gint width, gint height,
+              gint angle1, gint angle2)
+{
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  ggobi_gc_apply (cr, gc);
+  cairo_save (cr);
+  cairo_translate (cr, x + width / 2.0, y + height / 2.0);
+  cairo_scale (cr, width / 2.0, height / 2.0);
+  cairo_arc_negative (cr, 0.0, 0.0, 1.0,
+                      (360.0 - (angle1 / 64.0)) * M_PI / 180.0,
+                      (360.0 - (angle2 / 64.0)) * M_PI / 180.0);
+  if (filled)
+    cairo_fill_preserve (cr);
+  cairo_stroke (cr);
+  cairo_restore (cr);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_polygon (GdkDrawable *drawable, GdkGC *gc, gboolean filled,
+                  GdkPoint *points, gint npoints)
+{
+  gint i;
+  cairo_t *cr;
+
+  if (points == NULL || npoints <= 0)
+    return;
+
+  cr = ggobi_drawable_begin (drawable);
+  ggobi_gc_apply (cr, gc);
+  cairo_move_to (cr, points[0].x, points[0].y);
+  for (i = 1; i < npoints; i++)
+    cairo_line_to (cr, points[i].x, points[i].y);
+  cairo_close_path (cr);
+  if (filled)
+    cairo_fill_preserve (cr);
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_points (GdkDrawable *drawable, GdkGC *gc,
+                 GdkPoint *points, gint npoints)
+{
+  gint i;
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  ggobi_gc_apply (cr, gc);
+  for (i = 0; i < npoints; i++)
+    cairo_rectangle (cr, points[i].x, points[i].y, 1.0, 1.0);
+  cairo_fill (cr);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_segments (GdkDrawable *drawable, GdkGC *gc,
+                   GdkSegment *segs, gint nsegs)
+{
+  gint i;
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  ggobi_gc_apply (cr, gc);
+  for (i = 0; i < nsegs; i++) {
+    cairo_move_to (cr, segs[i].x1, segs[i].y1);
+    cairo_line_to (cr, segs[i].x2, segs[i].y2);
+  }
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_lines (GdkDrawable *drawable, GdkGC *gc,
+                GdkPoint *points, gint npoints)
+{
+  gint i;
+  cairo_t *cr;
+
+  if (points == NULL || npoints <= 0)
+    return;
+
+  cr = ggobi_drawable_begin (drawable);
+  ggobi_gc_apply (cr, gc);
+  cairo_move_to (cr, points[0].x, points[0].y);
+  for (i = 1; i < npoints; i++)
+    cairo_line_to (cr, points[i].x, points[i].y);
+  cairo_stroke (cr);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_point (GdkDrawable *drawable, GdkGC *gc, gint x, gint y)
+{
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  ggobi_gc_apply (cr, gc);
+  cairo_rectangle (cr, x, y, 1.0, 1.0);
+  cairo_fill (cr);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_layout (GdkDrawable *drawable, GdkGC *gc,
+                 gint x, gint y, PangoLayout *layout)
+{
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  ggobi_gc_apply (cr, gc);
+  cairo_move_to (cr, x, y);
+  pango_cairo_show_layout (cr, layout);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_string (GdkDrawable *drawable, gpointer font, GdkGC *gc,
+                 gint x, gint y, const gchar *text)
+{
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  (void) font;
+  ggobi_gc_apply (cr, gc);
+  cairo_move_to (cr, x, y);
+  cairo_show_text (cr, text);
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_pixmap (GdkDrawable *drawable, GdkGC *gc, GdkPixmap *src,
+                 gint xsrc, gint ysrc, gint xdest, gint ydest,
+                 gint width, gint height)
+{
+  cairo_t *cr = ggobi_drawable_begin (drawable);
+
+  (void) gc;
+  (void) xsrc;
+  (void) ysrc;
+  (void) width;
+  (void) height;
+  if (src && src->surface) {
+    cairo_set_source_surface (cr, src->surface, xdest, ydest);
+    cairo_paint (cr);
+  }
+  cairo_destroy (cr);
+}
+
+void
+gdk_draw_drawable (GdkDrawable *drawable, GdkGC *gc, GdkDrawable *src,
+                   gint xsrc, gint ysrc, gint xdest, gint ydest,
+                   gint width, gint height)
+{
+  gdk_draw_pixmap (drawable, gc, (GdkPixmap *) src, xsrc, ysrc,
+                   xdest, ydest, width, height);
+}
+
+GdkRegion *
+gdk_region_polygon (const GdkPoint *points, gint npoints, gint fill_rule)
+{
+  GdkRegion *region;
+
+  (void) fill_rule;
+  if (points == NULL || npoints <= 0)
+    return NULL;
+
+  region = g_new0 (GdkRegion, 1);
+  region->points = g_new (GdkPoint, npoints);
+  memcpy (region->points, points, sizeof (GdkPoint) * npoints);
+  region->npoints = npoints;
+  return region;
+}
+
+gboolean
+gdk_region_point_in (const GdkRegion *region, gint x, gint y)
+{
+  if (region == NULL || region->points == NULL || region->npoints < 3)
+    return FALSE;
+
+  return ggobi_point_in_polygon (region->points, region->npoints, x, y);
+}
+
+void
+gdk_region_destroy (GdkRegion *region)
+{
+  if (region == NULL)
+    return;
+
+  g_free (region->points);
+  g_free (region);
+}
+
+GdkPixmap *
+gdk_pixmap_colormap_create_from_xpm_d (gpointer drawable,
+                                       GdkColormap *colormap,
+                                       gpointer mask,
+                                       gpointer transparent_color,
+                                       gchar **data)
+{
+  GdkPixbuf *pixbuf;
+  GdkPixmap *pixmap;
+  cairo_t *cr;
+
+  (void) drawable;
+  (void) colormap;
+  (void) mask;
+  (void) transparent_color;
+
+  pixbuf = gdk_pixbuf_new_from_xpm_data ((const char **) data);
+  pixmap = gdk_pixmap_new (NULL,
+                           gdk_pixbuf_get_width (pixbuf),
+                           gdk_pixbuf_get_height (pixbuf),
+                           -1);
+  cr = cairo_create (pixmap->surface);
+  gdk_cairo_set_source_pixbuf (cr, pixbuf, 0, 0);
+  cairo_paint (cr);
+  cairo_destroy (cr);
+  g_object_unref (pixbuf);
+
+  return pixmap;
+}
+
+GtkWidget *
+ggobi_gtk_image_new_from_pixmap (GdkPixmap *pixmap, gpointer mask)
+{
+  (void) mask;
+  return gtk_image_new_from_surface (pixmap->surface);
+}
+
+GtkWidget *
+ggobi_gtk_hruler_new (void)
+{
+  GtkWidget *widget = gtk_scale_new_with_range (GTK_ORIENTATION_HORIZONTAL,
+                                                0.0, 1.0, 0.01);
+
+  gtk_scale_set_draw_value (GTK_SCALE (widget), FALSE);
+  gtk_widget_set_size_request (widget, -1, 24);
+  gtk_widget_add_events (widget,
+                         GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK);
+  ggobi_gtk_ruler_state_ensure (widget)->orientation = GTK_ORIENTATION_HORIZONTAL;
+  return widget;
+}
+
+GtkWidget *
+ggobi_gtk_vruler_new (void)
+{
+  GtkWidget *widget = gtk_scale_new_with_range (GTK_ORIENTATION_VERTICAL,
+                                                0.0, 1.0, 0.01);
+
+  gtk_scale_set_draw_value (GTK_SCALE (widget), FALSE);
+  gtk_widget_set_size_request (widget, 24, -1);
+  gtk_widget_add_events (widget,
+                         GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK);
+  ggobi_gtk_ruler_state_ensure (widget)->orientation = GTK_ORIENTATION_VERTICAL;
+  return widget;
+}
+
+void
+ggobi_gtk_ruler_set_range (GtkWidget *widget, gdouble lower,
+                           gdouble upper, gdouble position,
+                           gdouble max_size)
+{
+  GGobiRulerState *state;
+
+  if (widget == NULL)
+    return;
+
+  state = ggobi_gtk_ruler_state_ensure (widget);
+  state->lower = lower;
+  state->upper = upper;
+  state->position = position;
+  state->max_size = max_size;
+
+  if (GTK_IS_RANGE (widget)) {
+    gtk_range_set_range (GTK_RANGE (widget), lower, upper);
+    gtk_range_set_value (GTK_RANGE (widget), position);
+  }
+}
+
+void
+ggobi_gtk_ruler_get_range (GtkWidget *widget, gdouble *lower,
+                           gdouble *upper, gdouble *position,
+                           gdouble *max_size)
+{
+  GGobiRulerState *state;
+
+  if (widget == NULL)
+    return;
+
+  state = ggobi_gtk_ruler_state_ensure (widget);
+  if (lower)
+    *lower = state->lower;
+  if (upper)
+    *upper = state->upper;
+  if (position)
+    *position = state->position;
+  if (max_size)
+    *max_size = state->max_size;
+}
+
+void
+ggobi_gtk_ruler_set_position (GtkWidget *widget, gdouble position)
+{
+  GGobiRulerState *state;
+
+  if (widget == NULL)
+    return;
+
+  state = ggobi_gtk_ruler_state_ensure (widget);
+  state->position = position;
+  if (GTK_IS_RANGE (widget))
+    gtk_range_set_value (GTK_RANGE (widget), position);
+}
+
+gboolean
+ggobi_gtk_ruler_is_horizontal (GtkWidget *widget)
+{
+  if (widget == NULL)
+    return TRUE;
+
+  return ggobi_gtk_ruler_state_ensure (widget)->orientation ==
+    GTK_ORIENTATION_HORIZONTAL;
+}
+
+GdkColormap *
+gdk_colormap_get_system (void)
+{
+  return NULL;
+}
+
+gboolean
+gdk_colormap_alloc_color (GdkColormap *colormap, GdkColor *color,
+                          gboolean writeable, gboolean best_match)
+{
+  (void) colormap;
+  (void) color;
+  (void) writeable;
+  (void) best_match;
+  return TRUE;
+}
+
+void
+gdk_colormap_alloc_colors (GdkColormap *colormap, GdkColor *colors,
+                           gint ncolors, gboolean writeable,
+                           gboolean best_match, gboolean *success)
+{
+  gint i;
+
+  (void) colormap;
+  (void) colors;
+  (void) writeable;
+  (void) best_match;
+  if (success) {
+    for (i = 0; i < ncolors; i++)
+      success[i] = TRUE;
+  }
+}
+
+void
+gdk_colormap_query_color (GdkColormap *colormap, gulong pixel, GdkColor *result)
+{
+  (void) colormap;
+  if (result)
+    result->pixel = pixel;
+}
+
+gboolean
+gdk_color_alloc (GdkColormap *colormap, GdkColor *color)
+{
+  (void) colormap;
+  (void) color;
+  return TRUE;
+}
+
+void
+gdk_color_white (GdkColormap *colormap, GdkColor *color)
+{
+  (void) colormap;
+  if (color) {
+    color->red = 65535;
+    color->green = 65535;
+    color->blue = 65535;
+  }
+}
+
+void
+gdk_color_black (GdkColormap *colormap, GdkColor *color)
+{
+  (void) colormap;
+  if (color) {
+    color->red = 0;
+    color->green = 0;
+    color->blue = 0;
+  }
+}
+
+GdkColormap *
+gtk_widget_get_colormap (GtkWidget *widget)
+{
+  (void) widget;
+  return NULL;
+}
+
+GList *
+ggobi_gtk_table_children (GtkWidget *table)
+{
+  return gtk_container_get_children (GTK_CONTAINER (table));
+}
+
+void
+ggobi_gtk_table_get_attachments (GtkWidget *table, GtkWidget *child,
+                                 guint *left_attach, guint *right_attach,
+                                 guint *top_attach, guint *bottom_attach)
+{
+  gtk_container_child_get (GTK_CONTAINER (table), child,
+                           "left-attach", left_attach,
+                           "right-attach", right_attach,
+                           "top-attach", top_attach,
+                           "bottom-attach", bottom_attach,
+                           NULL);
+}
+
+void
+ggobi_gtk_table_set_attachments (GtkWidget *table, GtkWidget *child,
+                                 guint left_attach, guint right_attach,
+                                 guint top_attach, guint bottom_attach)
+{
+  gtk_container_child_set (GTK_CONTAINER (table), child,
+                           "left-attach", left_attach,
+                           "right-attach", right_attach,
+                           "top-attach", top_attach,
+                           "bottom-attach", bottom_attach,
+                           NULL);
+}
+
+#endif

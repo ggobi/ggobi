@@ -117,17 +117,18 @@ t2d_optimz_cb (GtkToggleButton  *w, displayd *dsp)
     return;
   }
 
-  t2d_optimz(w->active, &dsp->t2d.get_new_target, &dsp->t2d.target_selection_method, dsp);
+  t2d_optimz(gtk_toggle_button_get_active (w),
+    &dsp->t2d.get_new_target, &dsp->t2d.target_selection_method, dsp);
 }
 
 static void t2d_pptemp_set_cb (GtkAdjustment *adj, displayd *dsp) {
 
-  t2d_pptemp_set(adj->value, dsp, dsp->d->gg);
+  t2d_pptemp_set(gtk_adjustment_get_value (adj), dsp, dsp->d->gg);
 }
 
 static void t2d_ppcool_set_cb (GtkAdjustment *adj, displayd *dsp) {
 
-  t2d_ppcool_set(adj->value, dsp, dsp->d->gg);
+  t2d_ppcool_set(gtk_adjustment_get_value (adj), dsp, dsp->d->gg);
 }
 
 /*
@@ -203,12 +204,13 @@ record_bitmap_cb (GtkToggleButton  *w) {
 static gint
 t2d_ppda_configure_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
 {
-  gint wid = w->allocation.width, hgt = w->allocation.height;
+  gint wid = gtk_widget_get_allocated_width (w);
+  gint hgt = gtk_widget_get_allocated_height (w);
 
   if (dsp->t2d_pp_pixmap != NULL)
     gdk_pixmap_unref (dsp->t2d_pp_pixmap);
 
-  dsp->t2d_pp_pixmap = gdk_pixmap_new (dsp->t2d_ppda->window,
+  dsp->t2d_pp_pixmap = gdk_pixmap_new (gtk_widget_get_window (dsp->t2d_ppda),
     wid, hgt, -1);
 
   return false;
@@ -226,7 +228,8 @@ t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
   GtkStyle *style = gtk_widget_get_style (dsp->t2d_ppda);
   GGobiData *d = dsp->d;
 */
-  gint wid = w->allocation.width, hgt = w->allocation.height;
+  gint wid = gtk_widget_get_allocated_width (w);
+  gint hgt = gtk_widget_get_allocated_height (w);
   /*  static gboolean init = true;*/
 
   /*  if (init) {
@@ -234,7 +237,8 @@ t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
     init=false;
     }*/
 
-  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
+  gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (dsp->t2d_ppda),
+                   gg->plot_GC, dsp->t2d_pp_pixmap,
                    0, 0, 0, 0,
                    wid, hgt);
 
@@ -273,7 +277,7 @@ void
 tour2dpp_window_open (ggobid *gg) {
   /*GtkWidget **btn, *label, *da, *entry;*/
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar, *lbl;
-  GtkObject *adj;
+  GtkAdjustment *adj;
   displayd *dsp = gg->current_display;  /* ok as long as we only use the gui */
   GGobiData *d = dsp->d;
   gboolean vars_sphered = true;
@@ -387,11 +391,11 @@ tour2dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
   /*-- value, lower, upper, step --*/
-    adj = gtk_adjustment_new (1.0, 0.1, 3.0, 0.1, 0.1, 0.0);
+    adj = GTK_ADJUSTMENT (gtk_adjustment_new (1.0, 0.1, 3.0, 0.1, 0.1, 0.0));
     g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (t2d_pptemp_set_cb), dsp);
 
-    sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+    sbar = gtk_hscale_new (adj);
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_widget_set_name (sbar, "TOUR2D:PP_TEMPST");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
@@ -412,11 +416,11 @@ tour2dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vb), lbl,
       false, false, 0);
 
-    adj = gtk_adjustment_new (0.99, 0.50, 1.0, 0.05, 0.05, 0.0);
+    adj = GTK_ADJUSTMENT (gtk_adjustment_new (0.99, 0.50, 1.0, 0.05, 0.05, 0.0));
     g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (t2d_ppcool_set_cb), dsp);
 
-    sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+    sbar = gtk_hscale_new (adj);
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_widget_set_name (sbar, "TOUR2D:PP_COOLING");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
@@ -549,5 +553,4 @@ tour2dpp_window_open (ggobid *gg) {
     gtk_widget_show_all (dsp->t2d_window);
   }
 }
-
 

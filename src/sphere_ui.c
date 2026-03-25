@@ -75,9 +75,8 @@ void
 sphere_npcs_range_set (gint n, ggobid * gg)
 {
   if (gg->sphere_ui.npcs_adj != NULL) {
-    GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj)->upper = (gfloat) n;
-    gtk_adjustment_set_value (GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj),
-                              (gfloat) n);
+    gtk_adjustment_set_upper (gg->sphere_ui.npcs_adj, (gfloat) n);
+    gtk_adjustment_set_value (gg->sphere_ui.npcs_adj, (gfloat) n);
   }
 }
 
@@ -105,13 +104,13 @@ deleteit (ggobid * gg)
   gg->sphere_ui.variance_entry = NULL;
   gg->sphere_ui.stdized_entry = NULL;
   gg->sphere_ui.apply_btn = NULL;
-  gg->sphere_ui.npcs_adj = (GtkObject *) NULL;
+  gg->sphere_ui.npcs_adj = NULL;
 }
 
 void
 sphere_npcs_set_cb (GtkAdjustment * adj, ggobid * gg)
 {
-  gint n = (gint) adj->value;
+  gint n = (gint) gtk_adjustment_get_value (adj);
   GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
 
   if (d != NULL)
@@ -123,7 +122,7 @@ vars_stdized_cb (GtkToggleButton * btn, ggobid * gg)
 {
   GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
 
-  d->sphere.vars_stdized = btn->active;
+  d->sphere.vars_stdized = gtk_toggle_button_get_active (btn);
 }
 
 void
@@ -253,12 +252,15 @@ scree_mapped_p (ggobid * gg)
 static gint
 scree_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 {
+  GdkWindow *window = gtk_widget_get_window (w);
+
   if (gg->sphere_ui.scree_pixmap != NULL)
     gdk_pixmap_unref (gg->sphere_ui.scree_pixmap);
 
-  gg->sphere_ui.scree_pixmap = gdk_pixmap_new (w->window,
-                                               w->allocation.width,
-                                               w->allocation.height, -1);
+  gg->sphere_ui.scree_pixmap =
+    gdk_pixmap_new (window,
+                    gtk_widget_get_allocated_width (w),
+                    gtk_widget_get_allocated_height (w), -1);
 
   return false;
 }
@@ -271,7 +273,10 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
   gint xpos, ypos, xstrt = 0, ystrt = 0; // compiler pacification
   gchar *tickmk;
   GGobiData *d = datad_get_from_window (gg->sphere_ui.window);
-  gint wid = w->allocation.width, hgt = w->allocation.height;
+  GdkWindow *window = gtk_widget_get_window (w);
+  GdkDrawable *drawable = (GdkDrawable *) window;
+  gint wid = gtk_widget_get_allocated_width (w);
+  gint hgt = gtk_widget_get_allocated_height (w);
   gint *sphvars, nels;
   gfloat *evals;
   colorschemed *scheme = gg->activeColorScheme;
@@ -325,8 +330,8 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
     g_free ((gpointer) evals);
   }
 
-  gdk_draw_pixmap (w->window, gg->plot_GC, gg->sphere_ui.scree_pixmap,
-                   0, 0, 0, 0, w->allocation.width, w->allocation.height);
+  gdk_draw_pixmap (drawable, gg->plot_GC, gg->sphere_ui.scree_pixmap,
+                   0, 0, 0, 0, wid, hgt);
   return false;
 }
 
@@ -473,16 +478,16 @@ sphere_panel_open (ggobid * gg)
 
     /* Spinner: number of principal components */
     /*-- the parameters of the adjustment should be reset each time --*/
-    gg->sphere_ui.npcs_adj = gtk_adjustment_new ((gfloat) d->sphere.vars.nels,
-                                                 1.0,
-                                                 (gfloat) d->sphere.vars.nels,
-                                                 1.0, 5.0, 0.0);
+    gg->sphere_ui.npcs_adj =
+      GTK_ADJUSTMENT (gtk_adjustment_new ((gfloat) d->sphere.vars.nels,
+                                          1.0,
+                                          (gfloat) d->sphere.vars.nels,
+                                          1.0, 5.0, 0.0));
 
     g_signal_connect (G_OBJECT (gg->sphere_ui.npcs_adj),
                       "value_changed", G_CALLBACK (sphere_npcs_set_cb), gg);
 
-    spinner = gtk_spin_button_new (GTK_ADJUSTMENT (gg->sphere_ui.npcs_adj),
-                                   0, 0);
+    spinner = gtk_spin_button_new (gg->sphere_ui.npcs_adj, 0, 0);
     gtk_label_set_mnemonic_widget (GTK_LABEL (label), spinner);
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinner,
@@ -606,7 +611,8 @@ sphere_panel_open (ggobid * gg)
   gtk_widget_show_all (gg->sphere_ui.window);
 
 /*-- play around with making this notebook larger --*/
-  if (notebook && GTK_IS_NOTEBOOK(notebook) && g_list_length (GTK_NOTEBOOK (notebook)->children) > 0) {
+  if (notebook && GTK_IS_NOTEBOOK (notebook) &&
+      gtk_notebook_get_n_pages (GTK_NOTEBOOK (notebook)) > 0) {
     gint page;
     GtkWidget *swin, *tree_view;
     GtkAdjustment *adj;
@@ -614,9 +620,11 @@ sphere_panel_open (ggobid * gg)
     swin = gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), page);
     if (swin) {
       adj = gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (swin));
-      tree_view = GTK_BIN (swin)->child;
-      if (tree_view->allocation.height < adj->upper) {
-        gint sz = MIN (tree_view->allocation.height * 2, adj->upper);
+      tree_view = gtk_bin_get_child (GTK_BIN (swin));
+      if (gtk_widget_get_allocated_height (tree_view) <
+          gtk_adjustment_get_upper (adj)) {
+        gint sz = MIN (gtk_widget_get_allocated_height (tree_view) * 2,
+                       (gint) gtk_adjustment_get_upper (adj));
         gtk_widget_set_size_request (tree_view, -1, sz);
       }
       /*

@@ -58,7 +58,7 @@ degree_cb (GtkAdjustment * adj, ggobid * gg)
 
   vars = get_selections_from_tree_view (tree_view, &nvars);
 
-  jitter_value_set (adj->value, d, gg);
+  jitter_value_set (gtk_adjustment_get_value (adj), d, gg);
   if (nvars) {
     rejitter (vars, nvars, d, gg);
     g_free (vars);
@@ -111,7 +111,7 @@ jitter_window_open (ggobid * gg)
   GtkWidget *btn, *lbl;
   GtkWidget *vbox, *vb, *hb;
   GtkWidget *sbar, *opt;
-  GtkObject *adj;
+  GtkAdjustment *adj;
   GtkWidget *notebook;
 
   /*-- if used before we have data, bail out --*/
@@ -174,7 +174,7 @@ jitter_window_open (ggobid * gg)
       g_signal_connect (G_OBJECT (adj), "value_changed",
                         G_CALLBACK (degree_cb), (gpointer) gg);
 
-      sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+      sbar = gtk_hscale_new (adj);
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
                             "Set the degree of jitter", NULL);
       gtk_scale_set_draw_value (GTK_SCALE (sbar), false);
@@ -209,5 +209,5 @@ jitter_window_open (ggobid * gg)
     }
   }
 
-  gdk_window_raise (gg->jitter_ui.window->window);
+  gdk_window_raise (gtk_widget_get_window (gg->jitter_ui.window));
 }

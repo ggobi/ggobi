@@ -47,7 +47,7 @@ static void
 ASH_add_lines_cb (GtkToggleButton *button, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->t1d.ASH_add_lines_p = button->active;
+  cpanel->t1d.ASH_add_lines_p = gtk_toggle_button_get_active (button);
   splot_redraw (gg->current_splot, FULL, gg);
 }
 
@@ -94,14 +94,14 @@ cpanel_tour1d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 
 static void speed1d_set_cb (GtkAdjustment *adj, ggobid *gg) {
 
-  tour1d_speed_set(adj->value, gg);
+  tour1d_speed_set(gtk_adjustment_get_value (adj), gg);
 }
 
 static void tour1d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
 
-  tour1d_pause (&dsp->cpanel, button->active, dsp, gg);
+  tour1d_pause (&dsp->cpanel, gtk_toggle_button_get_active (button), dsp, gg);
 }
 
 static void reinit_cb (GtkWidget *w, ggobid *gg) {
@@ -130,8 +130,9 @@ static void t1d_ash_sm_cb (GtkAdjustment *adj, ggobid *gg)
   splotd *sp = gg->current_splot;
 
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
-  cpanel->t1d.nASHes = (gint) ((gfloat) cpanel->t1d.nbins * (adj->value / 2.0));
-  cpanel->t1d.ASH_smooth = adj->value;
+  cpanel->t1d.nASHes = (gint) ((gfloat) cpanel->t1d.nbins *
+    (gtk_adjustment_get_value (adj) / 2.0));
+  cpanel->t1d.ASH_smooth = gtk_adjustment_get_value (adj);
 
   display_tailpipe (gg->current_display, FULL, gg);
 
@@ -162,7 +163,7 @@ void
 cpanel_tour1d_make (ggobid *gg) {
   modepaneld *panel;
   GtkWidget *frame, *framevb, *box, *btn, *sbar, *vb, *lbl;
-  GtkObject *adj;
+  GtkAdjustment *adj;
   
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
@@ -177,11 +178,13 @@ cpanel_tour1d_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (sessionOptions->defaultTour1dSpeed, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
+  adj = GTK_ADJUSTMENT (gtk_adjustment_new (sessionOptions->defaultTour1dSpeed,
+                                            0.0, MAX_TOUR_SPEED,
+                                            1.0, 1.0, 0.0));
   g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (speed1d_set_cb), (gpointer) gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  sbar = gtk_hscale_new (adj);
   gtk_widget_set_name (sbar, "TOUR1D:speed_bar");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of tour motion", NULL);
@@ -280,12 +283,12 @@ cpanel_tour1d_make (ggobid *gg) {
     false, false, 0);
 
   /*-- value, lower, upper, step --*/
-  adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
+  adj = GTK_ADJUSTMENT (gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0));
   g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (t1d_ash_sm_cb), gg);
 
 /*  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.smoothness_adj));*/
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  sbar = gtk_hscale_new (adj);
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
   gtk_widget_set_name (sbar, "TOUR1D:ASH_smooth");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
@@ -717,7 +720,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   GdkModifierType state;
 
-  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
+  gdk_window_get_pointer (gtk_widget_get_window (w),
+                          &sp->mousepos.x, &sp->mousepos.y, &state);
 
   tour1d_manip_end(sp);
 

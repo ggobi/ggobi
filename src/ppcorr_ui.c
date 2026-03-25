@@ -35,7 +35,7 @@ hide_cb (GtkAction * action, GtkWidget * window)
 static void
 optimize_cb (GtkToggleButton * w)
 {
-  g_printerr ("optimize?  %d\n", w->active);
+  g_printerr ("optimize?  %d\n", gtk_toggle_button_get_active (w));
 }
 
 static const gchar *ui_str =

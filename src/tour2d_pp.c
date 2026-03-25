@@ -446,8 +446,9 @@ void t2d_clear_pppixmap(displayd *dsp, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
-  gint wid = dsp->t2d_ppda->allocation.width, 
-    hgt = dsp->t2d_ppda->allocation.height;
+  GdkDrawable *drawable = (GdkDrawable *) gtk_widget_get_window (dsp->t2d_ppda);
+  gint wid = gtk_widget_get_allocated_width (dsp->t2d_ppda);
+  gint hgt = gtk_widget_get_allocated_height (dsp->t2d_ppda);
 
   /* clear the pixmap */
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
@@ -461,7 +462,7 @@ void t2d_clear_pppixmap(displayd *dsp, ggobid *gg)
   gdk_draw_line (dsp->t2d_pp_pixmap, gg->plot_GC,
     margin, hgt - margin, margin, margin);
 
-  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
+  gdk_draw_pixmap (drawable, gg->plot_GC, dsp->t2d_pp_pixmap,
                    0, 0, 0, 0,
                    wid, hgt);
 }
@@ -499,7 +500,8 @@ void t2d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
   gdk_draw_lines (dsp->t2d_pp_pixmap, gg->plot_GC,
     pptrace, dsp->t2d_ppindx_count);
 
-  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
+  gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (dsp->t2d_ppda),
+    gg->plot_GC, dsp->t2d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
 
 }
@@ -510,8 +512,8 @@ void t2d_ppdraw_think(displayd *dsp, ggobid *gg)
 {
   splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
   colorschemed *scheme = gg->activeColorScheme;
-  gint wid = dsp->t2d_ppda->allocation.width, 
-    hgt = dsp->t2d_ppda->allocation.height;
+  gint wid = gtk_widget_get_allocated_width (dsp->t2d_ppda);
+  gint hgt = gtk_widget_get_allocated_height (dsp->t2d_ppda);
   PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, "Thinking...");
   
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
@@ -524,7 +526,8 @@ void t2d_ppdraw_think(displayd *dsp, ggobid *gg)
     gdk_draw_string (dsp->t2d_pp_pixmap,
     gtk_style_get_font (style),
      gg->plot_GC, 10, 10, varlab);*/
-  gdk_draw_pixmap (dsp->t2d_ppda->window, gg->plot_GC, dsp->t2d_pp_pixmap,
+  gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (dsp->t2d_ppda),
+    gg->plot_GC, dsp->t2d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
 }
 
@@ -533,8 +536,8 @@ void t2d_ppdraw(gfloat pp_indx_val, displayd *dsp, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
-  gint wid = dsp->t2d_ppda->allocation.width, 
-    hgt = dsp->t2d_ppda->allocation.height;
+  gint wid = gtk_widget_get_allocated_width (dsp->t2d_ppda);
+  gint hgt = gtk_widget_get_allocated_height (dsp->t2d_ppda);
   gint j;
   static gboolean init = true;
   gchar *label = g_strdup("PP index: (0.0) 0.0000 (0.0)");

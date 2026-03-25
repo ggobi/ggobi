@@ -821,7 +821,8 @@ void tour2d_func (gboolean state, displayd *dsp, ggobid *gg)
   if (state) {
     if (dsp->t2d.idled == 0) {
       dsp->t2d.idled = g_idle_add_full (G_PRIORITY_LOW,
-                                   (GtkFunction) tour2d_idle_func, dsp, NULL);
+                                        (GSourceFunc) tour2d_idle_func,
+                                        dsp, NULL);
 
       gg->tour2d.idled = 1;
     }

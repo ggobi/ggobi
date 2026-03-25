@@ -270,11 +270,11 @@ special_colors_init (ggobid * gg)
 }
 
 void
-init_plot_GC (GdkWindow * w, ggobid * gg)
+init_plot_GC (gpointer w, ggobid * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
-  gg->plot_GC = gdk_gc_new (w);
+  gg->plot_GC = gdk_gc_new ((GdkWindow *) w);
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
   gdk_gc_set_background (gg->plot_GC, &scheme->rgb_bg);
   /* line_width, GdkLineStyle, GdkCapStyle, GdkJoinStyle */
@@ -286,7 +286,7 @@ init_plot_GC (GdkWindow * w, ggobid * gg)
 void
 init_var_GCs (GtkWidget * w, ggobid * gg)
 {
-  GdkWindow *window = w->window;
+  GdkWindow *window = gtk_widget_get_window (w);
   GtkStyle *style = gtk_widget_get_style (w);
   GdkColor white, black, bg, *bblack;
 

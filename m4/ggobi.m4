@@ -31,7 +31,7 @@ echo "pkgconfig path: ${PKG_CONFIG_PATH}"
 export PKG_CONFIG_PATH
 
 PKG_CHECK_MODULES(GGOBI, [ggobi])
-AC_SUBST(GGOBI_FLAGS)
+AC_SUBST(GGOBI_CFLAGS)
 AC_SUBST(GGOBI_LIBS)
 
 if test -n "$enable_debug" && ! test "$enable_debug" = "no" ;  then

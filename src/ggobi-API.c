@@ -1340,13 +1340,13 @@ GGOBI (raiseWindow) (int which, gboolean raiseOrIcon, gboolean up,
       continue;
     if (raiseOrIcon) {
       if (up)
-        gdk_window_raise (display->window->window);
+        gdk_window_raise (gtk_widget_get_window (display->window));
       else
-        gdk_window_lower (display->window->window);
+        gdk_window_lower (gtk_widget_get_window (display->window));
     }
     else {
       if (up)
-        gtk_widget_hide_all (display->window);
+        gtk_widget_hide (display->window);
       else
         gtk_widget_show_all (display->window);
 

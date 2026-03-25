@@ -340,5 +340,6 @@ display_tree_child_select (GtkTreeSelection * sel, gpointer data)
 
   gtk_widget_show (GGOBI_WINDOW_DISPLAY (display)->window);
   /* And now make certain the window comes to the top. */
-  gdk_window_raise (GGOBI_WINDOW_DISPLAY (display)->window->window);
+  gdk_window_raise (gtk_widget_get_window
+                    (GGOBI_WINDOW_DISPLAY (display)->window));
 }

@@ -74,7 +74,8 @@ stage1_cb (GtkWidget *w, ggobid *gg)
   vars = get_selections_from_tree_view (tree_view, &nvars);
 
   if (nvars) {
-    transform (1, indx, gg->tform_ui.boxcox_adj->value, vars, nvars, d, gg);
+    transform (1, indx, gtk_adjustment_get_value (gg->tform_ui.boxcox_adj),
+      vars, nvars, d, gg);
     g_free (vars);
   }
 }
@@ -92,7 +93,7 @@ void boxcox_cb (GtkAdjustment *adj, ggobid *gg)
   vars = get_selections_from_tree_view (tree_view, &nvars);
   
   if (nvars) {
-    transform (1, BOXCOX, adj->value, vars, nvars, d, gg);
+    transform (1, BOXCOX, gtk_adjustment_get_value (adj), vars, nvars, d, gg);
     g_free (vars);
   }
 }
@@ -405,7 +406,7 @@ transform_window_open (ggobid *gg)
   } 
 
   gtk_widget_show_all (gg->tform_ui.window);
-  gdk_window_raise (gg->tform_ui.window->window);
+  gdk_window_raise (gtk_widget_get_window (gg->tform_ui.window));
 }
 
 /*

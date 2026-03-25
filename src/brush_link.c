@@ -507,7 +507,7 @@ list_from_data (ggobid * gg, GGobiData * data, GtkNotebook * notebook)
   if (swin)
     list =
       GTK_LIST_STORE (gtk_tree_view_get_model
-                      (GTK_TREE_VIEW (GTK_BIN (swin)->child)));
+                      (GTK_TREE_VIEW (gtk_bin_get_child (GTK_BIN (swin)))));
 
   return (list);
 }

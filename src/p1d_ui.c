@@ -37,7 +37,7 @@ static void
 ASH_add_lines_cb (GtkToggleButton * button, ggobid * gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
-  cpanel->p1d.ASH_add_lines_p = button->active;
+  cpanel->p1d.ASH_add_lines_p = gtk_toggle_button_get_active (button);
   splot_redraw (gg->current_splot, FULL, gg);
 }
 
@@ -48,7 +48,7 @@ ash_smoothness_cb (GtkAdjustment * adj, ggobid * gg)
 
   /*-- adj->value ranges from .01 to .5; min value for nASHes = 1 --*/
   cpanel->p1d.nASHes = (gint)
-    ((gfloat) cpanel->p1d.nbins * (adj->value / 2.0));
+    ((gfloat) cpanel->p1d.nbins * (gtk_adjustment_get_value (adj) / 2.0));
 
   if (cpanel->p1d.type == ASH)
     display_tailpipe (gg->current_display, FULL, gg);
@@ -82,7 +82,7 @@ cycle_cb (GtkToggleButton * button, ggobid * gg)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
-  cpanel->p1d.cycle_p = button->active;
+  cpanel->p1d.cycle_p = gtk_toggle_button_get_active (button);
   p1d_cycle_activate (cpanel->p1d.cycle_p, cpanel, gg);
 }
 static void
@@ -91,7 +91,7 @@ cycle_speed_cb (GtkAdjustment * adj, ggobid * gg)
   displayd *display = gg->current_display;
   cpaneld *cpanel = &display->cpanel;
 
-  cpanel->p1d.cycle_delay = -1 * (guint32) adj->value;
+  cpanel->p1d.cycle_delay = -1 * (guint32) gtk_adjustment_get_value (adj);
   if (cpanel->p1d.cycle_p) {
     g_source_remove (gg->p1d.cycle_id);
     gg->p1d.cycle_id = g_timeout_add (cpanel->p1d.cycle_delay,
@@ -163,7 +163,7 @@ cpanel_p1dplot_make (ggobid * gg)
   modepaneld *panel;
   GtkWidget *frame, *framevb, *tgl, *btn, *vbox, *vb, *opt, *lbl;
   GtkWidget *sbar;
-  GtkObject *adj;
+  GtkAdjustment *adj;
 
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   panel->name = g_strdup (GGOBI (getPModeName) (P1PLOT));
@@ -211,11 +211,11 @@ cpanel_p1dplot_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (vbox), lbl, false, false, 0);
 
   /*-- value, lower, upper, step --*/
-  adj = gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0);
+  adj = GTK_ADJUSTMENT (gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0));
   g_signal_connect (G_OBJECT (adj), "value_changed",
                     G_CALLBACK (ash_smoothness_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  sbar = gtk_hscale_new (adj);
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), sbar);
   gtk_widget_set_name (sbar, "P1PLOT:ASH_smooth");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,

@@ -35,9 +35,9 @@ GGOBI_DATADIR_TMP=`eval echo ${datadir}`
 GGOBI_DATADIR=`eval echo "${GGOBI_DATADIR_TMP}"`
 AC_DEFINE_UNQUOTED([GGOBI_DATADIR], "$GGOBI_DATADIR", [Location of GGobi data installation])
 
-# Initialize gettext
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION(0.14.5)
+# Initialize gettext when the legacy autotools macros are available.
+m4_ifdef([AM_GNU_GETTEXT], [AM_GNU_GETTEXT([external])])
+m4_ifdef([AM_GNU_GETTEXT_VERSION], [AM_GNU_GETTEXT_VERSION(0.14.5)])
 GGOBI_LOCALEDIR="${GGOBI_DATADIR}/locale"
 AC_DEFINE_UNQUOTED([GGOBI_LOCALEDIR], "$GGOBI_LOCALEDIR", [Location of locale files])
 
@@ -66,7 +66,7 @@ AC_DEFINE_UNQUOTED([MICRO_VERSION], $MICRO_VERSION, [The micro *.*.x version])
 
 AC_ARG_ENABLE(debug, [--enable-debug          Compile with debugging symbols])
 
-PLUGIN_DIRS=""
+PLUGIN_DIRS="TestPlugin"
 
 AC_ARG_WITH(all-plugins, [--with-all-plugins  Enable all (supported) plugins])
 
@@ -109,7 +109,7 @@ if test "$with_plugins" != "" && test "$with_plugins" != "yes" && test "$with_pl
 fi
 
 if test -n "${with_all_plugins}" &&  test "${with_all_plugins}" != "no" ; then
- PLUGIN_DIRS="DataViewer DescribeDisplay GraphLayout GraphAction VarCloud ggvis"
+ PLUGIN_DIRS="TestPlugin DataViewer DescribeDisplay GraphLayout GraphAction VarCloud ggvis"
 fi
 
 # This is obviously ugly, but AC_CONFIG_SUBDIRS *requires* a literal
@@ -173,11 +173,11 @@ AC_PATH_PROG(GOB2, gob2,,$PATH)
 
 PKG_PROG_PKG_CONFIG(0.20)
 
-# FIND GTK2
+# FIND GTK3
 
- echo "Looking for gtk2"
+ echo "Looking for gtk3"
 
-PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= 2.6.0])
+PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= 3.24.0])
 
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
@@ -193,6 +193,13 @@ PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 
 AC_SUBST(LIBXML_CFLAGS)
 AC_SUBST(LIBXML_LIBS)
+
+dnl These are consumed by the in-tree plugin Makefiles via plugins/Makefile.plugin.
+GGOBI_CFLAGS="$GTK_CFLAGS $GMODULE_CFLAGS $LIBXML_CFLAGS"
+GGOBI_LIBS='$(top_builddir)/src/libggobi.la '"$GTK_LIBS"' '"$GMODULE_LIBS"' '"$LIBXML_LIBS"
+
+AC_SUBST(GGOBI_CFLAGS)
+AC_SUBST(GGOBI_LIBS)
 
 # Find pdflatex and bibtex for building the manual
 AC_PATH_PROGS(PDFLATEX, [${PDFLATEX} pdflatex], false)
@@ -214,7 +221,7 @@ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
  dnl Process the different .in files, substituting the values computed here in the configuration
  dnl script for the corresponding @variable@ in these files.
-AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile plugins/Makefile plugins/TestPlugin/Makefile ggobi.pc ggobi-system.pc po/Makefile.in doc/Makefile)
 AC_OUTPUT
 
 echo "*******************************"
@@ -224,4 +231,3 @@ echo " Plugins:                ${PLUGIN_DIRS}"
 echo " Installation directory: $prefix"
 echo ""
 echo "*******************************"
-

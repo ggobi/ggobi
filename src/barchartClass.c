@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include "externs.h"
-#include <gdk/gdkkeysyms.h>
 
 
  /* Making these available to ggobiClass.c */
@@ -36,7 +35,7 @@ static gint barchartVarIsPlotted (displayd * dpy, gint * cols, gint ncols,
 static gboolean barchartCPanelSet (displayd * dpy, cpaneld * cpanel,
                                    ggobid * gg);
 static void barchartDisplaySet (displayd * dpy, ggobid * gg);
-static void barchartDestroy (GtkObject *);
+static void barchart_finalize (GObject *obj);
 static void barchartPlaneToScreen (splotd * sp, GGobiData * d, ggobid * gg);
 void barchart_clean_init (barchartSPlotd * sp);
 void barchart_recalc_counts (barchartSPlotd * sp, GGobiData * d, ggobid * gg);
@@ -59,6 +58,7 @@ static gboolean barchartEventHandlersToggle (displayd * dpy, splotd * sp,
 static gboolean barchartKeyEventHandled (GtkWidget *, displayd *, splotd *,
                                          GdkEventKey *, ggobid *);
 void barchartRulerRangesSet (gboolean, displayd *, splotd *, ggobid *);
+static GObjectClass *barchart_parent_class = NULL;
 
 static void
 setShowAxesOption (displayd * display, gboolean active)
@@ -172,28 +172,19 @@ barchartDisplaySet (displayd * dpy, ggobid * gg)
 
 /* This is for the barchart SPlot Class */
 static void
-barchartDestroy (GtkObject * obj)
+barchart_finalize (GObject *obj)
 {
   if (obj && GGOBI_BARCHART_SPLOT (obj)->bar) {
-    GtkObjectClass *klass;
-    barchartSPlotd *sp;
-
-    sp = GGOBI_BARCHART_SPLOT (obj);
-
-    /* Goal here is to get the class object for the parent
-       of the GGOBI_TYPE_EXTENDED_SPLOT class so that we can call its
-       destroy method.
-       Need to get the class of the barchart and then constrain it to the 
-       extended splot class. */
-    klass = g_type_class_peek_parent (GGOBI_EXTENDED_SPLOT_GET_CLASS (sp));
+    barchartSPlotd *sp = GGOBI_BARCHART_SPLOT (obj);
 
     barchart_free_structure (sp);
     vectori_free (&sp->bar->index_to_rank);
     g_free ((gpointer) sp->bar);
     sp->bar = NULL;
-
-    klass->destroy (GTK_OBJECT (sp));
   }
+
+  if (barchart_parent_class->finalize)
+    barchart_parent_class->finalize (obj);
 }
 
 
@@ -645,7 +636,8 @@ barchartSPlotClassInit (GGobiBarChartSPlotClass * klass)
   klass->extendedSPlotClass.active_paint_points =
     barchart_active_paint_points;
 
-  GTK_OBJECT_CLASS (klass)->destroy = barchartDestroy;
+  barchart_parent_class = g_type_class_peek_parent (klass);
+  G_OBJECT_CLASS (klass)->finalize = barchart_finalize;
 
   klass->extendedSPlotClass.plotted_vars_get = splot1DVariablesGet;
 }

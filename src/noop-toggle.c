@@ -3,15 +3,6 @@
 #include "noop-toggle.h"
 #include <gtk/gtklabel.h>
 
-static GtkObjectClass *parent_class = NULL;
-
-static void
-ggobi_noop_toggle_button_destroy (GtkObject * obj)
-{
-  if (parent_class->destroy)
-    parent_class->destroy (obj);
-}
-
 static gint
 button_press_event (GtkWidget * w, GdkEventButton * event)
 {
@@ -31,12 +22,8 @@ button_press_event (GtkWidget * w, GdkEventButton * event)
 static void
 ggobi_noop_toggle_button_class_init (GGobiNoopToggleButtonClass * klass)
 {
-  GtkObjectClass *object_class = (GtkObjectClass *) klass;
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
-  parent_class = g_type_class_peek (GTK_TYPE_TOGGLE_BUTTON);
-
-  object_class->destroy = ggobi_noop_toggle_button_destroy;
   widget_class->button_press_event = button_press_event;
 }
 

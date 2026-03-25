@@ -128,10 +128,11 @@ mousepos_get_pressed (GtkWidget * w, GdkEventButton * event,
   *btn1_down_p = false;
   *btn2_down_p = false;
 
-  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y,
+  gdk_window_get_pointer (gtk_widget_get_window (w),
+                          &sp->mousepos.x, &sp->mousepos.y,
                           &state);
 
-  grab_ok = gdk_pointer_grab (sp->da->window,
+  grab_ok = gdk_pointer_grab (gtk_widget_get_window (sp->da),
                               false,
                               (GdkEventMask) (GDK_POINTER_MOTION_MASK |
                                               GDK_BUTTON_RELEASE_MASK),
@@ -167,7 +168,8 @@ mousepos_get_motion (GtkWidget * w, GdkEventMotion * event,
   if (event->is_hint) {
 */
 
-  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y,
+  gdk_window_get_pointer (gtk_widget_get_window (w),
+                          &sp->mousepos.x, &sp->mousepos.y,
                           &state);
   if ((state & GDK_BUTTON1_MASK) == GDK_BUTTON1_MASK)
     *btn1_down_p = true;
@@ -218,7 +220,7 @@ draw_3drectangle (GtkWidget * widget, GdkDrawable * drawable,
   gint h = height / 2;
 
   if (gg->rectangle_GC == NULL)
-    gg->rectangle_GC = gdk_gc_new (widget->window);
+    gg->rectangle_GC = gdk_gc_new (gtk_widget_get_window (widget));
 
   /*-- draw the rectangles --*/
   gdk_gc_set_foreground (gg->rectangle_GC, &gg->mediumgray);

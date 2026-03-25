@@ -57,7 +57,7 @@ undo_last_cb (GtkButton * button, ggobid * gg)
 static void
 move_cluster_cb (GtkWidget * w, ggobid * gg)
 {
-  gg->movepts.cluster_p = GTK_TOGGLE_BUTTON (w)->active;
+  gg->movepts.cluster_p = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (w));
 }
 
 static gchar *mdir_lbl[] = { "Both", "Vertical", "Horizontal" };

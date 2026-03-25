@@ -251,7 +251,7 @@ transform1_apply (gint j, GGobiData *d, ggobid *gg)
   lims slim, slim_tform;  /*-- specified limits --*/
   GtkWidget *stage1_cbox;
   gint tform1;
-  gfloat boxcoxparam = gg->tform_ui.boxcox_adj->value;
+  gfloat boxcoxparam = gtk_adjustment_get_value (gg->tform_ui.boxcox_adj);
   vartabled *vt = vartable_element_get (j, d);
   gfloat incr = vt->domain_incr;
   gfloat (*domain_adj) (gfloat x, gfloat incr) = vt->domain_adj;

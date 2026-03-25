@@ -85,14 +85,14 @@ cpanel_tour2d_set (displayd *display, cpaneld *cpanel, ggobid* gg)
 
 static void speed2d_set_cb (GtkAdjustment *adj, ggobid *gg) {
 
-  tour2d_speed_set(adj->value, gg);
+  tour2d_speed_set(gtk_adjustment_get_value (adj), gg);
 }
 
 static void tour2d_pause_cb (GtkToggleButton *button, ggobid *gg)
 {
   displayd *dsp = gg->current_display;
 
-  tour2d_pause (&dsp->cpanel, button->active, dsp, gg);
+  tour2d_pause (&dsp->cpanel, gtk_toggle_button_get_active (button), dsp, gg);
 }
 
 static void reinit_cb (GtkWidget *w, ggobid *gg) {
@@ -155,7 +155,7 @@ void
 cpanel_tour2d_make (ggobid *gg) {
   modepaneld *panel;
   GtkWidget *box, *btn, *sbar, *lbl, *vb;
-  GtkObject *adj;
+  GtkAdjustment *adj;
   GtkWidget *manip_opt;
   /*GtkWidget *tgl;*/
   
@@ -172,12 +172,14 @@ cpanel_tour2d_make (ggobid *gg) {
   /* Note that the page_size value only makes a difference for
    * scrollbar widgets, and the highest value you'll get is actually
    * (upper - page_size). */
-  adj = gtk_adjustment_new (sessionOptions->defaultTourSpeed, 0.0, MAX_TOUR_SPEED, 1.0, 1.0, 0.0);
+  adj = GTK_ADJUSTMENT (gtk_adjustment_new (sessionOptions->defaultTourSpeed,
+                                            0.0, MAX_TOUR_SPEED,
+                                            1.0, 1.0, 0.0));
 
   g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (speed2d_set_cb), (gpointer) gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+  sbar = gtk_hscale_new (adj);
   gtk_widget_set_name (sbar, "TOUR2D:speed_bar");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust speed of tour motion", NULL);
@@ -340,13 +342,14 @@ static void interp_cb (GtkWidget *w, ggobid *gg)
 
 static void localscan_cb (GtkToggleButton *button)
 {
-  g_printerr ("local scan: %d\n", button->active);
+  g_printerr ("local scan: %d\n", gtk_toggle_button_get_active (button));
 }
 
 static void step_cb (GtkToggleButton *tgl, GtkWidget *btn)
 {
-  g_printerr ("step: %d\n", tgl->active);
-  gtk_widget_set_sensitive (btn, tgl->active);
+  gboolean active = gtk_toggle_button_get_active (tgl);
+  g_printerr ("step: %d\n", active);
+  gtk_widget_set_sensitive (btn, active);
 }
 static void go_cb (GtkButton *button, ggobid *gg)
 {
@@ -356,7 +359,7 @@ static void go_cb (GtkButton *button, ggobid *gg)
 
 static void storebases_cb (GtkToggleButton *button)
 {
-  g_printerr ("store bases: %d\n", button->active);
+  g_printerr ("store bases: %d\n", gtk_toggle_button_get_active (button));
 }
 
 /* 
@@ -364,10 +367,10 @@ static void storebases_cb (GtkToggleButton *button)
 */
 static void section_cb (GtkToggleButton *button)
 {
-  g_printerr ("local scan: %d\n", button->active);
+  g_printerr ("local scan: %d\n", gtk_toggle_button_get_active (button));
 }
 static void epsilon_cb (GtkAdjustment *adj, gpointer cbd) {
-  g_printerr ("epsilon %f\n", adj->value);
+  g_printerr ("epsilon %f\n", gtk_adjustment_get_value (adj));
 }
 
 static void hide_cb (GtkWidget *w ) {
@@ -379,7 +382,7 @@ static void hide_cb (GtkWidget *w ) {
 static void tour2dadv_window_open (ggobid *gg) {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
-  GtkObject *adj;
+  GtkAdjustment *adj;
 
   if (window == NULL) {
     
@@ -561,11 +564,11 @@ static void tour2dadv_window_open (ggobid *gg) {
     gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
     gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-    adj = gtk_adjustment_new (1.0, 0.0, 1.0, 0.01, .01, 0.0);
+    adj = GTK_ADJUSTMENT (gtk_adjustment_new (1.0, 0.0, 1.0, 0.01, .01, 0.0));
     g_signal_connect (G_OBJECT (adj), "value_changed",
                         G_CALLBACK (epsilon_cb), NULL);
 
-    sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+    sbar = gtk_hscale_new (adj);
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
       "Set the width of the cross-section",
@@ -670,7 +673,8 @@ button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
   gboolean retval = true;
   GdkModifierType state;
 
-  gdk_window_get_pointer (w->window, &sp->mousepos.x, &sp->mousepos.y, &state);
+  gdk_window_get_pointer (gtk_widget_get_window (w),
+    &sp->mousepos.x, &sp->mousepos.y, &state);
 
   tour2d_manip_end(sp);
 

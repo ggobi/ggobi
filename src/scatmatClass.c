@@ -136,30 +136,34 @@ varpanelTooltipsSet (displayd * display, ggobid * gg, GtkWidget * wx,
 static gint
 plottedVarsGet (displayd * display, gint * vars, GGobiData * d, ggobid * gg)
 {
+  GList *children;
   GList *l;
-  GtkTableChild *child;
   GtkWidget *da;
   splotd *sp;
   gint nvars = 0;
 
   /* First count the number of variables */
-  for (l = (GTK_TABLE (display->table))->children; l; l = l->next) {
-    child = (GtkTableChild *) l->data;
-    da = child->widget;
+  children = ggobi_gtk_table_children (display->table);
+  for (l = children; l; l = l->next) {
+    da = GTK_WIDGET (l->data);
     sp = (splotd *) g_object_get_data (G_OBJECT (da), "splotd");
     if (sp->p1dvar != -1)
       nvars += 1;
   }
 
   /* Then populate the vector of variables */
-  for (l = (GTK_TABLE (display->table))->children; l; l = l->next) {
-    child = (GtkTableChild *) l->data;
-    da = child->widget;
+  for (l = children; l; l = l->next) {
+    guint left_attach = 0;
+
+    da = GTK_WIDGET (l->data);
     sp = (splotd *) g_object_get_data (G_OBJECT (da), "splotd");
+    ggobi_gtk_table_get_attachments (display->table, da,
+                                     &left_attach, NULL, NULL, NULL);
     if (sp->p1dvar != -1) {
-      vars[child->left_attach] = sp->p1dvar;
+      vars[left_attach] = sp->p1dvar;
     }
   }
+  g_list_free (children);
 
   return nvars;
 }
@@ -255,7 +259,8 @@ start_scatmat_drag (GtkWidget * src, GdkDragContext * ctxt,
                     GtkSelectionData * data, guint info, guint time,
                     gpointer udata)
 {
-  gtk_selection_data_set (data, data->target, 8, (guchar *) src,
+  gtk_selection_data_set (data, gtk_selection_data_get_target (data), 8,
+                          (guchar *) src,
                           sizeof (splotd *));
 }
 
@@ -266,10 +271,10 @@ receive_scatmat_drag (GtkWidget * src, GdkDragContext * context, int x, int y,
 {
   splotd *to = GGOBI_SPLOT (src), *from, *sp;
   displayd *display;
+  GList *children;
   GList *l;
   gint k, n, sprow, spcol;
   GtkWidget *da;
-  GtkTableChild *child;
   GList *ivars = NULL;
   gint nvars, *vars;
   GGobiData *d;
@@ -311,12 +316,17 @@ receive_scatmat_drag (GtkWidget * src, GdkDragContext * context, int x, int y,
 
     /* Loop through the plots setting the values of xyvars and
        p1dvar */
-    for (l = (GTK_TABLE (display->table))->children; l; l = l->next) {
-      child = (GtkTableChild *) l->data;
-      da = child->widget;
+    children = ggobi_gtk_table_children (display->table);
+    for (l = children; l; l = l->next) {
+      guint left_attach = 0, top_attach = 0;
+
+      da = GTK_WIDGET (l->data);
       sp = (splotd *) g_object_get_data (G_OBJECT (da), "splotd");
-      sprow = child->top_attach;  /* 0, ..., nrows-1 */
-      spcol = child->left_attach; /* 0, ..., ncols-1 */
+      ggobi_gtk_table_get_attachments (display->table, da,
+                                       &left_attach, NULL,
+                                       &top_attach, NULL);
+      sprow = top_attach;  /* 0, ..., nrows-1 */
+      spcol = left_attach; /* 0, ..., ncols-1 */
       if (sprow == spcol) {
         sp->p1dvar = GPOINTER_TO_INT (g_list_nth_data (ivars, sprow));
       }
@@ -326,6 +336,7 @@ receive_scatmat_drag (GtkWidget * src, GdkDragContext * context, int x, int y,
         sp->xyvars.y = GPOINTER_TO_INT (g_list_nth_data (ivars, sprow));
       }
     }
+    g_list_free (children);
 
     display_tailpipe (display, FULL, display->ggobi);
     varpanel_refresh (display, display->ggobi);

@@ -444,9 +444,9 @@ gint GGOBI (main) (gint argc, gchar * argv[], gboolean processEvents)
 
   gg = g_object_new (GGOBI_TYPE_GGOBI, NULL);
 
-  gg->mono_p = (vis->depth == 1 ||
-                vis->type == GDK_VISUAL_STATIC_GRAY ||
-                vis->type == GDK_VISUAL_GRAYSCALE);
+  gg->mono_p = (gdk_visual_get_depth (vis) == 1 ||
+                gdk_visual_get_visual_type (vis) == GDK_VISUAL_STATIC_GRAY ||
+                gdk_visual_get_visual_type (vis) == GDK_VISUAL_GRAYSCALE);
 
   make_ggobi (sessionOptions, processEvents, gg);
 
@@ -936,4 +936,3 @@ ndatad_with_vars_get (ggobid *gg)
 
  return nd;
 }
-

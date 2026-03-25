@@ -87,6 +87,8 @@ void
 splot_clear_pixmap0 (splotd *sp, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
+  gint width = gtk_widget_get_allocated_width (sp->da);
+  gint height = gtk_widget_get_allocated_height (sp->da);
 
   if (gg->plot_GC == NULL) {
     init_plot_GC (sp->pixmap0, gg);
@@ -95,9 +97,7 @@ splot_clear_pixmap0 (splotd *sp, ggobid *gg)
   /* clear the pixmap */
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
   gdk_draw_rectangle (sp->pixmap0, gg->plot_GC,
-                      true, 0, 0,
-                      sp->da->allocation.width,
-                      sp->da->allocation.height);
+                      true, 0, 0, width, height);
 }
 
 void
@@ -685,14 +685,16 @@ static void
 splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
+  gint width = gtk_widget_get_allocated_width (sp->da);
+  gint height = gtk_widget_get_allocated_height (sp->da);
 
-  if (sp != NULL && sp->da != NULL && sp->da->window != NULL) {
+  if (sp != NULL && sp->da != NULL && gtk_widget_get_window (sp->da) != NULL) {
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
     gdk_draw_rectangle (drawable, gg->plot_GC,
-      false, 1, 1, sp->da->allocation.width-3, sp->da->allocation.height-3);
+      false, 1, 1, width - 3, height - 3);
 
     gdk_gc_set_line_attributes (gg->plot_GC,
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
@@ -706,15 +708,15 @@ splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 void
 splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
-  GtkWidget *w = sp->da;
+  gint width = gtk_widget_get_allocated_width (sp->da);
+  gint height = gtk_widget_get_allocated_height (sp->da);
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
 
   if (!binned) {
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
                      0, 0, 0, 0,
-                     w->allocation.width,
-                     w->allocation.height);
+                     width, height);
   }
   else {
     gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
@@ -806,11 +808,11 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 void
 splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
-  GtkWidget *w = sp->da;
-  gdk_draw_pixmap (sp->da->window, gg->plot_GC, pixmap,
+  GdkDrawable *drawable = (GdkDrawable *) gtk_widget_get_window (sp->da);
+  gdk_draw_pixmap (drawable, gg->plot_GC, pixmap,
                    0, 0, 0, 0,
-                   w->allocation.width,
-                   w->allocation.height);
+                   gtk_widget_get_allocated_width (sp->da),
+                   gtk_widget_get_allocated_height (sp->da));
 }
 
 /*------------------------------------------------------------------------*/
@@ -878,7 +880,7 @@ splot_redraw (splotd *sp, RedrawStyle style, ggobid *gg) {
    * meantime, what's an extra rectangle?
   */
   if (sp == gg->current_splot && style != NONE) 
-    splot_draw_border (sp, sp->da->window, gg);
+    splot_draw_border (sp, (GdkDrawable *) gtk_widget_get_window (sp->da), gg);
 
   sp->redraw_style = EXPOSE;
 }

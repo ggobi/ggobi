@@ -188,16 +188,16 @@ subset_cb (GtkWidget *w, ggobid *gg)
       redraw = subset_random (d->subset.random_n, d, gg);
     break;
     case SS_BLOCK:
-      bstart = (gint) d->subset.bstart_adj->value;
-      bsize = (gint) d->subset.bsize_adj->value;
+      bstart = (gint) gtk_adjustment_get_value (d->subset.bstart_adj);
+      bsize = (gint) gtk_adjustment_get_value (d->subset.bsize_adj);
       redraw = subset_block (bstart-1, bsize, d, gg);
     break;
     case SS_RANGE:
       redraw = subset_range (d, gg);
     break;
     case SS_EVERYN:
-      estart = (gint) d->subset.estart_adj->value;
-      estep = (gint) d->subset.estep_adj->value;
+      estart = (gint) gtk_adjustment_get_value (d->subset.estart_adj);
+      estep = (gint) gtk_adjustment_get_value (d->subset.estep_adj);
       redraw = subset_everyn (estart-1, estep, d, gg);
     break;
     case SS_STICKY:
@@ -587,6 +587,6 @@ subset_window_open (ggobid *gg) {
     }  /*-- if window == NULL --*/
 
     gtk_widget_show (gg->subset_ui.window);
-    gdk_window_raise (gg->subset_ui.window->window);
+    gdk_window_raise (gtk_widget_get_window (gg->subset_ui.window));
   }
 }
