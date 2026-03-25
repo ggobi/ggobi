@@ -548,7 +548,7 @@ void t1d_clear_pppixmap(displayd *dsp, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
-  GdkDrawable *drawable = (GdkDrawable *) gtk_widget_get_window (dsp->t1d_ppda);
+  GdkDrawable *drawable = GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda));
   gint wid = gtk_widget_get_allocated_width (dsp->t1d_ppda);
   gint hgt = gtk_widget_get_allocated_height (dsp->t1d_ppda);
 
@@ -603,7 +603,7 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
   gdk_draw_lines (dsp->t1d_pp_pixmap, gg->plot_GC,
     pptrace, dsp->t1d_ppindx_count);
 
-  gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (dsp->t1d_ppda),
+  gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda)),
     gg->plot_GC, dsp->t1d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
 
@@ -629,7 +629,7 @@ void t1d_ppdraw_think(displayd *dsp, ggobid *gg)
     gdk_draw_string (dsp->t1d_pp_pixmap,
     gtk_style_get_font (style),
       gg->plot_GC, 10, 10, varlab);*/
-  gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (dsp->t1d_ppda),
+  gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda)),
     gg->plot_GC, dsp->t1d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
 }

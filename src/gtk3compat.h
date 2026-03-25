@@ -132,6 +132,9 @@ typedef struct _GGobiGdkDrawable {
   gint height;
 } GdkDrawable;
 
+#define GGOBI_GDK_WINDOW_TO_DRAWABLE(window_) \
+  (&(GdkDrawable) { TRUE, (window_), NULL, 0, 0 })
+
 typedef GdkDrawable GdkPixmap;
 typedef gpointer GdkColormap;
 

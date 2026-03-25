@@ -237,7 +237,7 @@ t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
     init=false;
     }*/
 
-  gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (dsp->t2d_ppda),
+  gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t2d_ppda)),
                    gg->plot_GC, dsp->t2d_pp_pixmap,
                    0, 0, 0, 0,
                    wid, hgt);
@@ -553,4 +553,3 @@ tour2dpp_window_open (ggobid *gg) {
     gtk_widget_show_all (dsp->t2d_window);
   }
 }
-

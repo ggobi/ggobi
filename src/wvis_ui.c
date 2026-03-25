@@ -561,7 +561,7 @@ da_expose_cb (GtkWidget *w, GdkEventExpose *event, ggobid *gg)
     g_object_unref(G_OBJECT(layout));
   }
 
-  gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (w), gg->wvis.GC, pix,
+  gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (w)), gg->wvis.GC, pix,
                    0, 0, 0, 0,
                    width,
                    full_height);

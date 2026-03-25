@@ -28,6 +28,7 @@
 static GtkWidget *varcircle_create (gint, GGobiData *, ggobid * gg);
 static void varcircle_draw (gint, GGobiData *, ggobid * gg);
 static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
+static gboolean da_draw_cb (GtkWidget *, cairo_t *, gpointer cbd);
 
 GtkWidget *varcircles_get_nth (gint which, gint jvar, GGobiData * d);
 static void varcircle_pack (GtkWidget *, GGobiData *);
@@ -274,13 +275,19 @@ da_manip_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
   GdkGC *gc = gdk_gc_new (gtk_widget_get_window (w));
 
   gdk_gc_set_foreground (gc, &gg->vcirc_manip_color);
-  gdk_draw_rectangle ((GdkDrawable *) gtk_widget_get_window (w), gc,
+  gdk_draw_rectangle (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (w)), gc,
                       true, 0, 0, gtk_widget_get_allocated_width (w),
                       gtk_widget_get_allocated_height (w));
   gdk_gc_destroy (gc);
 #endif
 
   return true;
+}
+
+static gboolean
+da_manip_draw_cb (GtkWidget *w, cairo_t *cr, GGobiData *d)
+{
+  return da_manip_expose_cb (w, NULL, d);
 }
 
 #ifdef FREEZE_IMPLEMENTED
@@ -299,7 +306,7 @@ da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
   GdkGC *gc = gdk_gc_new (gtk_widget_get_window (w));
 
   gdk_gc_set_foreground (gc, &gg->vcirc_freeze_color);
-  gdk_draw_rectangle ((GdkDrawable *) gtk_widget_get_window (w), gc,
+  gdk_draw_rectangle (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (w)), gc,
                       true, 0, 0, gtk_widget_get_allocated_width (w),
                       gtk_widget_get_allocated_height (w));
 
@@ -307,6 +314,12 @@ da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 #endif
 
   return true;
+}
+
+static gboolean
+da_freeze_draw_cb (GtkWidget *w, cairo_t *cr, GGobiData *d)
+{
+  return da_freeze_expose_cb (w, NULL, d);
 }
 #endif
 
@@ -438,8 +451,8 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da, false, false, 2);
   GGobi_widget_set (da, gg, true);
-  g_signal_connect (G_OBJECT (da), "expose_event",
-                    G_CALLBACK (da_manip_expose_cb), d);
+  g_signal_connect (G_OBJECT (da), "draw",
+                    G_CALLBACK (da_manip_draw_cb), d);
   gtk_widget_show (da);
 
   d->vcirc_ui.manip_btn = gtk_button_new_with_label ("Manip");
@@ -460,8 +473,8 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da, false, false, 2);
   GGobi_widget_set (da, gg, true);
-  g_signal_connect (G_OBJECT (da), "expose_event",
-                    G_CALLBACK (da_freeze_expose_cb), d);
+  g_signal_connect (G_OBJECT (da), "draw",
+                    G_CALLBACK (da_freeze_draw_cb), d);
   gtk_widget_show (da);
 
   d->vcirc_ui.freeze_btn = gtk_button_new_with_label ("Freeze");
@@ -597,8 +610,8 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), da,
                         "Click left to select or deselect", NULL);
 
-  g_signal_connect (G_OBJECT (da), "expose_event",
-                    G_CALLBACK (da_expose_cb), GINT_TO_POINTER (j));
+  g_signal_connect (G_OBJECT (da), "draw",
+                    G_CALLBACK (da_draw_cb), GINT_TO_POINTER (j));
   g_signal_connect (G_OBJECT (da), "button_press_event",
                     G_CALLBACK (varcircle_sel_cb), GINT_TO_POINTER (j));
   g_object_set_data (G_OBJECT (da), "datad", d);
@@ -755,7 +768,7 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
   /*
    * copy the pixmap to the window
    */
-  gdk_draw_drawable ((GdkDrawable *) gtk_widget_get_window (da), gg->unselvarfg_GC,
+  gdk_draw_drawable (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (da)), gg->unselvarfg_GC,
                      da_pix, 0, 0, 0, 0,
                      VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
 }
@@ -786,12 +799,18 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     varcircle_draw (j, d, gg);
   }
   else {
-    gdk_draw_pixmap ((GdkDrawable *) gtk_widget_get_window (da), gg->unselvarfg_GC,
+    gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (da)), gg->unselvarfg_GC,
                      da_pix, 0, 0, 0, 0,
                      VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
   }
 
   return true;
+}
+
+static gboolean
+da_draw_cb (GtkWidget *w, cairo_t *cr, gpointer cbd)
+{
+  return da_expose_cb (w, NULL, cbd);
 }
 
 /*-- used in cloning and appending variables; see vartable.c --*/

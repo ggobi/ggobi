@@ -448,6 +448,9 @@ gdk_draw_pixmap (GdkDrawable *drawable, GdkGC *gc, GdkPixmap *src,
 {
   cairo_t *cr = ggobi_drawable_begin (drawable);
 
+  if (cr == NULL)
+    return;
+
   (void) gc;
   (void) xsrc;
   (void) ysrc;
@@ -575,6 +578,10 @@ ggobi_gtk_ruler_set_range (GtkWidget *widget, gdouble lower,
                            gdouble max_size)
 {
   GGobiRulerState *state;
+  gdouble range_min;
+  gdouble range_max;
+  gdouble clamped_position;
+  gboolean inverted;
 
   if (widget == NULL)
     return;
@@ -585,9 +592,18 @@ ggobi_gtk_ruler_set_range (GtkWidget *widget, gdouble lower,
   state->position = position;
   state->max_size = max_size;
 
+  if (!isfinite (lower) || !isfinite (upper) || !isfinite (position))
+    return;
+
   if (GTK_IS_RANGE (widget)) {
-    gtk_range_set_range (GTK_RANGE (widget), lower, upper);
-    gtk_range_set_value (GTK_RANGE (widget), position);
+    inverted = (upper < lower);
+    range_min = MIN (lower, upper);
+    range_max = MAX (lower, upper);
+    clamped_position = CLAMP (position, range_min, range_max);
+
+    gtk_range_set_inverted (GTK_RANGE (widget), inverted);
+    gtk_range_set_range (GTK_RANGE (widget), range_min, range_max);
+    gtk_range_set_value (GTK_RANGE (widget), clamped_position);
   }
 }
 
@@ -622,8 +638,17 @@ ggobi_gtk_ruler_set_position (GtkWidget *widget, gdouble position)
 
   state = ggobi_gtk_ruler_state_ensure (widget);
   state->position = position;
-  if (GTK_IS_RANGE (widget))
-    gtk_range_set_value (GTK_RANGE (widget), position);
+  if (!isfinite (position) || !isfinite (state->lower) ||
+      !isfinite (state->upper))
+    return;
+
+  if (GTK_IS_RANGE (widget)) {
+    gdouble range_min = MIN (state->lower, state->upper);
+    gdouble range_max = MAX (state->lower, state->upper);
+
+    gtk_range_set_value (GTK_RANGE (widget), CLAMP (position, range_min,
+                                                    range_max));
+  }
 }
 
 gboolean

@@ -130,15 +130,21 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
   return retval;
 }
 
+static gboolean
+splot_draw_cb (GtkWidget *w, cairo_t *cr, splotd *sp)
+{
+  return splot_expose_cb (w, NULL, sp);
+}
+
 void
 splot_connect_expose_handler (gboolean idled, splotd *sp) 
 {
   if (idled)  // if idle_proc running
     g_signal_handlers_disconnect_by_func (G_OBJECT (sp->da),
-       G_CALLBACK(splot_expose_cb), GTK_OBJECT (sp));
+       G_CALLBACK(splot_draw_cb), GTK_OBJECT (sp));
   else
     g_signal_connect (G_OBJECT (sp->da),
-      "expose_event", G_CALLBACK(splot_expose_cb), (gpointer) sp);
+      "draw", G_CALLBACK(splot_draw_cb), (gpointer) sp);
 }
 
 /*-- this will be called by a key_press_cb for each scatterplot mode --*/
@@ -191,7 +197,12 @@ splot_event_handled (GtkWidget *w, GdkEventKey *event,
 void
 sp_event_handlers_toggle (splotd *sp, gboolean state, ProjectionMode pmode, InteractionMode imode) 
 {
-  displayd *display = (displayd *) sp->displayptr;
+  displayd *display;
+
+  if (sp == NULL || sp->displayptr == NULL)
+    return;
+
+  display = (displayd *) sp->displayptr;
 
   /* scatmat and parcoords are handling everything now and returning
      false; ts and barchart are handling their own and then returning
@@ -463,8 +474,8 @@ splot_init(splotd *sp, displayd *display, ggobid *gg)
   gtk_widget_set_double_buffered(sp->da, false);
 
   g_signal_connect (G_OBJECT (sp->da),
-                      "expose_event",
-                      G_CALLBACK(splot_expose_cb),
+                      "draw",
+                      G_CALLBACK(splot_draw_cb),
                       (gpointer) sp);
   g_signal_connect (G_OBJECT (sp->da),
                       "configure_event",
@@ -920,9 +931,14 @@ disconnect_scroll_signal (splotd *sp) {
 void
 splot_cursor_unset (splotd *sp)
 {
-  GdkWindow *window = gtk_widget_get_window (sp->da);
+  GdkWindow *window;
 
-  if (!GTK_WIDGET_REALIZED(sp->da))
+  if (sp == NULL || sp->da == NULL)
+    return;
+
+  window = gtk_widget_get_window (sp->da);
+
+  if (!GTK_WIDGET_REALIZED(sp->da) || window == NULL)
     return;
 
   sp->jcursor = 0;
@@ -935,9 +951,14 @@ splot_cursor_unset (splotd *sp)
 void
 splot_cursor_set (GdkCursorType jcursor, splotd *sp)
 {
-  GdkWindow *window = gtk_widget_get_window (sp->da);
+  GdkWindow *window;
 
-  if (!GTK_WIDGET_REALIZED(sp->da))
+  if (sp == NULL || sp->da == NULL)
+    return;
+
+  window = gtk_widget_get_window (sp->da);
+
+  if (!GTK_WIDGET_REALIZED(sp->da) || window == NULL)
     return;
 
   sp->jcursor = jcursor;

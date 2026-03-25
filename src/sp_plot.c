@@ -808,7 +808,14 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 void
 splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
-  GdkDrawable *drawable = (GdkDrawable *) gtk_widget_get_window (sp->da);
+  GdkWindow *window = gtk_widget_get_window (sp->da);
+  GdkDrawable *drawable;
+
+  if (window == NULL)
+    return;
+
+  drawable = GGOBI_GDK_WINDOW_TO_DRAWABLE (window);
+
   gdk_draw_pixmap (drawable, gg->plot_GC, pixmap,
                    0, 0, 0, 0,
                    gtk_widget_get_allocated_width (sp->da),
@@ -880,7 +887,8 @@ splot_redraw (splotd *sp, RedrawStyle style, ggobid *gg) {
    * meantime, what's an extra rectangle?
   */
   if (sp == gg->current_splot && style != NONE) 
-    splot_draw_border (sp, (GdkDrawable *) gtk_widget_get_window (sp->da), gg);
+    splot_draw_border (sp,
+      GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (sp->da)), gg);
 
   sp->redraw_style = EXPOSE;
 }
