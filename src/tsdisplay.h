@@ -101,11 +101,10 @@ gboolean tsplotKeyEventHandled(GtkWidget *, displayd *, splotd *sp, GdkEventKey 
 gchar *tsplot_tree_label(splotd *sp, GGobiData *d, ggobid *gg);
 
 GdkSegment * tsplotAllocWhiskers(displayd *dpy, splotd *sp, gint nrows, GGobiData *d);
-void tsplotAddPlotLabels(displayd *display, splotd *sp, GdkDrawable *drawable, GGobiData *d, ggobid *gg);
+void tsplotAddPlotLabels(displayd *display, splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg);
 
 
 
 splotd *ggobi_time_series_splot_new(displayd *dpy, ggobid *gg);
 
 #endif
-

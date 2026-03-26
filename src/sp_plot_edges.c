@@ -97,8 +97,8 @@ splot_hidden_edge (gint m, GGobiData * d, GGobiData * e,
 
 /*-- the current color and line type need to be drawn last --*/
 void
-splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
-                  ggobid * gg)
+splot_edges_draw (splotd *sp, gboolean draw_hidden, cairo_t *cr,
+                  ggobid *gg)
 {
   gint i, j, m;
   gint k, n, p, pp;
@@ -285,14 +285,16 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
                                             GDK_JOIN_ROUND);
               }
 
-              gdk_draw_segments (drawable, gg->plot_GC, sp->edges, nl);
+              ggobi_cairo_apply_gc (cr, gg->plot_GC);
+              ggobi_cairo_draw_segments (cr, sp->edges, nl);
             }
 
             if (arrowheads_show_p) {
               gdk_gc_set_line_attributes (gg->plot_GC,
                                           lwidth + 2, GDK_LINE_SOLID,
                                           GDK_CAP_ROUND, GDK_JOIN_ROUND);
-              gdk_draw_segments (drawable, gg->plot_GC, sp->arrowheads, nl);
+              ggobi_cairo_apply_gc (cr, gg->plot_GC);
+              ggobi_cairo_draw_segments (cr, sp->arrowheads, nl);
               gdk_gc_set_line_attributes (gg->plot_GC,
                                           0, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                           GDK_JOIN_ROUND);
@@ -320,8 +322,8 @@ splot_edges_draw (splotd * sp, gboolean draw_hidden, GdkDrawable * drawable,
 }
 
 void
-splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
-                              gboolean nearest, ggobid * gg)
+splot_add_edge_highlight_cue (splotd *sp, cairo_t *cr, gint k,
+                              gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiData *d = dsp->d;
@@ -346,19 +348,20 @@ splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
                                 3, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[e->color_now.els[k]]);
+    ggobi_cairo_apply_gc (cr, gg->plot_GC);
 
     if (endpoints[k].jpartner == -1) {
-      gdk_draw_line (drawable, gg->plot_GC,
-                     sp->screen[a].x, sp->screen[a].y,
-                     sp->screen[b].x, sp->screen[b].y);
+      ggobi_cairo_draw_line (cr,
+                             sp->screen[a].x, sp->screen[a].y,
+                             sp->screen[b].x, sp->screen[b].y);
     }
     else {                      /* thicken only half the line */
-      gdk_draw_line (drawable, gg->plot_GC,
-                     sp->screen[a].x, sp->screen[a].y,
-                     sp->screen[a].x + (sp->screen[b].x -
-                                        sp->screen[a].x) / 2,
-                     sp->screen[a].y + (sp->screen[b].y -
-                                        sp->screen[a].y) / 2);
+      ggobi_cairo_draw_line (cr,
+                             sp->screen[a].x, sp->screen[a].y,
+                             sp->screen[a].x + (sp->screen[b].x -
+                                                sp->screen[a].x) / 2,
+                             sp->screen[a].y + (sp->screen[b].y -
+                                                sp->screen[a].y) / 2);
     }
 
     gdk_gc_set_line_attributes (gg->plot_GC,
@@ -369,8 +372,8 @@ splot_add_edge_highlight_cue (splotd * sp, GdkDrawable * drawable, gint k,
 }
 
 void
-splot_add_edge_label (splotd * sp, GdkDrawable * drawable, gint k,
-                      gboolean nearest, ggobid * gg)
+splot_add_edge_label (splotd *sp, cairo_t *cr, gint k,
+                      gboolean nearest, ggobid *gg)
 {
   gchar *lbl;
   displayd *dsp = (displayd *) sp->displayptr;
@@ -416,16 +419,18 @@ splot_add_edge_label (splotd * sp, GdkDrawable * drawable, gint k,
 
     if (nearest) {
       underline_text (layout);
-      gdk_draw_layout (drawable, gg->plot_GC,
-                       (sp->max.x - rect.width) / 2, 5, layout);
+      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_cairo_draw_layout (cr, layout,
+                               (sp->max.x - rect.width) / 2, 5);
     }
-    gdk_draw_layout (drawable, gg->plot_GC, xp, yp, layout);
+    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_cairo_draw_layout (cr, layout, xp, yp);
   }
 }
 
 void
-splot_add_identify_edge_cues (splotd * sp, GdkDrawable * drawable, gint k,
-                              gboolean nearest, ggobid * gg)
+splot_add_identify_edge_cues (splotd *sp, cairo_t *cr, gint k,
+                              gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiData *e = dsp->e;
@@ -441,20 +446,20 @@ splot_add_identify_edge_cues (splotd * sp, GdkDrawable * drawable, gint k,
     GGobiExtendedSPlotClass *klass;
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS (sp);
     if (klass->add_identify_edge_cues)
-      klass->add_identify_edge_cues (k, sp, drawable, nearest, gg);
+      klass->add_identify_edge_cues (k, sp, cr, nearest, gg);
     else
       useDefault = true;
   }
 
   if (useDefault) {
-    splot_add_edge_highlight_cue (sp, drawable, k, nearest, gg);
-    splot_add_edge_label (sp, drawable, k, nearest, gg);
+    splot_add_edge_highlight_cue (sp, cr, k, nearest, gg);
+    splot_add_edge_label (sp, cr, k, nearest, gg);
   }
 }
 
 void
-splot_add_edgeedit_cues (splotd * sp, GdkDrawable * drawable,
-                         gint k, gboolean nearest, ggobid * gg)
+splot_add_edgeedit_cues (splotd *sp, cairo_t *cr,
+                         gint k, gboolean nearest, ggobid *gg)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -466,10 +471,10 @@ splot_add_edgeedit_cues (splotd * sp, GdkDrawable * drawable,
 
   if (cpanel->ee_mode == ADDING_EDGES) {
     if (k != -1)
-      splot_add_diamond_cue (k, sp, drawable, gg);
+      splot_add_diamond_cue (k, sp, cr, gg);
 
     if (gg->edgeedit.a != -1)
-      splot_add_diamond_cue (gg->edgeedit.a, sp, drawable, gg);
+      splot_add_diamond_cue (gg->edgeedit.a, sp, cr, gg);
 
     if (gg->buttondown && gg->edgeedit.a != -1 &&
         k != -1 && k != gg->edgeedit.a) {
@@ -482,10 +487,11 @@ splot_add_edgeedit_cues (splotd * sp, GdkDrawable * drawable,
       /* This isn't really the color I want to use, but I don't know
          how to get at the color of the endpoints here. */
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
-      gdk_draw_line (drawable, gg->plot_GC,
-                     sp->screen[gg->edgeedit.a].x,
-                     sp->screen[gg->edgeedit.a].y, sp->screen[k].x,
-                     sp->screen[k].y);
+      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_cairo_draw_line (cr,
+                             sp->screen[gg->edgeedit.a].x,
+                             sp->screen[gg->edgeedit.a].y, sp->screen[k].x,
+                             sp->screen[k].y);
     }
 /*  not ready to support deleting
   else if (cpanel->ee_deleting_p)

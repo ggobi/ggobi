@@ -375,7 +375,6 @@ struct _ggobid {
   struct _WeightedVis {
     GtkWidget *window, *da;
     GdkPixmap *pix;
-    GdkGC *GC;
 
     gfloat *pct;
     gint npct;

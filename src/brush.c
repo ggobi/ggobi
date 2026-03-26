@@ -402,8 +402,7 @@ brush_boundaries_set (cpaneld * cpanel,
 }
 
 void
-brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiData * d,
-                  ggobid * gg)
+brush_draw_label (splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg)
 {
   PangoRectangle rect;
   PangoLayout *layout =
@@ -412,16 +411,16 @@ brush_draw_label (splotd * sp, GdkDrawable * drawable, GGobiData * d,
   if (d->npts_under_brush > 0) {
     gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
     layout_text (layout, str, &rect);
-    gdk_draw_layout (drawable, gg->plot_GC,
-                     sp->max.x - rect.width - 5, 5, layout);
+    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_cairo_draw_layout (cr, layout,
+                             sp->max.x - rect.width - 5, 5);
     g_free (str);
   }
   g_object_unref (G_OBJECT (layout));
 }
 
 void
-brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
-                  ggobid * gg)
+brush_draw_brush (splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg)
 {
 /*
  * Use brush_pos to draw the brush.
@@ -475,25 +474,26 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     }
 
-    gdk_draw_rectangle (drawable, gg->plot_GC, false,
-                        x1, y1, (x2 > x1) ? (x2 - x1) : (x1 - x2),
-                        (y2 > y1) ? (y2 - y1) : (y1 - y2));
+    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_cairo_draw_rectangle (cr, false,
+                                x1, y1, (x2 > x1) ? (x2 - x1) : (x1 - x2),
+                                (y2 > y1) ? (y2 - y1) : (y1 - y2));
     /* Mark the corner to which the cursor will be attached */
-    gdk_draw_rectangle (drawable, gg->plot_GC, true,
-                        brush_pos->x2 - 1, brush_pos->y2 - 1, 2, 2);
+    ggobi_cairo_draw_rectangle (cr, true,
+                                brush_pos->x2 - 1, brush_pos->y2 - 1, 2, 2);
 
     /*
      * highlight brush: but only in the current display
      */
     if (cpanel->br.brush_on_p && display == gg->current_display) {
-      gdk_draw_rectangle (drawable, gg->plot_GC, false,
-                          x1 - 1, y1 - 1,
-                          (x2 > x1) ? (x2 - x1 + 2) : (x1 - x2 + 2),
-                          (y2 > y1) ? (y2 - y1 + 2) : (y1 - y2 + 2));
+      ggobi_cairo_draw_rectangle (cr, false,
+                                  x1 - 1, y1 - 1,
+                                  (x2 > x1) ? (x2 - x1 + 2) : (x1 - x2 + 2),
+                                  (y2 > y1) ? (y2 - y1 + 2) : (y1 - y2 + 2));
 
       /* Mark the corner to which the cursor will be attached */
-      gdk_draw_rectangle (drawable, gg->plot_GC, true,
-                          brush_pos->x2 - 2, brush_pos->y2 - 2, 4, 4);
+      ggobi_cairo_draw_rectangle (cr, true,
+                                  brush_pos->x2 - 2, brush_pos->y2 - 2, 4, 4);
     }
   }
 
@@ -516,16 +516,17 @@ brush_draw_brush (splotd * sp, GdkDrawable * drawable, GGobiData * d,
       gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     }
 
-    gdk_draw_line (drawable, gg->plot_GC,
-                   x1 + (x2 - x1) / 2, y1, x1 + (x2 - x1) / 2, y2);
-    gdk_draw_line (drawable, gg->plot_GC,
-                   x1, y1 + (y2 - y1) / 2, x2, y1 + (y2 - y1) / 2);
+    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_cairo_draw_line (cr,
+                           x1 + (x2 - x1) / 2, y1, x1 + (x2 - x1) / 2, y2);
+    ggobi_cairo_draw_line (cr,
+                           x1, y1 + (y2 - y1) / 2, x2, y1 + (y2 - y1) / 2);
 
     if (cpanel->br.brush_on_p) {
-      gdk_draw_line (drawable, gg->plot_GC,
-                     x1 + (x2 - x1) / 2 + 1, y1, x1 + (x2 - x1) / 2 + 1, y2);
-      gdk_draw_line (drawable, gg->plot_GC,
-                     x1, y1 + (y2 - y1) / 2 + 1, x2, y1 + (y2 - y1) / 2 + 1);
+      ggobi_cairo_draw_line (cr,
+                             x1 + (x2 - x1) / 2 + 1, y1, x1 + (x2 - x1) / 2 + 1, y2);
+      ggobi_cairo_draw_line (cr,
+                             x1, y1 + (y2 - y1) / 2 + 1, x2, y1 + (y2 - y1) / 2 + 1);
     }
 
   }

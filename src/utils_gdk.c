@@ -48,57 +48,60 @@ NewColor (glong red, glong green, glong blue)
  * but it's neceessary for the small ones.
 */
 void
-draw_glyph (GdkDrawable * drawable, glyphd * gl, icoords * xypos, gint jpos,
+draw_glyph (cairo_t *cr, glyphd *gl, icoords *xypos, gint jpos,
             ggobid * gg)
 {
   gushort size = gl->size + 1;
 
+  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+
   switch (gl->type) {
 
   case PLUS:
-    gdk_draw_line (drawable, gg->plot_GC,
-                   xypos[jpos].x - size, xypos[jpos].y,
-                   xypos[jpos].x + size, xypos[jpos].y);
-    gdk_draw_line (drawable, gg->plot_GC,
-                   xypos[jpos].x, xypos[jpos].y - size,
-                   xypos[jpos].x, xypos[jpos].y + size);
+    ggobi_cairo_draw_line (cr,
+                           xypos[jpos].x - size, xypos[jpos].y,
+                           xypos[jpos].x + size, xypos[jpos].y);
+    ggobi_cairo_draw_line (cr,
+                           xypos[jpos].x, xypos[jpos].y - size,
+                           xypos[jpos].x, xypos[jpos].y + size);
     break;
   case X:
-    gdk_draw_line (drawable, gg->plot_GC,
-                   xypos[jpos].x - size, xypos[jpos].y - size,
-                   xypos[jpos].x + size, xypos[jpos].y + size);
-    gdk_draw_line (drawable, gg->plot_GC,
-                   xypos[jpos].x + size, xypos[jpos].y - size,
-                   xypos[jpos].x - size, xypos[jpos].y + size);
+    ggobi_cairo_draw_line (cr,
+                           xypos[jpos].x - size, xypos[jpos].y - size,
+                           xypos[jpos].x + size, xypos[jpos].y + size);
+    ggobi_cairo_draw_line (cr,
+                           xypos[jpos].x + size, xypos[jpos].y - size,
+                           xypos[jpos].x - size, xypos[jpos].y + size);
     break;
   case OR:
-    gdk_draw_rectangle (drawable, gg->plot_GC, false,
-                        xypos[jpos].x - size, xypos[jpos].y - size,
-                        2 * size, 2 * size);
+    ggobi_cairo_draw_rectangle (cr, false,
+                                xypos[jpos].x - size, xypos[jpos].y - size,
+                                2 * size, 2 * size);
     break;
   case FR:
-    gdk_draw_rectangle (drawable, gg->plot_GC, false,
-                        xypos[jpos].x - size, xypos[jpos].y - size,
-                        2 * size, 2 * size);
-    gdk_draw_rectangle (drawable, gg->plot_GC, true,
-                        xypos[jpos].x - size, xypos[jpos].y - size,
-                        2 * size, 2 * size);
+    ggobi_cairo_draw_rectangle (cr, false,
+                                xypos[jpos].x - size, xypos[jpos].y - size,
+                                2 * size, 2 * size);
+    ggobi_cairo_draw_rectangle (cr, true,
+                                xypos[jpos].x - size, xypos[jpos].y - size,
+                                2 * size, 2 * size);
     break;
   case OC:
-    gdk_draw_arc (drawable, gg->plot_GC, false,
-                  xypos[jpos].x - size, xypos[jpos].y - size,
-                  2 * size, 2 * size, 0, (gshort) 23040);
+    ggobi_cairo_draw_arc (cr, false,
+                          xypos[jpos].x - size, xypos[jpos].y - size,
+                          2 * size, 2 * size, 0, (gshort) 23040);
     break;
   case FC:
-    gdk_draw_arc (drawable, gg->plot_GC, false,
-                  xypos[jpos].x - size, xypos[jpos].y - size,
-                  2 * size, 2 * size, 0, (gshort) 23040);
-    gdk_draw_arc (drawable, gg->plot_GC, true,
-                  xypos[jpos].x - size, xypos[jpos].y - size,
-                  2 * size, 2 * size, 0, (gshort) 23040);
+    ggobi_cairo_draw_arc (cr, false,
+                          xypos[jpos].x - size, xypos[jpos].y - size,
+                          2 * size, 2 * size, 0, (gshort) 23040);
+    ggobi_cairo_draw_arc (cr, true,
+                          xypos[jpos].x - size, xypos[jpos].y - size,
+                          2 * size, 2 * size, 0, (gshort) 23040);
     break;
   case DOT_GLYPH:
-    gdk_draw_point (drawable, gg->plot_GC, xypos[jpos].x, xypos[jpos].y);
+    cairo_rectangle (cr, xypos[jpos].x, xypos[jpos].y, 1, 1);
+    cairo_fill (cr);
     break;
   case UNKNOWN_GLYPH:
   default:
@@ -181,7 +184,7 @@ mouseinwindow (splotd * sp)
 
 /* (x,y) is the center of the rectangle */
 void
-draw_3drectangle (GtkWidget * widget, GdkDrawable * drawable,
+draw_3drectangle (GtkWidget *widget, cairo_t *cr,
                   gint x, gint y, gint width, gint height, ggobid * gg)
 {
   GdkPoint points[7];
@@ -193,8 +196,8 @@ draw_3drectangle (GtkWidget * widget, GdkDrawable * drawable,
 
   /*-- draw the rectangles --*/
   gdk_gc_set_foreground (gg->rectangle_GC, &gg->mediumgray);
-  gdk_draw_rectangle (drawable, gg->rectangle_GC, TRUE,
-                      x - w, y - h, width, height);
+  ggobi_cairo_apply_gc (cr, gg->rectangle_GC);
+  ggobi_cairo_draw_rectangle (cr, TRUE, x - w, y - h, width, height);
 
   /*-- draw the dark shadows --*/
   gdk_gc_set_foreground (gg->rectangle_GC, &gg->darkgray);
@@ -214,9 +217,9 @@ draw_3drectangle (GtkWidget * widget, GdkDrawable * drawable,
 
   points[6].x = x - w;
   points[6].y = y + h;
-  gdk_draw_polygon (drawable, gg->rectangle_GC, TRUE, points, 7);
-  gdk_draw_line (drawable, gg->rectangle_GC,
-                 x - 1, y - (h - 1), x - 1, y + (h - 2));
+  ggobi_cairo_apply_gc (cr, gg->rectangle_GC);
+  ggobi_cairo_draw_polygon (cr, TRUE, points, 7);
+  ggobi_cairo_draw_line (cr, x - 1, y - (h - 1), x - 1, y + (h - 2));
 
   /*-- draw the light shadows --*/
   gdk_gc_set_foreground (gg->rectangle_GC, &gg->lightgray);
@@ -236,6 +239,7 @@ draw_3drectangle (GtkWidget * widget, GdkDrawable * drawable,
 
   points[6].x = points[0].x;
   points[6].y = points[0].y;
-  gdk_draw_polygon (drawable, gg->rectangle_GC, TRUE, points, 7);
-  gdk_draw_line (drawable, gg->rectangle_GC, x, y - (h - 1), x, y + (h - 2));
+  ggobi_cairo_apply_gc (cr, gg->rectangle_GC);
+  ggobi_cairo_draw_polygon (cr, TRUE, points, 7);
+  ggobi_cairo_draw_line (cr, x, y - (h - 1), x, y + (h - 2));
 }

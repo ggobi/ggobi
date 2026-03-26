@@ -25,7 +25,7 @@
 
 #undef WIN32
 
-static void splot_draw_border (splotd *, GdkDrawable *, ggobid *);
+static void splot_draw_border (splotd *, cairo_t *, ggobid *);
 
 static void
 splot_check_colors (gushort maxcolorid, gint *ncolors_used,
@@ -160,7 +160,9 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         display->options.edges_arrowheads_show_p ||
         display->options.edges_directed_show_p)
     {
-      splot_edges_draw (sp, draw_hidden, sp->pixmap0, gg);
+      cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+      splot_edges_draw (sp, draw_hidden, cr, gg);
+      cairo_destroy (cr);
     }
   }
 
@@ -193,11 +195,16 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
            * in order to draw the whiskers but not the points.
           */
           if (display->options.points_show_p)
-            draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
-              m, gg);
+          {
+            cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+            draw_glyph (cr, &d->glyph_now.els[m], sp->screen, m, gg);
+            cairo_destroy (cr);
+          }
           /* draw the whiskers ... or, potentially, other decorations */
           if (klass && klass->within_draw_to_unbinned) {
-            klass->within_draw_to_unbinned(sp, m, sp->pixmap0, gg->plot_GC);
+            cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+            klass->within_draw_to_unbinned (sp, m, cr);
+            cairo_destroy (cr);
           }
         }
       }
@@ -229,12 +236,16 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
              * but not the points.
             */
             if (display->options.points_show_p)
-              draw_glyph (sp->pixmap0, &d->glyph_now.els[m], sp->screen,
-                m, gg);
+            {
+              cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+              draw_glyph (cr, &d->glyph_now.els[m], sp->screen, m, gg);
+              cairo_destroy (cr);
+            }
 
             if (klass && klass->within_draw_to_unbinned) {
-              klass->within_draw_to_unbinned(sp, m, 
-              sp->pixmap0, gg->plot_GC);
+              cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+              klass->within_draw_to_unbinned (sp, m, cr);
+              cairo_destroy (cr);
             }
 
           }
@@ -359,13 +370,15 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             if (d->hidden_now.els[i] &&
                 splot_plot_case (i, d, sp, display, gg))
             {
-              draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
-                sp->screen, i, gg);
+              cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+              draw_glyph (cr, &d->glyph_now.els[i], sp->screen, i, gg);
+              cairo_destroy (cr);
 
               /* parallel coordinate plot and time series plot whiskers */
               if(klass && klass->within_draw_to_binned) {
-                klass->within_draw_to_binned(sp, i,
-                  sp->pixmap0, gg->plot_GC);
+                cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+                klass->within_draw_to_binned (sp, i, cr);
+                cairo_destroy (cr);
               }
             }
           }
@@ -400,13 +413,15 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
                   d->color_now.els[i] == current_color &&
                   splot_plot_case (i, d, sp, display, gg))
               {
-                draw_glyph (sp->pixmap0, &d->glyph_now.els[i],
-                  sp->screen, i, gg);
+                cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+                draw_glyph (cr, &d->glyph_now.els[i], sp->screen, i, gg);
+                cairo_destroy (cr);
 
                 /* parallel coordinate plot whiskers */
                 if(klass && klass->within_draw_to_binned) {
-                  klass->within_draw_to_binned(sp, i,
-                    sp->pixmap0, gg->plot_GC);
+                  cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+                  klass->within_draw_to_binned (sp, i, cr);
+                  cairo_destroy (cr);
                 }
               }
             }
@@ -418,7 +433,9 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   }
 
   if (proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR) {
-    splot_draw_tour_axes(sp, sp->pixmap0, gg);
+    cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+    splot_draw_tour_axes (sp, cr, gg);
+    cairo_destroy (cr);
   }
 
   return;
@@ -430,7 +447,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 /*------------------------------------------------------------------------*/
 
 static void
-splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg) 
+splot_add_plot_labels (splotd *sp, cairo_t *cr, ggobid *gg) 
 {
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -444,12 +461,13 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     return;
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  ggobi_cairo_apply_gc (cr, gg->plot_GC);
 
   if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
-    void (*f)(splotd *, GdkDrawable*, ggobid*);
+    void (*f)(splotd *, cairo_t*, ggobid*);
     f =  GGOBI_EXTENDED_SPLOT_GET_CLASS(sp)->add_plot_labels;
     if(f) {
-      f(sp, drawable, gg);
+      f(sp, cr, gg);
       return;
     }
 
@@ -458,10 +476,10 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
       have a special splot class for the display type but still need
       to do something special. */
   if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
-    void (*f)(displayd *, splotd *, GdkDrawable*, GGobiData *, ggobid*);
+    void (*f)(displayd *, splotd *, cairo_t*, GGobiData *, ggobid*);
     f =  GGOBI_EXTENDED_DISPLAY_GET_CLASS(display)->add_plot_labels;
     if(f)
-      f(display, sp, drawable, d, gg);
+      f(display, sp, cr, d, gg);
   }
 
 }
@@ -472,7 +490,7 @@ splot_add_plot_labels (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 /*-- draw a diamond around the current case --*/
 void
-splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_add_diamond_cue (gint k, splotd *sp, cairo_t *cr, ggobid *gg)
 {
   GGobiData *d = sp->displayptr->d;
   gint diamond_dim = DIAMOND_DIM;
@@ -491,7 +509,8 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   diamond[3].y = sp->screen[k].y + diamond_dim;
 
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_lines (drawable, gg->plot_GC, diamond, 5);
+  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_cairo_draw_lines (cr, diamond, 5);
 }
 
 /*-- add the label to a case (with or without underlining).  if this
@@ -499,7 +518,7 @@ splot_add_diamond_cue (gint k, splotd *sp, GdkDrawable *drawable, ggobid *gg)
   window. --*/
 void
 splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
-  GdkDrawable *drawable, ggobid *gg)
+  cairo_t *cr, ggobid *gg)
 {
   displayd *dsp = sp->displayptr;
   GGobiData *d = dsp->d;
@@ -522,21 +541,21 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
     /* display the label in the top center of the window */
     if (nearest_p && top_p) {
       underline_text(layout);
-      gdk_draw_layout (drawable, gg->plot_GC,
-       	(sp->max.x - rect.width)/2, 5, layout);
+      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_cairo_draw_layout (cr, layout, (sp->max.x - rect.width)/2, 5);
     }
     /* display the label next to the point */
     if (sp->screen[k].x <= sp->max.x/2) {
-      gdk_draw_layout (drawable, gg->plot_GC, 
+      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_cairo_draw_layout (cr, layout,
   	 sp->screen[k].x+diamond_dim,
-	 sp->screen[k].y-rect.height-diamond_dim,
-	 layout);
+	 sp->screen[k].y-rect.height-diamond_dim);
 
     } else {
-      gdk_draw_layout(drawable, gg->plot_GC,
+      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_cairo_draw_layout(cr, layout,
         sp->screen[k].x - rect.width - diamond_dim,
-	sp->screen[k].y - rect.height - diamond_dim,
-	layout);
+	sp->screen[k].y - rect.height - diamond_dim);
     }
     g_free(lbl);
     g_object_unref(layout);
@@ -545,26 +564,26 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
 
 // Generic, for scatterplots and cousins
 void
-splot_add_identify_point_cues(splotd *sp, GdkDrawable *drawable,
+splot_add_identify_point_cues(splotd *sp, cairo_t *cr,
   gint k, gboolean nearest_p, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
 
   if (k != -1) {
     if (nearest_p)
-      splot_add_diamond_cue (k, sp, drawable, gg);
+      splot_add_diamond_cue (k, sp, cr, gg);
 
     /* I've turned off this label for the barchart.  parallel coords
        and scatterplot matrix displays need some thought too. dfs */
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-    splot_add_point_label (nearest_p, k, true, sp, drawable, gg);
+    splot_add_point_label (nearest_p, k, true, sp, cr, gg);
   }
 }
 
 // Messy -- points, edges, bars, ... there's probably a better way
 // to sort this out.
 void
-splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_add_identify_nearest_cues (splotd *sp, cairo_t *cr, ggobid *gg)
 {
   displayd *display = sp->displayptr;
   gint pt;
@@ -574,19 +593,19 @@ splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if (klass->add_identify_cues) {
       pt = display->d->nearest_point;
-      klass->add_identify_cues(true, pt, sp, drawable, gg);
+      klass->add_identify_cues(true, pt, sp, cr, gg);
 
     } else {
       cpaneld *cpanel = &display->cpanel;
       if (cpanel->id_target_type == identify_points) {
         GGobiData *d = display->d;
         pt = d->nearest_point;
-        splot_add_identify_point_cues (sp, drawable, pt, true, gg);
+        splot_add_identify_point_cues (sp, cr, pt, true, gg);
       } else {
         if (display->e) {
           GGobiData *e = display->e;
           pt = e->nearest_point;
-          splot_add_identify_edge_cues (sp, drawable, pt, true, gg);
+          splot_add_identify_edge_cues (sp, cr, pt, true, gg);
         }
       }
     }
@@ -595,7 +614,7 @@ splot_add_identify_nearest_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 /* Points only, so not so messy */
 void
-splot_add_identify_sticky_cues (splotd *sp, GdkDrawable *drawable, gint k,
+splot_add_identify_sticky_cues (splotd *sp, cairo_t *cr, gint k,
   ggobid *gg)
 {
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
@@ -603,16 +622,16 @@ splot_add_identify_sticky_cues (splotd *sp, GdkDrawable *drawable, gint k,
     klass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     if (klass->add_identify_cues) {
       // No sticky-drawing behavior in the barchart?
-      klass->add_identify_cues(false, k, sp, drawable, gg);
+      klass->add_identify_cues(false, k, sp, cr, gg);
 
     } else {
-      splot_add_identify_point_cues (sp, drawable, k, false, gg);
+      splot_add_identify_point_cues (sp, cr, k, false, gg);
     }
   }
 }
 
 void
-splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
+splot_add_movepts_cues (splotd *sp, cairo_t *cr,
   gint k, gboolean nearest, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
@@ -621,16 +640,16 @@ splot_add_movepts_cues (splotd *sp, GdkDrawable *drawable,
   if (k < 0 || k >= d->nrows)
     return;
 
-  splot_add_diamond_cue (k, sp, drawable, gg);
+  splot_add_diamond_cue (k, sp, cr, gg);
 
   /*-- only add the label if the mouse is up --*/
   if (!gg->buttondown) {
-    splot_add_point_label (nearest, k, true, sp, drawable, gg);
+    splot_add_point_label (nearest, k, true, sp, cr, gg);
   }
 }
 
 static void
-splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
+splot_add_record_cues (splotd *sp, cairo_t *cr, ggobid *gg) {
   gint id;
   GSList *l;
   displayd *display = (displayd *) sp->displayptr;
@@ -647,13 +666,13 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
   */
 
   if (imode == IDENT) 
-    splot_add_identify_nearest_cues(sp, drawable, gg); // pt or edge
+    splot_add_identify_nearest_cues(sp, cr, gg); // pt or edge
   else if (imode == MOVEPTS)
-     splot_add_movepts_cues (sp, drawable, d->nearest_point, true, gg);
+     splot_add_movepts_cues (sp, cr, d->nearest_point, true, gg);
   else if (imode == EDGEED)
     /* If I want to draw in the color of nearest_point, I should pass
        it in here -- dfs*/
-    splot_add_edgeedit_cues (sp, drawable, d->nearest_point, true, gg);
+    splot_add_edgeedit_cues (sp, cr, d->nearest_point, true, gg);
  
 
   /*-- and these are the sticky points, added in all modes --*/
@@ -662,7 +681,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
       id = GPOINTER_TO_INT (l->data);
       if (!d->hidden_now.els[id])
         /*-- false = !nearest --*/
-        splot_add_identify_sticky_cues (sp, drawable, id, gg);
+        splot_add_identify_sticky_cues (sp, cr, id, gg);
     }
   }
 
@@ -672,9 +691,9 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
       id = GPOINTER_TO_INT (l->data);
       if (!e->hidden_now.els[id])
         /*-- false = !nearest --*/
-        splot_add_identify_edge_cues (sp, drawable, id, false, gg);
-    }
+        splot_add_identify_edge_cues (sp, cr, id, false, gg);
   }
+}
 }
 
 /*------------------------------------------------------------------------*/
@@ -682,7 +701,7 @@ splot_add_record_cues (splotd *sp, GdkDrawable *drawable, ggobid *gg) {
 /*------------------------------------------------------------------------*/
 
 static void
-splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_draw_border (splotd *sp, cairo_t *cr, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint width = gtk_widget_get_allocated_width (sp->da);
@@ -692,9 +711,8 @@ splot_draw_border (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
     gdk_gc_set_line_attributes (gg->plot_GC,
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-
-    gdk_draw_rectangle (drawable, gg->plot_GC,
-      false, 1, 1, width - 3, height - 3);
+    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_cairo_draw_rectangle (cr, false, 1, 1, width - 3, height - 3);
 
     gdk_gc_set_line_attributes (gg->plot_GC,
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
@@ -735,6 +753,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
   GGobiExtendedSPlotClass *splotKlass;
+  cairo_t *cr = gdk_cairo_create (drawable);
 
   /*
    * if identification is going on in a plot of points that 
@@ -757,52 +776,53 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
     }
 
     if (draw_edge && e->nearest_point != -1) {
-      splot_add_edge_highlight_cue (sp, drawable, e->nearest_point,
+      splot_add_edge_highlight_cue (sp, cr, e->nearest_point,
         true, gg);
-      splot_add_edge_label (sp, drawable, e->nearest_point,
+      splot_add_edge_label (sp, cr, e->nearest_point,
         true, gg);
     }
   }
   
   if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-    void (*f)(splotd *, GdkDrawable*, ggobid*);
+    void (*f)(splotd *, cairo_t*, ggobid*);
     splotKlass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
     f = splotKlass->add_markup_cues;
     if(f) {
-      f(sp, drawable, gg);
+      f(sp, cr, gg);
     }
   }
    
-  splot_add_plot_labels (sp, drawable, gg);  /*-- axis labels --*/
+  splot_add_plot_labels (sp, cr, gg);  /*-- axis labels --*/
 
   /*-- identify points or edges, move points, edge editing --*/
-  splot_add_record_cues (sp, drawable, gg);  
+  splot_add_record_cues (sp, cr, gg);  
 
   if (sp == gg->current_splot)
-    splot_draw_border (sp, drawable, gg);
+    splot_draw_border (sp, cr, gg);
 
   /*-- draw these cues whether this is the current display or not --*/
   if (g_list_length (dsp->splots) == 1  /*-- scatterplot --*/
       || sp == dsp->current_splot)  /*-- ... in a multi-plot display --*/
   {
     if (cpanel->imode == BRUSH) {
-      brush_draw_brush (sp, drawable, d, gg);
-      brush_draw_label (sp, drawable, d, gg);
+      brush_draw_brush (sp, cr, d, gg);
+      brush_draw_label (sp, cr, d, gg);
     } else if (cpanel->imode == SCALE) {
 
       if (GGOBI_IS_EXTENDED_SPLOT(sp)) {
-        void (*f)(splotd *, GdkDrawable*, ggobid*);
+        void (*f)(splotd *, cairo_t*, ggobid*);
         splotKlass = GGOBI_EXTENDED_SPLOT_GET_CLASS(sp);
         f = splotKlass->add_scaling_cues;
         if(f)
-          f(sp, drawable, gg);
+          f(sp, cr, gg);
       }
     }
   }
 
   if (proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR) {
-    splot_draw_tour_axes(sp, drawable, gg);
+    splot_draw_tour_axes (sp, cr, gg);
   }
+  cairo_destroy (cr);
 }
 
 
@@ -888,8 +908,12 @@ splot_redraw (splotd *sp, RedrawStyle style, ggobid *gg) {
    * meantime, what's an extra rectangle?
   */
   if (sp == gg->current_splot && style != NONE) 
-    splot_draw_border (sp,
-      GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (sp->da)), gg);
+  {
+    cairo_t *cr =
+      gdk_cairo_create (gtk_widget_get_window (sp->da));
+    splot_draw_border (sp, cr, gg);
+    cairo_destroy (cr);
+  }
 
   sp->redraw_style = EXPOSE;
 

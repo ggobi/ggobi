@@ -263,7 +263,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     x = (gint) (display->t1d.F.vals[0][jvar] * (gfloat) r);
     y = 0;
     if (jvar == display->t1d_manip_var) {
-      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_manip_color);
       cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, (5.0 / 6) * M_PI, (7.0 / 6) * M_PI);
       cairo_stroke (c);
@@ -282,7 +282,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     x = (gint) (display->t2d3.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->t2d3.F.vals[1][jvar] * (gfloat) r);
     if (jvar == display->t2d3_manip_var) {
-      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_manip_color);
       cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, 0, 2 * M_PI);
     }
@@ -299,7 +299,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     x = (gint) (display->t2d.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->t2d.F.vals[1][jvar] * (gfloat) r);
     if (jvar == display->t2d_manip_var) {
-      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_manip_color);
       cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, 0, 2 * M_PI);
     }
@@ -321,14 +321,14 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     x = (gint) (display->tcorr1.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->tcorr2.F.vals[0][jvar] * (gfloat) r);
     if (jvar == display->tc1_manip_var) {
-      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_manip_color);
       cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, (5.0 / 6) * M_PI, (7.0 / 6) * M_PI);
       cairo_stroke (c);
       cairo_arc (c, r, r, r - 5, (11.0 / 6) * M_PI, (13.0 / 6) * M_PI);
     }
     if (jvar == display->tc2_manip_var) {
-      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_manip_color);
       cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, (1.0 / 3) * M_PI, (2.0 / 3) * M_PI);
       cairo_stroke (c);
@@ -1384,7 +1384,7 @@ drawEdge (splotd * sp, gint m, GGobiData * d, GGobiData * e, ggobid * gg)
 }
 
 void
-scatter1DAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
+scatter1DAddPlotLabels (splotd * sp, cairo_t *cr)
 {
   PangoLayout *layout =
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
@@ -1392,14 +1392,14 @@ scatter1DAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
   GGobiData *d = sp->displayptr->d;
 
   layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->p1dvar), &rect);
-  gdk_draw_layout (drawable, gc,
-                   sp->max.x / 2 - rect.width / 2,
-                   sp->max.y - rect.height - 5, layout);
+  ggobi_cairo_draw_layout (cr, layout,
+                           sp->max.x / 2 - rect.width / 2,
+                           sp->max.y - rect.height - 5);
   g_object_unref (G_OBJECT (layout));
 }
 
 void
-scatterXYAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
+scatterXYAddPlotLabels (splotd * sp, cairo_t *cr)
 {
   PangoLayout *layout =
     gtk_widget_create_pango_layout (GTK_WIDGET (sp->da), NULL);
@@ -1409,28 +1409,28 @@ scatterXYAddPlotLabels (splotd * sp, GdkDrawable * drawable, GdkGC * gc)
 
   /*-- xyplot: right justify the label --*/
   layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->xyvars.x), &rect);
-  gdk_draw_layout (drawable, gc,
-                   sp->max.x - rect.width - 5,
-                   sp->max.y - rect.height - 5, layout);
+  ggobi_cairo_draw_layout (cr, layout,
+                           sp->max.x - rect.width - 5,
+                           sp->max.y - rect.height - 5);
 
   layout_text (layout, ggobi_data_get_transformed_col_name(d, sp->xyvars.y), &rect);
-  gdk_draw_layout (drawable, gc, 5, 5, layout);
+  ggobi_cairo_draw_layout (cr, layout, 5, 5);
   g_object_unref (G_OBJECT (layout));
 }
 
 static void
-addPlotLabels (splotd * sp, GdkDrawable * drawable, ggobid * gg)
+addPlotLabels (splotd *sp, cairo_t *cr, ggobid *gg)
 {
 /* Same as scatmat... */
   cpaneld *cpanel = &(sp->displayptr->cpanel);
   if (cpanel->pmode == XYPLOT)
-    scatterXYAddPlotLabels (sp, drawable, gg->plot_GC);
+    scatterXYAddPlotLabels (sp, cr);
   else if (cpanel->pmode == P1PLOT)
-    scatter1DAddPlotLabels (sp, drawable, gg->plot_GC);
+    scatter1DAddPlotLabels (sp, cr);
 }
 
 static void
-withinDrawToUnbinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
+withinDrawToUnbinned (splotd *sp, gint m, cairo_t *cr)
 {
   displayd *display = sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -1443,20 +1443,21 @@ withinDrawToUnbinned (splotd * sp, gint m, GdkDrawable * drawable, GdkGC * gc)
        cpanel->p1d.type == ASH && cpanel->p1d.ASH_add_lines_p)) {
     baseline = (proj == TOUR1D) ? &sp->tour1d.ash_baseline :
       &sp->p1d.ash_baseline;
+    ggobi_cairo_apply_gc (cr, GGobiFromSPlot (sp)->plot_GC);
 
     if (display->p1d_orientation == HORIZONTAL)
-      gdk_draw_line (drawable, gc,
-                     sp->screen[m].x, sp->screen[m].y,
-                     sp->screen[m].x, baseline->y);
+      ggobi_cairo_draw_line (cr,
+                             sp->screen[m].x, sp->screen[m].y,
+                             sp->screen[m].x, baseline->y);
     else
-      gdk_draw_line (drawable, gc,
-                     sp->screen[m].x, sp->screen[m].y,
-                     baseline->x, sp->screen[m].y);
+      ggobi_cairo_draw_line (cr,
+                             sp->screen[m].x, sp->screen[m].y,
+                             baseline->x, sp->screen[m].y);
   }
 }
 
 void
-addMarkupCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
+addMarkupCues (splotd *sp, cairo_t *cr, ggobid *gg)
 {
 /* See splot_add_markup_to_pixmap */
   displayd *display = sp->displayptr;
@@ -1466,20 +1467,22 @@ addMarkupCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
         display->options.edges_arrowheads_show_p ||
         display->options.edges_directed_show_p)
       if (e->nearest_point != -1)
-        splot_add_identify_edge_cues (sp, drawable, e->nearest_point,
+        splot_add_identify_edge_cues (sp, cr, e->nearest_point,
                                       true, gg);
 }
 
 void
-addScalingCues (splotd * sp, GdkDrawable * drawable, ggobid * gg)
+addScalingCues (splotd *sp, cairo_t *cr, ggobid *gg)
 {
   cpaneld *cpanel = &gg->current_display->cpanel;
 
   if (!cpanel->scale.updateAlways_p) {
-    if (gg->buttondown)
-      gdk_draw_line (drawable, gg->plot_GC,
-                     sp->mousedownpos.x, sp->mousedownpos.y,
-                     sp->mousepos.x, sp->mousepos.y);
+    if (gg->buttondown) {
+      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_cairo_draw_line (cr,
+                             sp->mousedownpos.x, sp->mousedownpos.y,
+                             sp->mousepos.x, sp->mousepos.y);
+    }
   }
 }
 

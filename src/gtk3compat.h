@@ -139,6 +139,20 @@ typedef GdkDrawable GdkPixmap;
 typedef gpointer GdkColormap;
 
 cairo_t *ggobi_gdk_cairo_create (gpointer target);
+void ggobi_cairo_apply_gc (cairo_t *cr, GdkGC *gc);
+void ggobi_cairo_set_source_gdk_color (cairo_t *cr, const GdkColor *color);
+void ggobi_cairo_draw_rectangle (cairo_t *cr, gboolean filled,
+                                 gint x, gint y, gint width, gint height);
+void ggobi_cairo_draw_line (cairo_t *cr, gint x1, gint y1, gint x2, gint y2);
+void ggobi_cairo_draw_arc (cairo_t *cr, gboolean filled,
+                           gint x, gint y, gint width, gint height,
+                           gint angle1, gint angle2);
+void ggobi_cairo_draw_polygon (cairo_t *cr, gboolean filled,
+                               GdkPoint *points, gint npoints);
+void ggobi_cairo_draw_lines (cairo_t *cr, GdkPoint *points, gint npoints);
+void ggobi_cairo_draw_segments (cairo_t *cr, GdkSegment *segs, gint nsegs);
+void ggobi_cairo_draw_layout (cairo_t *cr, PangoLayout *layout,
+                              gint x, gint y);
 GdkGC *gdk_gc_new (GdkWindow *window);
 void gdk_gc_destroy (GdkGC *gc);
 void gdk_gc_set_foreground (GdkGC *gc, const GdkColor *color);

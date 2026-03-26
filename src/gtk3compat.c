@@ -94,6 +94,8 @@ static void
 ggobi_gc_apply (cairo_t *cr, GdkGC *gc)
 {
   GdkRGBA rgba;
+  cairo_line_cap_t cap = CAIRO_LINE_CAP_ROUND;
+  cairo_line_join_t join = CAIRO_LINE_JOIN_ROUND;
 
   if (cr == NULL || gc == NULL)
     return;
@@ -101,8 +103,46 @@ ggobi_gc_apply (cairo_t *cr, GdkGC *gc)
   ggobi_gdk_color_to_rgba (&gc->foreground, &rgba);
   gdk_cairo_set_source_rgba (cr, &rgba);
   cairo_set_line_width (cr, MAX (1, gc->line_width));
-  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
-  cairo_set_line_join (cr, CAIRO_LINE_JOIN_ROUND);
+
+  switch (gc->cap_style) {
+  case GDK_CAP_BUTT:
+    cap = CAIRO_LINE_CAP_BUTT;
+    break;
+  case GDK_CAP_PROJECTING:
+    cap = CAIRO_LINE_CAP_SQUARE;
+    break;
+  case GDK_CAP_NOT_LAST:
+  case GDK_CAP_ROUND:
+  default:
+    cap = CAIRO_LINE_CAP_ROUND;
+    break;
+  }
+  cairo_set_line_cap (cr, cap);
+
+  switch (gc->join_style) {
+  case GDK_JOIN_MITER:
+    join = CAIRO_LINE_JOIN_MITER;
+    break;
+  case GDK_JOIN_BEVEL:
+    join = CAIRO_LINE_JOIN_BEVEL;
+    break;
+  case GDK_JOIN_ROUND:
+  default:
+    join = CAIRO_LINE_JOIN_ROUND;
+    break;
+  }
+  cairo_set_line_join (cr, join);
+
+  if (gc->line_style == GDK_LINE_ON_OFF_DASH && gc->ndashes > 0) {
+    double dashes[8];
+    gint i;
+
+    for (i = 0; i < gc->ndashes; i++)
+      dashes[i] = MAX (1, (gint) gc->dashes[i]);
+    cairo_set_dash (cr, dashes, gc->ndashes, gc->dashes_offset);
+  } else {
+    cairo_set_dash (cr, NULL, 0, 0.0);
+  }
 }
 
 GtkTooltips *
@@ -144,6 +184,138 @@ ggobi_gdk_cairo_create (gpointer target)
     return gdk_cairo_create (GDK_WINDOW (target));
 
   return ggobi_drawable_begin ((GdkDrawable *) target);
+}
+
+void
+ggobi_cairo_apply_gc (cairo_t *cr, GdkGC *gc)
+{
+  ggobi_gc_apply (cr, gc);
+}
+
+void
+ggobi_cairo_set_source_gdk_color (cairo_t *cr, const GdkColor *color)
+{
+  GdkRGBA rgba;
+
+  if (cr == NULL || color == NULL)
+    return;
+
+  ggobi_gdk_color_to_rgba (color, &rgba);
+  gdk_cairo_set_source_rgba (cr, &rgba);
+}
+
+void
+ggobi_cairo_draw_rectangle (cairo_t *cr, gboolean filled,
+                            gint x, gint y, gint width, gint height)
+{
+  if (cr == NULL)
+    return;
+
+  cairo_rectangle (cr, x, y, width, height);
+  if (filled)
+    cairo_fill (cr);
+  else
+    cairo_stroke (cr);
+}
+
+void
+ggobi_cairo_draw_line (cairo_t *cr, gint x1, gint y1, gint x2, gint y2)
+{
+  if (cr == NULL)
+    return;
+
+  cairo_move_to (cr, x1, y1);
+  cairo_line_to (cr, x2, y2);
+  cairo_stroke (cr);
+}
+
+void
+ggobi_cairo_draw_arc (cairo_t *cr, gboolean filled,
+                      gint x, gint y, gint width, gint height,
+                      gint angle1, gint angle2)
+{
+  gdouble cx, cy, rx, ry;
+  gdouble start, end;
+
+  if (cr == NULL)
+    return;
+
+  cx = x + width / 2.0;
+  cy = y + height / 2.0;
+  rx = MAX (1, width) / 2.0;
+  ry = MAX (1, height) / 2.0;
+  start = angle1 / (64.0 * 180.0) * G_PI;
+  end = (angle1 + angle2) / (64.0 * 180.0) * G_PI;
+
+  cairo_save (cr);
+  cairo_translate (cr, cx, cy);
+  cairo_scale (cr, rx, ry);
+  cairo_arc (cr, 0.0, 0.0, 1.0, start, end);
+  cairo_restore (cr);
+
+  if (filled)
+    cairo_fill (cr);
+  else
+    cairo_stroke (cr);
+}
+
+void
+ggobi_cairo_draw_polygon (cairo_t *cr, gboolean filled,
+                          GdkPoint *points, gint npoints)
+{
+  gint i;
+
+  if (cr == NULL || points == NULL || npoints <= 0)
+    return;
+
+  cairo_move_to (cr, points[0].x, points[0].y);
+  for (i = 1; i < npoints; i++)
+    cairo_line_to (cr, points[i].x, points[i].y);
+  cairo_close_path (cr);
+
+  if (filled)
+    cairo_fill (cr);
+  else
+    cairo_stroke (cr);
+}
+
+void
+ggobi_cairo_draw_lines (cairo_t *cr, GdkPoint *points, gint npoints)
+{
+  gint i;
+
+  if (cr == NULL || points == NULL || npoints <= 0)
+    return;
+
+  cairo_move_to (cr, points[0].x, points[0].y);
+  for (i = 1; i < npoints; i++)
+    cairo_line_to (cr, points[i].x, points[i].y);
+  cairo_stroke (cr);
+}
+
+void
+ggobi_cairo_draw_segments (cairo_t *cr, GdkSegment *segs, gint nsegs)
+{
+  gint i;
+
+  if (cr == NULL || segs == NULL || nsegs <= 0)
+    return;
+
+  for (i = 0; i < nsegs; i++) {
+    cairo_move_to (cr, segs[i].x1, segs[i].y1);
+    cairo_line_to (cr, segs[i].x2, segs[i].y2);
+  }
+  cairo_stroke (cr);
+}
+
+void
+ggobi_cairo_draw_layout (cairo_t *cr, PangoLayout *layout, gint x, gint y)
+{
+  if (cr == NULL || layout == NULL)
+    return;
+
+  cairo_move_to (cr, x, y);
+  pango_cairo_show_layout (cr, layout);
 }
 
 GdkGC *

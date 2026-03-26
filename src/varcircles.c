@@ -262,7 +262,7 @@ da_manip_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   cairo_t *c = gdk_cairo_create (gtk_widget_get_window (w));
-  gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+  ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_manip_color);
   cairo_rectangle (c, 0, 0, gtk_widget_get_allocated_width (w),
     gtk_widget_get_allocated_height (w));
   cairo_fill (c);
@@ -283,7 +283,7 @@ da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
   cairo_t *c = gdk_cairo_create (gtk_widget_get_window (w));
-  gdk_cairo_set_source_color (c, &gg->vcirc_freeze_color);
+  ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_freeze_color);
   cairo_rectangle (c, 0, 0, gtk_widget_get_allocated_width (w),
     gtk_widget_get_allocated_height (w));
   cairo_fill (c);

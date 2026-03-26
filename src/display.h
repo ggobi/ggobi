@@ -299,7 +299,7 @@ typedef struct
   /* new - dfs */
   gint (*splot_key_event_handled)(GtkWidget *, displayd *, splotd *, GdkEventKey *, ggobid *);
 
-    void (*add_plot_labels)(displayd *dpy, splotd *sp, GdkDrawable *, GGobiData *, ggobid *);
+    void (*add_plot_labels)(displayd *dpy, splotd *sp, cairo_t *, GGobiData *, ggobid *);
 
   gboolean (*varpanel_highd)(displayd *dpy);
 
