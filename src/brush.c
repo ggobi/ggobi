@@ -72,13 +72,13 @@ set_lattribute_from_ltype (gint ltype, ggobid * gg)
     lattr = GDK_LINE_ON_OFF_DASH;
     dash_list[0] = 8;
     dash_list[1] = 2;
-    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+    ggobi_draw_style_set_dashes (GGOBI_PLOT_STYLE (gg), 0, dash_list, 2);
     break;
   case NARROW_DASH:
     lattr = GDK_LINE_ON_OFF_DASH;
     dash_list[0] = 4;
     dash_list[1] = 2;
-    gdk_gc_set_dashes (gg->plot_GC, 0, dash_list, 2);
+    ggobi_draw_style_set_dashes (GGOBI_PLOT_STYLE (gg), 0, dash_list, 2);
     break;
   }
   return lattr;
@@ -411,7 +411,7 @@ brush_draw_label (splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg)
   if (d->npts_under_brush > 0) {
     gchar *str = g_strdup_printf ("%d", d->npts_under_brush);
     layout_text (layout, str, &rect);
-    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
     ggobi_cairo_draw_layout (cr, layout,
                              sp->max.x - rect.width - 5, 5);
     g_free (str);
@@ -440,7 +440,7 @@ brush_draw_brush (splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg)
 
   if (cpanel->br.mode == BR_TRANSIENT) {
     gint8 dash_list[2];
-    gdk_gc_set_line_attributes (gg->plot_GC,
+    ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg),
                                 0, GDK_LINE_ON_OFF_DASH, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
     /* just selection: set special dash pattern and draw like points */
@@ -451,30 +451,30 @@ brush_draw_brush (splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg)
       dash_list[0] = 4;
       dash_list[1] = 4;
     }
-    gdk_gc_set_dashes(gg->plot_GC, 0, dash_list, 2);
+    ggobi_draw_style_set_dashes (GGOBI_PLOT_STYLE (gg), 0, dash_list, 2);
   }
   
   if (point_painting_p || selection_p) {
 
     /* set brush color for points */
     if (cpanel->br.point_targets == br_shadow) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
     }
     else if (cpanel->br.point_targets == br_unshadow) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
     }
     else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red ||
               scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue ||
               scheme->rgb[gg->color_id].green != scheme->rgb_bg.green) &&
              !selection_p) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[gg->color_id]);
     }
     else {
       /* for selection (at least) */
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
     }
 
-    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
     ggobi_cairo_draw_rectangle (cr, false,
                                 x1, y1, (x2 > x1) ? (x2 - x1) : (x1 - x2),
                                 (y2 > y1) ? (y2 - y1) : (y1 - y2));
@@ -501,22 +501,22 @@ brush_draw_brush (splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg)
 
     /* set brush color for edges */
     if (cpanel->br.edge_targets == br_shadow) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
     }
     else if (cpanel->br.point_targets == br_unshadow) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
     }
     else if ((scheme->rgb[gg->color_id].red != scheme->rgb_bg.red) ||
              (scheme->rgb[gg->color_id].blue != scheme->rgb_bg.blue) ||
              (scheme->rgb[gg->color_id].green != scheme->rgb_bg.green)) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[gg->color_id]);
     }
     else {
       /* I don't remember what this is for ... -- dfs */
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
     }
 
-    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
     ggobi_cairo_draw_line (cr,
                            x1 + (x2 - x1) / 2, y1, x1 + (x2 - x1) / 2, y2);
     ggobi_cairo_draw_line (cr,
@@ -532,7 +532,7 @@ brush_draw_brush (splotd *sp, cairo_t *cr, GGobiData *d, ggobid *gg)
   }
 
   if (cpanel->br.mode == BR_TRANSIENT)
-    gdk_gc_set_line_attributes (gg->plot_GC,
+    ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg),
                                 0, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
 }

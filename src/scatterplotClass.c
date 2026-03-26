@@ -359,8 +359,7 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
 
        x = 0;
        y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
-       gdk_draw_line (da_pix,
-       gg->selvarfg_GC, r, r, r+x, r-y);
+       gdk_draw_line (da_pix, NULL, r, r, r+x, r-y);
 
        } */
 
@@ -1443,7 +1442,7 @@ withinDrawToUnbinned (splotd *sp, gint m, cairo_t *cr)
        cpanel->p1d.type == ASH && cpanel->p1d.ASH_add_lines_p)) {
     baseline = (proj == TOUR1D) ? &sp->tour1d.ash_baseline :
       &sp->p1d.ash_baseline;
-    ggobi_cairo_apply_gc (cr, GGobiFromSPlot (sp)->plot_GC);
+    ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (GGobiFromSPlot (sp)));
 
     if (display->p1d_orientation == HORIZONTAL)
       ggobi_cairo_draw_line (cr,
@@ -1478,7 +1477,7 @@ addScalingCues (splotd *sp, cairo_t *cr, ggobid *gg)
 
   if (!cpanel->scale.updateAlways_p) {
     if (gg->buttondown) {
-      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
       ggobi_cairo_draw_line (cr,
                              sp->mousedownpos.x, sp->mousedownpos.y,
                              sp->mousepos.x, sp->mousepos.y);

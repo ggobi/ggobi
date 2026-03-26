@@ -576,7 +576,7 @@ addIdentifyCues (gboolean nearest_p, gint k, splotd * sp,
   if (nearest_p)
     splot_add_diamond_cue (k, sp, cr, gg);
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
   splot_add_point_label (nearest_p, k, false, sp, cr, gg);
 }
 

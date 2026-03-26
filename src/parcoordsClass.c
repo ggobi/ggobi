@@ -306,9 +306,9 @@ withinDrawBinned (splotd *sp, gint m, cairo_t *cr)
     lwidth = lwidth_from_gsize (d->glyph_now.els[m].size);
     gtype = d->glyph_now.els[m].type;
     ltype = set_lattribute_from_ltype (ltype_from_gtype (gtype), gg);
-    gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
+    ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), lwidth,
                                 ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
     ggobi_cairo_draw_line (cr,
                            sp->whiskers[n].x1, sp->whiskers[n].y1,
                            sp->whiskers[n].x2, sp->whiskers[n].y2);
@@ -317,7 +317,7 @@ withinDrawBinned (splotd *sp, gint m, cairo_t *cr)
                            sp->whiskers[n].x1, sp->whiskers[n].y1,
                            sp->whiskers[n].x2, sp->whiskers[n].y2);
   }
-  gdk_gc_set_line_attributes (gg->plot_GC,
+  ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg),
                               0, GDK_LINE_SOLID, GDK_CAP_ROUND,
                               GDK_JOIN_ROUND);
 }
@@ -339,9 +339,9 @@ withinDrawUnbinned (splotd *sp, gint m, cairo_t *cr)
     lwidth = lwidth_from_gsize (d->glyph_now.els[m].size);
     gtype = d->glyph_now.els[m].type;
     ltype = set_lattribute_from_ltype (ltype_from_gtype (gtype), gg);
-    gdk_gc_set_line_attributes (gg->plot_GC, lwidth,
+    ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), lwidth,
                                 ltype, GDK_CAP_BUTT, GDK_JOIN_ROUND);
-    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
     ggobi_cairo_draw_line (cr,
                            sp->whiskers[n].x1, sp->whiskers[n].y1,
                            sp->whiskers[n].x2, sp->whiskers[n].y2);
@@ -350,7 +350,7 @@ withinDrawUnbinned (splotd *sp, gint m, cairo_t *cr)
                            sp->whiskers[n].x1, sp->whiskers[n].y1,
                            sp->whiskers[n].x2, sp->whiskers[n].y2);
   }
-  gdk_gc_set_line_attributes (gg->plot_GC,
+  ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg),
                               0, GDK_LINE_SOLID, GDK_CAP_ROUND,
                               GDK_JOIN_ROUND);
 }
@@ -499,11 +499,11 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
     return;
 
   if (display->options.whiskers_show_p) {
-    gdk_gc_set_line_attributes (gg->plot_GC,
+    ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg),
                                 3, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[d->color_now.els[k]]);
-    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[d->color_now.els[k]]);
+    ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
 
     n = 2 * k;
     ggobi_cairo_draw_line (cr,
@@ -514,14 +514,14 @@ splot_add_whisker_cues (gboolean nearest_p, gint k, splotd * sp,
                            sp->whiskers[n].x1, sp->whiskers[n].y1,
                            sp->whiskers[n].x2, sp->whiskers[n].y2);
 
-    gdk_gc_set_line_attributes (gg->plot_GC,
+    ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg),
                                 0, GDK_LINE_SOLID, GDK_CAP_ROUND,
                                 GDK_JOIN_ROUND);
   }
 
   if (nearest_p) {
     /* Add the label for the nearest point at the top as well */
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
     splot_add_point_label (true, k, true, sp, cr, gg);
   }
 }

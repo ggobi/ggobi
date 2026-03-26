@@ -318,10 +318,6 @@ ggobi_alloc (ggobid * tmp)
 
   tmp->printOptions = NULL;
   tmp->pluginInstances = NULL;
-
-  tmp->plot_GC = NULL;
-
-
   tmp->colorSchemes = sessionOptions->colorSchemes;
   if (sessionOptions->activeColorScheme)
     tmp->activeColorScheme = findColorSchemeByName (tmp->colorSchemes,
@@ -342,6 +338,8 @@ ggobi_alloc (ggobid * tmp)
   }
   else
     colorscheme_init (tmp->activeColorScheme);
+
+  init_plot_style (tmp);
   /*
    * the number of colors in use will be tested against the
    * scheme->n the first time we plot, and the color ids will

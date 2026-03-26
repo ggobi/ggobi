@@ -90,13 +90,9 @@ splot_clear_pixmap0 (splotd *sp, ggobid *gg)
   gint width = gtk_widget_get_allocated_width (sp->da);
   gint height = gtk_widget_get_allocated_height (sp->da);
 
-  if (gg->plot_GC == NULL) {
-    init_plot_GC (sp->pixmap0, gg);
-  }
-
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (sp->pixmap0, gg->plot_GC,
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
+  gdk_draw_rectangle (sp->pixmap0, GGOBI_PLOT_STYLE (gg),
                       true, 0, 0, width, height);
 }
 
@@ -181,7 +177,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   } else {
 
     if (draw_hidden) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
 
 #ifdef WIN32
       win32_draw_to_pixmap_unbinned (-1, sp, draw_hidden, gg);
@@ -219,7 +215,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
       */
       for (k=0; k<ncolors_used; k++) {
         current_color = colors_used[k];
-        gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
+        ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[current_color]);
 #ifdef WIN32
         win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
 #else
@@ -300,12 +296,8 @@ splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
   loc_clear1.y = (bin1->y == d->brush.nbins-1) ? sp->max.y :
                                                loc1->y - BRUSH_MARGIN;
 
-  if (gg->plot_GC == NULL) {
-    init_plot_GC (sp->pixmap0, gg);
-  }
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (sp->pixmap0, gg->plot_GC,
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
+  gdk_draw_rectangle (sp->pixmap0, GGOBI_PLOT_STYLE (gg),
                       true,  /* fill */
                       loc_clear0.x, loc_clear0.y,
                       1 + loc_clear1.x - loc_clear0.x ,
@@ -335,9 +327,6 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
   GGobiExtendedSPlotClass *klass = NULL;
 
-  if (gg->plot_GC == NULL)
-    init_plot_GC (sp->pixmap0, gg);
-
     /* Allow the extended plot to take over the entire thing.
        If it wants to take over just a small part, see below.*/
   if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
@@ -356,7 +345,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
     if (draw_hidden) {  /* draw only the hidden cases */
 
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
 
 #ifdef WIN32
       win32_draw_to_pixmap_binned (bin0, bin1, -1, sp, draw_hidden, gg);
@@ -397,7 +386,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
       */
       for (k=0; k<ncolors_used; k++) {
         current_color = colors_used[k];
-        gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[current_color]);
+        ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[current_color]);
 
 #ifdef WIN32
         win32_draw_to_pixmap_binned (bin0, bin1, current_color,
@@ -460,8 +449,8 @@ splot_add_plot_labels (splotd *sp, cairo_t *cr, ggobid *gg)
   if (!proceed)
     return;
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
 
   if(GGOBI_IS_EXTENDED_SPLOT(sp)) {
     void (*f)(splotd *, cairo_t*, ggobid*);
@@ -508,8 +497,8 @@ splot_add_diamond_cue (gint k, splotd *sp, cairo_t *cr, ggobid *gg)
   diamond[3].x = sp->screen[k].x;
   diamond[3].y = sp->screen[k].y + diamond_dim;
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
   ggobi_cairo_draw_lines (cr, diamond, 5);
 }
 
@@ -541,18 +530,18 @@ splot_add_point_label (gboolean nearest_p, gint k, gboolean top_p, splotd *sp,
     /* display the label in the top center of the window */
     if (nearest_p && top_p) {
       underline_text(layout);
-      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
       ggobi_cairo_draw_layout (cr, layout, (sp->max.x - rect.width)/2, 5);
     }
     /* display the label next to the point */
     if (sp->screen[k].x <= sp->max.x/2) {
-      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
       ggobi_cairo_draw_layout (cr, layout,
   	 sp->screen[k].x+diamond_dim,
 	 sp->screen[k].y-rect.height-diamond_dim);
 
     } else {
-      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
       ggobi_cairo_draw_layout(cr, layout,
         sp->screen[k].x - rect.width - diamond_dim,
 	sp->screen[k].y - rect.height - diamond_dim);
@@ -575,7 +564,7 @@ splot_add_identify_point_cues(splotd *sp, cairo_t *cr,
 
     /* I've turned off this label for the barchart.  parallel coords
        and scatterplot matrix displays need some thought too. dfs */
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
     splot_add_point_label (nearest_p, k, true, sp, cr, gg);
   }
 }
@@ -708,13 +697,13 @@ splot_draw_border (splotd *sp, cairo_t *cr, ggobid *gg)
   gint height = gtk_widget_get_allocated_height (sp->da);
 
   if (sp != NULL && sp->da != NULL && gtk_widget_get_window (sp->da) != NULL) {
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-    gdk_gc_set_line_attributes (gg->plot_GC,
+    ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
+    ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg),
       3, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
-    ggobi_cairo_apply_gc (cr, gg->plot_GC);
+    ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
     ggobi_cairo_draw_rectangle (cr, false, 1, 1, width - 3, height - 3);
 
-    gdk_gc_set_line_attributes (gg->plot_GC,
+    ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg),
       0, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND);
   }
 }
@@ -732,12 +721,12 @@ splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
   icoords *loc1 = &gg->plot.loc1;
 
   if (!binned) {
-    gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
+    gdk_draw_pixmap (sp->pixmap1, GGOBI_PLOT_STYLE (gg), sp->pixmap0,
                      0, 0, 0, 0,
                      width, height);
   }
   else {
-    gdk_draw_pixmap (sp->pixmap1, gg->plot_GC, sp->pixmap0,
+    gdk_draw_pixmap (sp->pixmap1, GGOBI_PLOT_STYLE (gg), sp->pixmap0,
                       loc0->x, loc0->y,
                       loc0->x, loc0->y,
                       1 + loc1->x - loc0->x, 1 + loc1->y - loc0->y);
@@ -836,7 +825,7 @@ splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
 
   drawable = GGOBI_GDK_WINDOW_TO_DRAWABLE (window);
 
-  gdk_draw_pixmap (drawable, gg->plot_GC, pixmap,
+  gdk_draw_pixmap (drawable, GGOBI_PLOT_STYLE (gg), pixmap,
                    0, 0, 0, 0,
                    gtk_widget_get_allocated_width (sp->da),
                    gtk_widget_get_allocated_height (sp->da));

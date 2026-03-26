@@ -222,20 +222,20 @@ ggobi_drawable_begin (GdkDrawable *drawable)
 }
 
 static void
-ggobi_gc_apply (cairo_t *cr, GdkGC *gc)
+ggobi_gc_apply (cairo_t *cr, const GGobiDrawStyle *style)
 {
   GdkRGBA rgba;
   cairo_line_cap_t cap = CAIRO_LINE_CAP_ROUND;
   cairo_line_join_t join = CAIRO_LINE_JOIN_ROUND;
 
-  if (cr == NULL || gc == NULL)
+  if (cr == NULL || style == NULL)
     return;
 
-  ggobi_gdk_color_to_rgba (&gc->foreground, &rgba);
+  ggobi_gdk_color_to_rgba (&style->foreground, &rgba);
   gdk_cairo_set_source_rgba (cr, &rgba);
-  cairo_set_line_width (cr, MAX (1, gc->line_width));
+  cairo_set_line_width (cr, MAX (1, style->line_width));
 
-  switch (gc->cap_style) {
+  switch (style->cap_style) {
   case GDK_CAP_BUTT:
     cap = CAIRO_LINE_CAP_BUTT;
     break;
@@ -250,7 +250,7 @@ ggobi_gc_apply (cairo_t *cr, GdkGC *gc)
   }
   cairo_set_line_cap (cr, cap);
 
-  switch (gc->join_style) {
+  switch (style->join_style) {
   case GDK_JOIN_MITER:
     join = CAIRO_LINE_JOIN_MITER;
     break;
@@ -264,13 +264,13 @@ ggobi_gc_apply (cairo_t *cr, GdkGC *gc)
   }
   cairo_set_line_join (cr, join);
 
-  if (gc->line_style == GDK_LINE_ON_OFF_DASH && gc->ndashes > 0) {
+  if (style->line_style == GDK_LINE_ON_OFF_DASH && style->ndashes > 0) {
     double dashes[8];
     gint i;
 
-    for (i = 0; i < gc->ndashes; i++)
-      dashes[i] = MAX (1, (gint) gc->dashes[i]);
-    cairo_set_dash (cr, dashes, gc->ndashes, gc->dashes_offset);
+    for (i = 0; i < style->ndashes; i++)
+      dashes[i] = MAX (1, (gint) style->dashes[i]);
+    cairo_set_dash (cr, dashes, style->ndashes, style->dashes_offset);
   } else {
     cairo_set_dash (cr, NULL, 0, 0.0);
   }
@@ -321,6 +321,84 @@ void
 ggobi_cairo_apply_gc (cairo_t *cr, GdkGC *gc)
 {
   ggobi_gc_apply (cr, gc);
+}
+
+void
+ggobi_draw_style_init (GGobiDrawStyle *style)
+{
+  if (style == NULL)
+    return;
+
+  memset (style, 0, sizeof (*style));
+  style->background.red = 65535;
+  style->background.green = 65535;
+  style->background.blue = 65535;
+  style->line_width = 1;
+  style->line_style = GDK_LINE_SOLID;
+  style->cap_style = GDK_CAP_ROUND;
+  style->join_style = GDK_JOIN_ROUND;
+}
+
+void
+ggobi_draw_style_apply (cairo_t *cr, const GGobiDrawStyle *style)
+{
+  ggobi_gc_apply (cr, style);
+}
+
+void
+ggobi_draw_style_set_foreground (GGobiDrawStyle *style, const GdkColor *color)
+{
+  if (style && color)
+    style->foreground = *color;
+}
+
+void
+ggobi_draw_style_set_background (GGobiDrawStyle *style, const GdkColor *color)
+{
+  if (style && color)
+    style->background = *color;
+}
+
+void
+ggobi_draw_style_set_line_attributes (GGobiDrawStyle *style, gint line_width,
+                                      gint line_style, gint cap_style,
+                                      gint join_style)
+{
+  if (style == NULL)
+    return;
+
+  style->line_width = line_width;
+  style->line_style = line_style;
+  style->cap_style = cap_style;
+  style->join_style = join_style;
+}
+
+void
+ggobi_draw_style_set_dashes (GGobiDrawStyle *style, gint dash_offset,
+                             const gchar *dash_list, gint n)
+{
+  if (style == NULL)
+    return;
+
+  style->dashes_offset = dash_offset;
+  style->ndashes = MIN (n, (gint) G_N_ELEMENTS (style->dashes));
+  if (dash_list && style->ndashes > 0)
+    memcpy (style->dashes, dash_list, style->ndashes);
+}
+
+void
+ggobi_draw_style_get_values (const GGobiDrawStyle *style, GdkGCValues *values)
+{
+  if (style == NULL || values == NULL)
+    return;
+
+  memset (values, 0, sizeof (*values));
+  values->foreground = style->foreground;
+  values->background = style->background;
+  values->line_width = style->line_width;
+  values->line_style = style->line_style;
+  values->cap_style = style->cap_style;
+  values->join_style = style->join_style;
 }
 
 void
@@ -455,17 +533,7 @@ gdk_gc_new (GdkWindow *window)
   GdkGC *gc = g_new0 (GdkGC, 1);
 
   (void) window;
-  gc->foreground.red = 0;
-  gc->foreground.green = 0;
-  gc->foreground.blue = 0;
-  gc->background.red = 65535;
-  gc->background.green = 65535;
-  gc->background.blue = 65535;
-  gc->line_width = 1;
-  gc->line_style = GDK_LINE_SOLID;
-  gc->cap_style = GDK_CAP_ROUND;
-  gc->join_style = GDK_JOIN_ROUND;
-
+  ggobi_draw_style_init (gc);
   return gc;
 }
 
@@ -478,55 +546,33 @@ gdk_gc_destroy (GdkGC *gc)
 void
 gdk_gc_set_foreground (GdkGC *gc, const GdkColor *color)
 {
-  if (gc && color)
-    gc->foreground = *color;
+  ggobi_draw_style_set_foreground (gc, color);
 }
 
 void
 gdk_gc_set_background (GdkGC *gc, const GdkColor *color)
 {
-  if (gc && color)
-    gc->background = *color;
+  ggobi_draw_style_set_background (gc, color);
 }
 
 void
 gdk_gc_set_line_attributes (GdkGC *gc, gint line_width, gint line_style,
                             gint cap_style, gint join_style)
 {
-  if (gc == NULL)
-    return;
-
-  gc->line_width = line_width;
-  gc->line_style = line_style;
-  gc->cap_style = cap_style;
-  gc->join_style = join_style;
+  ggobi_draw_style_set_line_attributes (gc, line_width, line_style,
+                                        cap_style, join_style);
 }
 
 void
 gdk_gc_set_dashes (GdkGC *gc, gint dash_offset, const gchar *dash_list, gint n)
 {
-  if (gc == NULL)
-    return;
-
-  gc->dashes_offset = dash_offset;
-  gc->ndashes = MIN (n, (gint) G_N_ELEMENTS (gc->dashes));
-  if (dash_list && gc->ndashes > 0)
-    memcpy (gc->dashes, dash_list, gc->ndashes);
+  ggobi_draw_style_set_dashes (gc, dash_offset, dash_list, n);
 }
 
 void
 gdk_gc_get_values (GdkGC *gc, GdkGCValues *values)
 {
-  if (gc == NULL || values == NULL)
-    return;
-
-  memset (values, 0, sizeof (*values));
-  values->foreground = gc->foreground;
-  values->background = gc->background;
-  values->line_width = gc->line_width;
-  values->line_style = gc->line_style;
-  values->cap_style = gc->cap_style;
-  values->join_style = gc->join_style;
+  ggobi_draw_style_get_values (gc, values);
 }
 
 GdkColormap *

@@ -285,14 +285,14 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
   CHECK_GG (gg);
 
   /* clear the pixmap */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (gg->sphere_ui.scree_pixmap, gg->plot_GC,
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
+  gdk_draw_rectangle (gg->sphere_ui.scree_pixmap, GGOBI_PLOT_STYLE (gg),
                       true, 0, 0, wid, hgt);
 
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC,
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
+  gdk_draw_line (gg->sphere_ui.scree_pixmap, GGOBI_PLOT_STYLE (gg),
                  margin, hgt - margin, wid - margin, hgt - margin);
-  gdk_draw_line (gg->sphere_ui.scree_pixmap, gg->plot_GC,
+  gdk_draw_line (gg->sphere_ui.scree_pixmap, GGOBI_PLOT_STYLE (gg),
                  margin, hgt - margin, margin, margin);
 
   if (d != NULL) {
@@ -314,14 +314,14 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
       tickmk = g_strdup_printf ("%d", j + 1);
       layout = gtk_widget_create_pango_layout (gg->sphere_ui.scree_da, NULL);
       layout_text (layout, tickmk, &rect);
-      gdk_draw_layout (gg->sphere_ui.scree_pixmap, gg->plot_GC, xpos,
+      gdk_draw_layout (gg->sphere_ui.scree_pixmap, GGOBI_PLOT_STYLE (gg), xpos,
                        hgt - margin / 2 - 0.75 * rect.height, layout);
       g_object_unref (G_OBJECT (layout));
       g_free (tickmk);
 
       if (j > 0)
         gdk_draw_line (gg->sphere_ui.scree_pixmap,
-                       gg->plot_GC, xstrt, ystrt, xpos, ypos);
+                       GGOBI_PLOT_STYLE (gg), xstrt, ystrt, xpos, ypos);
 
       xstrt = xpos;
       ystrt = ypos;
@@ -330,7 +330,7 @@ scree_expose_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
     g_free ((gpointer) evals);
   }
 
-  gdk_draw_pixmap (drawable, gg->plot_GC, gg->sphere_ui.scree_pixmap,
+  gdk_draw_pixmap (drawable, GGOBI_PLOT_STYLE (gg), gg->sphere_ui.scree_pixmap,
                    0, 0, 0, 0, wid, hgt);
   return false;
 }

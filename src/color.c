@@ -270,73 +270,17 @@ special_colors_init (ggobid * gg)
 }
 
 void
-init_plot_GC (gpointer w, ggobid * gg)
+init_plot_style (ggobid * gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
+  GGobiDrawStyle *plot_style = GGOBI_PLOT_STYLE (gg);
 
-  gg->plot_GC = gdk_gc_new ((GdkWindow *) w);
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  gdk_gc_set_background (gg->plot_GC, &scheme->rgb_bg);
+  ggobi_draw_style_set_foreground (plot_style, &scheme->rgb_accent);
+  ggobi_draw_style_set_background (plot_style, &scheme->rgb_bg);
   /* line_width, GdkLineStyle, GdkCapStyle, GdkJoinStyle */
-  gdk_gc_set_line_attributes (gg->plot_GC,
-                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-}
-
-void
-init_var_GCs (GtkWidget * w, ggobid * gg)
-{
-  GdkWindow *window = gtk_widget_get_window (w);
-  GtkStyle *style = gtk_widget_get_style (w);
-  GdkColor white, black, bg, *bblack;
-
-  gdk_color_white (gdk_colormap_get_system (), &white);
-  gdk_color_black (gdk_colormap_get_system (), &black);
-
-/*
-  if(!sessionOptions->info->bgColor) {
-    gdk_color_black (gdk_colormap_get_system (), &black);
-    bblack = &black;
-  } else
-    bblack = sessionOptions->info->bgColor;
-*/
-  gdk_color_black (gdk_colormap_get_system (), &black);
-  bblack = &black;
-
-/*
- * the unselected variable GCs: thin lines
-*/
-  gg->unselvarbg_GC = gdk_gc_new (window);
-  bg = style->bg[GTK_STATE_NORMAL];
-  gdk_gc_set_foreground (gg->unselvarbg_GC, &bg);
-
-  gg->unselvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes (gg->unselvarfg_GC,
-                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (gg->unselvarfg_GC, bblack);
-
-
-/*
- * the selected variable GC: thick lines
-*/
-  gg->selvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes (gg->selvarfg_GC,
-                              2, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (gg->selvarfg_GC, &black);
-
-  gg->selvarbg_GC = gdk_gc_new (window);
-  gdk_gc_set_foreground (gg->selvarbg_GC, &white);
-
-/*
- * the manip variable GCs: thin purple lines
-*/
-  gg->manipvarfg_GC = gdk_gc_new (window);
-  gdk_gc_set_line_attributes (gg->manipvarfg_GC,
-                              0, GDK_LINE_SOLID, GDK_CAP_ROUND,
-                              GDK_JOIN_ROUND);
-  gdk_gc_set_foreground (gg->manipvarfg_GC, &gg->vcirc_manip_color);
+  ggobi_draw_style_set_line_attributes (plot_style,
+                                        0, GDK_LINE_SOLID, GDK_CAP_ROUND,
+                                        GDK_JOIN_ROUND);
 }
 
 gushort  /*-- returns the maximum color id --*/

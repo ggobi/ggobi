@@ -671,23 +671,23 @@ barchart_redraw (splotd * rawsp, GGobiData * d, ggobid * gg, gboolean binned)
   barchart_recalc_group_counts (sp, d, gg);
 
 /* dfs: if there are hiddens, draw the entire rectangle in the shadow color */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
   for (i = 0; i < sp->bar->nbins; i++) {
     bin = &sp->bar->bins[i];
     if (bin->nhidden) {
-      gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
+      gdk_draw_rectangle (rawsp->pixmap0, GGOBI_PLOT_STYLE (gg), TRUE,
                           bin->rect.x, bin->rect.y, bin->rect.width,
                           bin->rect.height + 1);
     }
   }
 /* */
   for (j = 0; j < sp->bar->ncolors; j++) {
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
+    ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[j]);
 
     for (i = 0; i < sp->bar->nbins; i++) {
       bin = &sp->bar->cbins[i][j];
       if (bin->count > 0) {
-        gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
+        gdk_draw_rectangle (rawsp->pixmap0, GGOBI_PLOT_STYLE (gg), TRUE,
                             bin->rect.x, bin->rect.y, bin->rect.width,
                             bin->rect.height);
       }
@@ -699,16 +699,16 @@ barchart_redraw (splotd * rawsp, GGobiData * d, ggobid * gg, gboolean binned)
     /*  start with the hiddens */
     if (sp->bar->high_bin->nhidden) {
       bin = sp->bar->high_bin;
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
-      gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
+      gdk_draw_rectangle (rawsp->pixmap0, GGOBI_PLOT_STYLE (gg), TRUE,
                           bin->rect.x, bin->rect.y, bin->rect.width,
                           bin->rect.height + 1);
     }
     for (j = 0; j < sp->bar->ncolors; j++) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[j]);
       bin = &sp->bar->col_high_bin[j];
       if (bin->count > 0)
-        gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
+        gdk_draw_rectangle (rawsp->pixmap0, GGOBI_PLOT_STYLE (gg), TRUE,
                             bin->rect.x, bin->rect.y, bin->rect.width,
                             bin->rect.height);
     }
@@ -717,31 +717,31 @@ barchart_redraw (splotd * rawsp, GGobiData * d, ggobid * gg, gboolean binned)
     /*  start with the hiddens */
     if (sp->bar->low_bin->nhidden) {
       bin = sp->bar->low_bin;
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_hidden);
-      gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
+      gdk_draw_rectangle (rawsp->pixmap0, GGOBI_PLOT_STYLE (gg), TRUE,
                           bin->rect.x, bin->rect.y, bin->rect.width,
                           bin->rect.height + 1);
     }
     for (j = 0; j < sp->bar->ncolors; j++) {
-      gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[j]);
+      ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[j]);
       bin = &sp->bar->col_low_bin[j];
       if (bin->count > 0)
-        gdk_draw_rectangle (rawsp->pixmap0, gg->plot_GC, TRUE,
+        gdk_draw_rectangle (rawsp->pixmap0, GGOBI_PLOT_STYLE (gg), TRUE,
                             bin->rect.x, bin->rect.y, bin->rect.width,
                             bin->rect.height);
     }
   }
 
 /* mark empty bins with a small circle */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
   for (i = 0; i < sp->bar->nbins; i++) {
     bin = &sp->bar->bins[i];
     if (bin->count == 0) {
       radius = bin->rect.height / 4;
-      gdk_draw_line (rawsp->pixmap0, gg->plot_GC,
+      gdk_draw_line (rawsp->pixmap0, GGOBI_PLOT_STYLE (gg),
                      bin->rect.x, bin->rect.y,
                      bin->rect.x, bin->rect.y + bin->rect.height);
-      gdk_draw_arc (rawsp->pixmap0, gg->plot_GC, FALSE,
+      gdk_draw_arc (rawsp->pixmap0, GGOBI_PLOT_STYLE (gg), FALSE,
                     bin->rect.x - radius / 2,
                     bin->rect.y + bin->rect.height / 2 - radius / 2,
                     radius, radius, 0, 64 * 360);
@@ -1487,21 +1487,21 @@ button_draw_with_shadows (GdkPoint *region, cairo_t *cr,
 {
   colorschemed *scheme = gg->activeColorScheme;
 
-  /*gdk_gc_set_foreground(gg->plot_GC, &gg->wvis.gray3); */
-  gdk_gc_set_foreground (gg->plot_GC, &gg->lightgray);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  /*gdk_gc_set_foreground(GGOBI_PLOT_STYLE (gg), &gg->wvis.gray3); */
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &gg->lightgray);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
   ggobi_cairo_draw_polygon (cr, TRUE, region, 3);
 
 /* dark shadows */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
   ggobi_cairo_draw_polygon (cr, FALSE, region, 3);
   ggobi_cairo_draw_line (cr, region[0].x, region[2].y,
                          region[2].x, region[2].y);
 
 /* light shadows */
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
   ggobi_cairo_draw_line (cr, region[0].x, region[0].y,
                          region[1].x, region[1].y);
   ggobi_cairo_draw_line (cr, region[1].x, region[1].y,

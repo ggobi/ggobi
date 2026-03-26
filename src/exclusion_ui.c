@@ -87,13 +87,13 @@ cluster_symbol_draw_cb (GtkWidget * w, cairo_t *cr, gpointer cbd)
   colorschemed *scheme = gg->activeColorScheme;
 
   /*-- fill in the background color --*/
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
 
   /*-- draw the appropriate symbol in the appropriate color --*/
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[d->clusv[k].color]);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[d->clusv[k].color]);
   g.type = d->clusv[k].glyphtype;
   g.size = d->clusv[k].glyphsize;
 

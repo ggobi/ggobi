@@ -65,7 +65,7 @@ void ggobi_gtk_tooltips_disable (GtkTooltips *tips);
 #define GTK_UPDATE_CONTINUOUS 0
 #define GTK_UPDATE_DISCONTINUOUS 1
 
-typedef struct _GGobiGdkGC {
+typedef struct _GGobiDrawStyle {
   GdkColor foreground;
   GdkColor background;
   gint line_width;
@@ -75,7 +75,9 @@ typedef struct _GGobiGdkGC {
   gint dashes_offset;
   gchar dashes[8];
   gint ndashes;
-} GdkGC;
+} GGobiDrawStyle;
+
+typedef GGobiDrawStyle GdkGC;
 
 #ifndef GDK_LINE_SOLID
 #define GDK_LINE_SOLID 0
@@ -139,6 +141,19 @@ typedef GdkDrawable GdkPixmap;
 typedef gpointer GdkColormap;
 
 cairo_t *ggobi_gdk_cairo_create (gpointer target);
+void ggobi_draw_style_init (GGobiDrawStyle *style);
+void ggobi_draw_style_apply (cairo_t *cr, const GGobiDrawStyle *style);
+void ggobi_draw_style_set_foreground (GGobiDrawStyle *style,
+                                      const GdkColor *color);
+void ggobi_draw_style_set_background (GGobiDrawStyle *style,
+                                      const GdkColor *color);
+void ggobi_draw_style_set_line_attributes (GGobiDrawStyle *style,
+                                           gint line_width, gint line_style,
+                                           gint cap_style, gint join_style);
+void ggobi_draw_style_set_dashes (GGobiDrawStyle *style, gint dash_offset,
+                                  const gchar *dash_list, gint n);
+void ggobi_draw_style_get_values (const GGobiDrawStyle *style,
+                                  GdkGCValues *values);
 void ggobi_cairo_apply_gc (cairo_t *cr, GdkGC *gc);
 void ggobi_cairo_set_source_gdk_color (cairo_t *cr, const GdkColor *color);
 void ggobi_cairo_draw_rectangle (cairo_t *cr, gboolean filled,

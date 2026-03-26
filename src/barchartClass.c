@@ -531,8 +531,8 @@ barchart_identify_cues_draw (gboolean nearest_p, gint k, splotd * rawsp,
   gint j;
 
   nbins = sp->bar->nbins;
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
 
   if (sp->bar->low_pts_missing && sp->bar->bar_hit[0]) {
     string = g_strdup_printf ("%ld point%s < %.2f", sp->bar->low_bin->count,

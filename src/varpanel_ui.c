@@ -540,7 +540,6 @@ varpanel_make (GtkWidget * parent, ggobid * gg)
 {
 
   gg->varpanel_ui.layoutByRow = true;  /*-- for the circles --*/
-  gg->selvarfg_GC = NULL;
 
   gg->varpanel_ui.notebook = gtk_notebook_new ();
   gtk_notebook_set_show_border (GTK_NOTEBOOK (gg->varpanel_ui.notebook),

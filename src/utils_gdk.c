@@ -53,7 +53,7 @@ draw_glyph (cairo_t *cr, glyphd *gl, icoords *xypos, gint jpos,
 {
   gushort size = gl->size + 1;
 
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
 
   switch (gl->type) {
 
@@ -186,16 +186,14 @@ draw_3drectangle (GtkWidget *widget, cairo_t *cr,
   gint w = width / 2;
   gint h = height / 2;
 
-  if (gg->rectangle_GC == NULL)
-    gg->rectangle_GC = gdk_gc_new (gtk_widget_get_window (widget));
+  (void) widget;
 
   /*-- draw the rectangles --*/
-  gdk_gc_set_foreground (gg->rectangle_GC, &gg->mediumgray);
-  ggobi_cairo_apply_gc (cr, gg->rectangle_GC);
+  ggobi_cairo_set_source_gdk_color (cr, &gg->mediumgray);
   ggobi_cairo_draw_rectangle (cr, TRUE, x - w, y - h, width, height);
 
   /*-- draw the dark shadows --*/
-  gdk_gc_set_foreground (gg->rectangle_GC, &gg->darkgray);
+  ggobi_cairo_set_source_gdk_color (cr, &gg->darkgray);
   points[0].x = x - w;
   points[0].y = y + h;
   points[1].x = x + w;
@@ -212,12 +210,11 @@ draw_3drectangle (GtkWidget *widget, cairo_t *cr,
 
   points[6].x = x - w;
   points[6].y = y + h;
-  ggobi_cairo_apply_gc (cr, gg->rectangle_GC);
   ggobi_cairo_draw_polygon (cr, TRUE, points, 7);
   ggobi_cairo_draw_line (cr, x - 1, y - (h - 1), x - 1, y + (h - 2));
 
   /*-- draw the light shadows --*/
-  gdk_gc_set_foreground (gg->rectangle_GC, &gg->lightgray);
+  ggobi_cairo_set_source_gdk_color (cr, &gg->lightgray);
   points[0].x = x - w;   /*-- lower left --*/
   points[0].y = y + (h - 1);
   points[1].x = x - w;   /*-- upper left --*/
@@ -234,7 +231,6 @@ draw_3drectangle (GtkWidget *widget, cairo_t *cr,
 
   points[6].x = points[0].x;
   points[6].y = points[0].y;
-  ggobi_cairo_apply_gc (cr, gg->rectangle_GC);
   ggobi_cairo_draw_polygon (cr, TRUE, points, 7);
   ggobi_cairo_draw_line (cr, x, y - (h - 1), x, y + (h - 2));
 }

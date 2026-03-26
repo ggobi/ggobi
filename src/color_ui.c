@@ -194,14 +194,11 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
   margin = gg->color_ui.margin;
   spacing = gg->color_ui.spacing;
 
-  if (gg->plot_GC == NULL)
-    init_plot_GC (window, gg);
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[gg->color_id]);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[gg->color_id]);
 
   /*
    * The factor of three is dictated by the sizing of circles
@@ -209,7 +206,7 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
    */
   pos.y = margin + 3 / 2;
   pos.x = spacing / 2;
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
   cairo_rectangle (cr, pos.x, pos.y, 1, 1);
   cairo_fill (cr);
 
@@ -335,11 +332,8 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
   margin = gg->color_ui.margin;
   spacing = gg->color_ui.spacing;
 
-  if (gg->plot_GC == NULL)
-    init_plot_GC (window, gg);
-
-  gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
   ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb[gg->color_id]);
@@ -477,9 +471,6 @@ redraw_fg (GtkWidget * w, gint k, ggobid * gg)
     return;
 
   cr = gdk_cairo_create (window);
-  if (gg->plot_GC == NULL)
-    init_plot_GC (window, gg);
-
   ggobi_cairo_set_source_gdk_color (cr, &gg->activeColorScheme->rgb[k]);
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
@@ -524,9 +515,6 @@ redraw_bg (GtkWidget * w, ggobid * gg)
     return;
 
   cr = gdk_cairo_create (window);
-  if (gg->plot_GC == NULL)
-    init_plot_GC (window, gg);
-
   ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb_bg);
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
@@ -554,9 +542,6 @@ redraw_accent (GtkWidget * w, ggobid * gg)
     return;
 
   cr = gdk_cairo_create (window);
-  if (gg->plot_GC == NULL)
-    init_plot_GC (window, gg);
-
   ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb_accent);
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
@@ -584,9 +569,6 @@ redraw_hidden (GtkWidget * w, ggobid * gg)
     return;
 
   cr = gdk_cairo_create (window);
-  if (gg->plot_GC == NULL)
-    init_plot_GC (window, gg);
-
   ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb_hidden);
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);

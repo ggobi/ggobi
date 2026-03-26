@@ -643,9 +643,6 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
 
   cpanel = &display->cpanel;
 
-  if (gg->selvarfg_GC == NULL)
-    init_var_GCs (da, gg);
-
   if ((len = g_slist_length (d->vcirc_ui.da_pix)) < d->ncols) {
     for (k = len; k < d->ncols; k++) {
       d->vcirc_ui.da_pix = g_slist_append (d->vcirc_ui.da_pix,
@@ -739,7 +736,7 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     varcircle_draw (j, d, gg);
   }
   else {
-    gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (da)), gg->unselvarfg_GC,
+    gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (da)), NULL,
                      da_pix, 0, 0, 0, 0,
                      VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
   }

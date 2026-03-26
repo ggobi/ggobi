@@ -54,7 +54,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
                                        pango_context_get_font_description
                                        (ctx), NULL);
   if (sp != NULL && sp->da != NULL && gtk_widget_get_window (sp->da) != NULL) {
-    gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_accent);
+    ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
     switch (proj) {
     case TOUR1D:
         /*-- use string height to place the labels --*/
@@ -63,7 +63,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
                                  pango_font_metrics_get_descent (metrics));
 
         /*-- draw vertical lines to mark the min and max positions --*/
-      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
       ggobi_cairo_draw_line (cr,
                              dawidth / 4, daheight - textheight * d->ncols - 10,
                              dawidth / 4, daheight);
@@ -71,7 +71,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
                              3 * dawidth / 4, daheight - textheight * d->ncols - 10,
                              3 * dawidth / 4, daheight);
 
-      gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
+      ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 2, GDK_LINE_SOLID,
                                   GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
       for (k = 0; k < dsp->t1d.nsubset; k++) {
@@ -99,7 +99,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
                                     dsp->t1d.F.vals[0][j],
                                     vt->lim.max - vt->lim.min);
           layout_text (layout, varlab, &rect);
-          ggobi_cairo_apply_gc (cr, gg->plot_GC);
+          ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
           ggobi_cairo_draw_layout (cr, layout,
                                    (ix >
                                     dawidth / 2) ? 3 * dawidth / 4 +
@@ -108,7 +108,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
           g_free (varlab);
         }
       }
-      gdk_gc_set_line_attributes (gg->plot_GC, 1, GDK_LINE_SOLID,
+      ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 1, GDK_LINE_SOLID,
                                   GDK_CAP_ROUND, GDK_JOIN_ROUND);
       break;
 
@@ -126,7 +126,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
         iy = daheight - axindent - (daheight / 8 +
                                     (gint) (dsp->t2d3.F.vals[1][j] *
                                             (gfloat) daheight / 8));
-        gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
+        ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 2, GDK_LINE_SOLID,
                                     GDK_CAP_ROUND, GDK_JOIN_ROUND);
         if (j == dsp->t2d_manip_var)
           ggobi_cairo_set_source_gdk_color (cr, &gg->vcirc_manip_color);
@@ -164,7 +164,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
           //else
           //  iy += (rect.height);
 
-          ggobi_cairo_apply_gc (cr, gg->plot_GC);
+          ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
           ggobi_cairo_draw_layout (cr, layout, ix, iy);
           g_free (varlab);
         }
@@ -181,12 +181,12 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
 
           ix = dawidth - rect.width - axindent;
           iy = daheight - (dsp->t2d3.nsubset - k) * textheight2 - axindent;
-          ggobi_cairo_apply_gc (cr, gg->plot_GC);
+          ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
           ggobi_cairo_draw_layout (cr, layout, ix, iy);
           g_free (varval);
         }
       }
-      gdk_gc_set_line_attributes (gg->plot_GC, 0, GDK_LINE_SOLID,
+      ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 0, GDK_LINE_SOLID,
                                   GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
       break;
@@ -206,7 +206,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
         iy = daheight - axindent - (daheight / 8 +
                                     (gint) (dsp->t2d.F.vals[1][j] *
                                             (gfloat) daheight / 8));
-        gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
+        ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 2, GDK_LINE_SOLID,
                                     GDK_CAP_ROUND, GDK_JOIN_ROUND);
         if (j == dsp->t2d_manip_var)
           ggobi_cairo_set_source_gdk_color (cr, &gg->vcirc_manip_color);
@@ -245,7 +245,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
           //else
           //  iy += (rect.height);
 
-          ggobi_cairo_apply_gc (cr, gg->plot_GC);
+          ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
           ggobi_cairo_draw_layout (cr, layout, ix, iy);
           g_free (varlab);
         }
@@ -264,13 +264,13 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
 
           ix = dawidth - rect.width - axindent;
           iy = daheight - (dsp->t2d.nsubset - k) * textheight2 - axindent;
-          ggobi_cairo_apply_gc (cr, gg->plot_GC);
+          ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
           ggobi_cairo_draw_layout (cr, layout, ix, iy);
           g_free (varval);
         }
 
       }
-      gdk_gc_set_line_attributes (gg->plot_GC, 0, GDK_LINE_SOLID,
+      ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 0, GDK_LINE_SOLID,
                                   GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
       break;
@@ -285,7 +285,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
                                  pango_font_metrics_get_descent (metrics));
 
         /*-- draw vertical lines to mark the min and max positions --*/
-      ggobi_cairo_apply_gc (cr, gg->plot_GC);
+      ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
       ggobi_cairo_draw_line (cr,
                              dawidth / 4, daheight - textheight * nc - 10,
                              dawidth / 4, daheight);
@@ -299,7 +299,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
       ggobi_cairo_draw_line (cr,
                              0, 3 * daheight / 4, textheight * nc, 3 * daheight / 4);
 
-      gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
+      ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 2, GDK_LINE_SOLID,
                                   GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
       k = 0;
@@ -331,11 +331,11 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
         cairo_move_to (cr, dawidth / 2, iy + rect.height / 2);
         cairo_line_to (cr, ix, iy + rect.height / 2);
         cairo_stroke (cr);
-        gdk_gc_set_line_attributes (gg->plot_GC, 1, GDK_LINE_SOLID,
+        ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 1, GDK_LINE_SOLID,
                                     GDK_CAP_ROUND, GDK_JOIN_ROUND);
 
         layout_text (layout, varlab, &rect);
-        ggobi_cairo_apply_gc (cr, gg->plot_GC);
+        ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
         ggobi_cairo_draw_layout (cr, layout,
                                  dawidth / 2 + dawidth / 4 + 10, iy);
 
@@ -344,7 +344,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
         iy = daheight - (daheight / 2 +
                          (gint) (dsp->tcorr2.F.vals[0][j] *
                                  (gfloat) daheight / 4));
-        gdk_gc_set_line_attributes (gg->plot_GC, 2, GDK_LINE_SOLID,
+        ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 2, GDK_LINE_SOLID,
                                     GDK_CAP_ROUND, GDK_JOIN_ROUND);
         if (j == dsp->tc2_manip_var)
           ggobi_cairo_set_source_gdk_color (cr, &gg->vcirc_manip_color);
@@ -358,7 +358,7 @@ splot_draw_tour_axes (splotd *sp, cairo_t *cr, ggobid *gg)
           /*-- can't add vertical variable labels --*/
         k++;
       }
-      gdk_gc_set_line_attributes (gg->plot_GC, 0, GDK_LINE_SOLID,
+      ggobi_draw_style_set_line_attributes (GGOBI_PLOT_STYLE (gg), 0, GDK_LINE_SOLID,
                                   GDK_CAP_ROUND, GDK_JOIN_ROUND);
       break;
     }

@@ -218,7 +218,7 @@ ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
     }*/
 
   gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda)),
-                   gg->plot_GC, dsp->t1d_pp_pixmap,
+                   GGOBI_PLOT_STYLE (gg), dsp->t1d_pp_pixmap,
                    0, 0, 0, 0,
                    wid, hgt);
 

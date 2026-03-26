@@ -107,7 +107,7 @@ tsAddPlotLabels(splotd *sp, cairo_t *cr, ggobid *gg)
 void
 tsWithinDrawBinned(splotd *sp, gint m, cairo_t *cr)
 {
-  ggobi_cairo_apply_gc (cr, GGobiFromSPlot (sp)->plot_GC);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (GGobiFromSPlot (sp)));
   ggobi_cairo_draw_line (cr,
     sp->whiskers[m].x1, sp->whiskers[m].y1,
     sp->whiskers[m].x2, sp->whiskers[m].y2);
@@ -121,7 +121,7 @@ tsShowWhiskers(splotd *sp, gint m, cairo_t *cr)
      /*-- there are n-1 whiskers --*/
   if (dpy->options.whiskers_show_p && m < dpy->d->nrows_in_plot-1) 
      {
-       ggobi_cairo_apply_gc (cr, GGobiFromSPlot (sp)->plot_GC);
+       ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (GGobiFromSPlot (sp)));
        ggobi_cairo_draw_line (cr,
          sp->whiskers[m].x1, sp->whiskers[m].y1,
          sp->whiskers[m].x2, sp->whiskers[m].y2);

@@ -134,12 +134,10 @@ da_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
     gg->svis.scheme : gg->activeColorScheme;
   GGobiData *d = NULL;
   GdkPixmap *pix = gg->svis.pix;
+  cairo_t *pix_cr;
 
   if (pix == NULL)
     return false;
-
-  if (gg->svis.GC == NULL)
-    gg->svis.GC = gdk_gc_new (gtk_widget_get_window (w));
 
   hgt = height / (scheme->n - 1);
 
@@ -151,19 +149,22 @@ da_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
   }
 
   /*-- clear the pixmap --*/
-  gdk_gc_set_foreground (gg->svis.GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (pix, gg->svis.GC, TRUE,
-                      0, 0, width, gtk_widget_get_allocated_height (w));
+  pix_cr = cairo_create (pix->surface);
+  ggobi_cairo_set_source_gdk_color (pix_cr, &scheme->rgb_bg);
+  cairo_rectangle (pix_cr, 0, 0, width, gtk_widget_get_allocated_height (w));
+  cairo_fill (pix_cr);
 
 
   /*-- draw the color bars --*/
   x0 = xmargin;
   for (k = 0; k < scheme->n; k++) {
     x1 = xmargin + gg->svis.pct[k] * (width - 2 * xmargin);
-    gdk_gc_set_foreground (gg->svis.GC, &scheme->rgb[k]);
-    gdk_draw_rectangle (pix, gg->svis.GC, TRUE, x0, ymargin, x1 - x0, height);
+    ggobi_cairo_set_source_gdk_color (pix_cr, &scheme->rgb[k]);
+    cairo_rectangle (pix_cr, x0, ymargin, x1 - x0, height);
+    cairo_fill (pix_cr);
     x0 = x1;
   }
+  cairo_destroy (pix_cr);
 
   if (pix->surface != NULL) {
     cairo_set_source_surface (cr, pix->surface, 0, 0);

@@ -318,23 +318,20 @@ draw_glyphs (splotd *sp, GdkDrawable *drawable,
   arcd *filled_arcs,   gint nc_filled,
   ggobid *gg)
 {
-  if (gg->plot_GC == NULL)
-    init_plot_GC (drawable, gg);
-
   if (np)
-    gdk_draw_points (drawable, gg->plot_GC, points, np);
+    gdk_draw_points (drawable, GGOBI_PLOT_STYLE (gg), points, np);
   if (ns)
-    gdk_draw_segments (drawable, gg->plot_GC, segs, ns);
+    gdk_draw_segments (drawable, GGOBI_PLOT_STYLE (gg), segs, ns);
 
   if (nr_open)
-    win32_draw_rectangles (drawable, gg->plot_GC, OPEN, open_rects, nr_open);
+    win32_draw_rectangles (drawable, GGOBI_PLOT_STYLE (gg), OPEN, open_rects, nr_open);
   if (nr_filled)
-    win32_draw_rectangles (drawable, gg->plot_GC, FILL, filled_rects, nr_filled);
+    win32_draw_rectangles (drawable, GGOBI_PLOT_STYLE (gg), FILL, filled_rects, nr_filled);
 
   if (nc_open)
-    win32_draw_arcs (drawable, gg->plot_GC, OPEN, open_arcs, nc_open);
+    win32_draw_arcs (drawable, GGOBI_PLOT_STYLE (gg), OPEN, open_arcs, nc_open);
   if (nc_filled)
-    win32_draw_arcs (drawable, gg->plot_GC, FILL, filled_arcs, nc_filled);
+    win32_draw_arcs (drawable, GGOBI_PLOT_STYLE (gg), FILL, filled_arcs, nc_filled);
 }
 
 void
@@ -386,10 +383,10 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
     }
   }
   if (nwhisker_segs)
-    gdk_draw_segments (sp->pixmap0, gg->plot_GC,
+    gdk_draw_segments (sp->pixmap0, GGOBI_PLOT_STYLE (gg),
       sp->win32.whisker_segs, nwhisker_segs);
   if (nash_segs) {
-    gdk_draw_segments (sp->pixmap0, gg->plot_GC, sp->win32.ash_segs, nash_segs);
+    gdk_draw_segments (sp->pixmap0, GGOBI_PLOT_STYLE (gg), sp->win32.ash_segs, nash_segs);
   }
   draw_glyphs (sp, sp->pixmap0,
     sp->win32.points, npt,           sp->win32.segs, nseg,
@@ -437,7 +434,7 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
       }
     }
   }
-  gdk_draw_segments (sp->pixmap0, gg->plot_GC,
+  gdk_draw_segments (sp->pixmap0, GGOBI_PLOT_STYLE (gg),
     sp->win32.whisker_segs, nwhisker_segs);
   draw_glyphs (sp, sp->pixmap0,
     sp->win32.points, npt,           sp->win32.segs, nseg,

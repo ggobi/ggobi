@@ -55,6 +55,8 @@ typedef struct {
   void *user_data;
 } IdentifyHandler;
 
+#define GGOBI_PLOT_STYLE(gg) (&((gg)->plot_style))
+
 
 /*
  This is a typedef that is used for registering a routine for handling
@@ -199,7 +201,6 @@ struct _ggobid {
 /*--------------------------------------------------------------------*/
 /*                         color                                      */
 /*--------------------------------------------------------------------*/
-  GdkGC *rectangle_GC;
   GdkColor mediumgray, lightgray, darkgray;  /* for 3d rectangles */
   GdkColor vcirc_freeze_color, vcirc_manip_color; /* for variable circles */
   gshort color_id, color_0;     /* 0:ncolors-1 */
@@ -218,10 +219,7 @@ struct _ggobid {
 
 /*---------------------- graphics contexts -----------------------------*/
 
-  GdkGC *plot_GC;
-  GdkGC *selvarfg_GC, *selvarbg_GC;     /* white background, thick lines */
-  GdkGC *unselvarfg_GC, *unselvarbg_GC; /* grey background, thin lines */
-  GdkGC *manipvarfg_GC;         /* white background, thin purple line */
+  GGobiDrawStyle plot_style;
 
 /*--------------------------- jittering --------------------------------*/
 
@@ -365,7 +363,6 @@ struct _ggobid {
     GtkWidget *window, *entry_preview, *entry_applied, *da;
     GdkPixmap *pix;
     colorschemed *scheme; /*-- current color scheme --*/
-    GdkGC *GC;
     gfloat *pct;
     gint npct;
   } svis;

@@ -18,5 +18,4 @@ svis_init (ggobid * gg)
   gg->svis.npct = 0;
   gg->svis.pix = NULL;
   gg->svis.scheme = NULL;
-  gg->svis.GC = NULL;
 }
