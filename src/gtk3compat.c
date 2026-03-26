@@ -730,6 +730,42 @@ ggobi_gtk_image_new_from_pixmap (GdkPixmap *pixmap, gpointer mask)
   return gtk_image_new_from_surface (pixmap->surface);
 }
 
+gboolean
+ggobi_pointer_grab (GtkWidget *widget, GdkEvent *event, GdkEventMask event_mask)
+{
+  GdkWindow *window;
+  GdkSeat *seat;
+
+  (void) event_mask;
+
+  if (widget == NULL)
+    return FALSE;
+
+  window = gtk_widget_get_window (widget);
+  if (window == NULL)
+    return FALSE;
+
+  seat = gdk_display_get_default_seat (gtk_widget_get_display (widget));
+  if (seat == NULL)
+    return FALSE;
+
+  return gdk_seat_grab (seat, window, GDK_SEAT_CAPABILITY_POINTER,
+                        FALSE, NULL, event, NULL, NULL) == GDK_GRAB_SUCCESS;
+}
+
+void
+ggobi_pointer_ungrab (GtkWidget *widget)
+{
+  GdkSeat *seat;
+
+  if (widget == NULL)
+    return;
+
+  seat = gdk_display_get_default_seat (gtk_widget_get_display (widget));
+  if (seat != NULL)
+    gdk_seat_ungrab (seat);
+}
+
 GtkWidget *
 ggobi_gtk_hruler_new (void)
 {

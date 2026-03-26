@@ -325,16 +325,15 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
 {
   gboolean retval = true;
   ggobid *gg = GGobiFromSPlot (sp);
-  GdkModifierType state;
   displayd *dsp = sp->displayptr;
   cpaneld *cpanel = &dsp->cpanel;
 
   gg->buttondown = 0;
 
-  gdk_window_get_pointer (gtk_widget_get_window (w),
-                          &sp->mousepos.x, &sp->mousepos.y, &state);
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
-  gdk_pointer_ungrab (event->time);
+  ggobi_pointer_ungrab (w);
   disconnect_motion_signal (sp);
 
   if (!cpanel->scale.updateAlways_p) {

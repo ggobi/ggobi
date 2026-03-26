@@ -479,17 +479,12 @@ ruler_motion_cb (GtkWidget * ruler, GdkEventMotion * event, GtkWidget * da)
   gdouble position;
   gdouble lower, upper;
 
-  gint x, y;
-  GdkModifierType state;
-
-  gdk_window_get_pointer (gtk_widget_get_window (da), &x, &y, &state);
-
   if (ggobi_gtk_ruler_is_horizontal (ruler)) {
-    pos = x;
+    pos = (gint) event->x;
     max = gtk_widget_get_allocated_width (da);
   }
   else {
-    pos = y;
+    pos = (gint) event->y;
     max = gtk_widget_get_allocated_height (da);
   }
 

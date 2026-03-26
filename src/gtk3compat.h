@@ -206,6 +206,9 @@ GdkPixmap *gdk_pixmap_colormap_create_from_xpm_d (gpointer drawable,
                                                   gpointer transparent_color,
                                                   gchar **data);
 GtkWidget *ggobi_gtk_image_new_from_pixmap (GdkPixmap *pixmap, gpointer mask);
+gboolean ggobi_pointer_grab (GtkWidget *widget, GdkEvent *event,
+                             GdkEventMask event_mask);
+void ggobi_pointer_ungrab (GtkWidget *widget);
 
 GtkWidget *ggobi_gtk_hruler_new (void);
 GtkWidget *ggobi_gtk_vruler_new (void);

@@ -671,14 +671,13 @@ static gint
 button_release_cb (GtkWidget *w, GdkEventButton *event, splotd *sp)
 {
   gboolean retval = true;
-  GdkModifierType state;
 
-  gdk_window_get_pointer (gtk_widget_get_window (w),
-    &sp->mousepos.x, &sp->mousepos.y, &state);
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   tour2d_manip_end(sp);
 
-  gdk_pointer_ungrab (event->time);
+  ggobi_pointer_ungrab (w);
 
   return retval;
 }

@@ -463,7 +463,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
       for (i = 0; i < d->nrows; i++)
         g_free (rowids[i]);
       g_free (rowids);
-      gdk_pointer_ungrab (event->time);
+      ggobi_pointer_ungrab (w);
     }
     if (which_button == 1)
       record_add_defaults (d, e, display, gg);
@@ -473,7 +473,7 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   }
 
   /*-- Release the pointer so the button press can be detected --*/
-  gdk_pointer_ungrab (event->time);
+  ggobi_pointer_ungrab (w);
   return retval;
 }
 

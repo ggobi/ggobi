@@ -350,16 +350,14 @@ button_release_cb (GtkWidget * w, GdkEventButton * event, splotd * sp)
   cpaneld *cpanel = &display->cpanel;
   GGobiData *d = display->d;
   gboolean retval = true;
-  GdkModifierType state;
 
-  gdk_window_get_pointer (gtk_widget_get_window (w),
-                          &sp->mousepos.x, &sp->mousepos.y,
-                          &state);
+  sp->mousepos.x = (gint) event->x;
+  sp->mousepos.y = (gint) event->y;
 
   gg->buttondown = 0;
 
   disconnect_motion_signal (sp);
-  gdk_pointer_ungrab (event->time);  /*-- grabbed in mousepos_get_pressed --*/
+  ggobi_pointer_ungrab (w);  /*-- grabbed in mousepos_get_pressed --*/
 
   if (cpanel->br.mode == BR_PERSISTENT) {
     //rows_in_plot_set (d, gg);
