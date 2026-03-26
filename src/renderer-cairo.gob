@@ -1,6 +1,5 @@
-%a{ /* only use cairo when GTK+ 2.8.0 or higher installed */
+%a{
   #include <gtk/gtk.h>
-  #if GTK_CHECK_VERSION(2,8,0)
 %}
 %{
   #include <math.h>
@@ -270,5 +269,4 @@ class GGobi:Renderer:Cairo from GGobi:Renderer
   }
 }
 %a{
-  #endif
 %}

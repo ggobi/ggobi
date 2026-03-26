@@ -9,12 +9,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-
- /* only use cairo when GTK+ 2.8.0 or higher installed */
   #include <gtk/gtk.h>
-  #if GTK_CHECK_VERSION(2,8,0)
-
-
 
   #include "ggobi-renderer.h"
   #include <cairo/cairo.h>
@@ -79,11 +74,6 @@ void 	ggobi_renderer_cairo_set_cairo	(GGobiRendererCairo * self,
 #define GGOBI_RENDERER_CAIRO_PROP_CAIRO(arg)    	"cairo",(cairo_t * )(arg)
 #define GGOBI_RENDERER_CAIRO_GET_PROP_CAIRO(arg)	"cairo",(cairo_t * *)(arg)
 #endif /* __GNUC__ && !__STRICT_ANSI__ */
-
-
-
-  #endif
-
 
 #ifdef __cplusplus
 }

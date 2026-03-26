@@ -793,8 +793,4 @@ vartabled *vartable_element_get(gint i, GGobiData *d);
 
 gboolean parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_prev, ggobid *gg, displayd *display);
 
-#ifdef ENABLE_CAIRO
-cairo_t*   create_cairo_glitz(GdkDrawable *drawable);
-#endif
-
 #endif

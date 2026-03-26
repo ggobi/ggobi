@@ -281,8 +281,4 @@ typedef enum {
   PYTHON
   } ProgrammingLanguage;
 
-#if GTK_CHECK_VERSION(2,8,0) && defined CAIRO_HAS_GLITZ_SURFACE
-//#define ENABLE_CAIRO 1
-#endif
-
 #endif /* End of conditional definition. */

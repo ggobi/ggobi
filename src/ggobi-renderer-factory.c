@@ -23,11 +23,7 @@
 #line 4 "renderer-factory.gob"
 
   #include <gtk/gtk.h>
-  #if GTK_CHECK_VERSION(2,8,0)
   #include "ggobi-renderer-cairo.h"
-  #else
-  #define GGOBI_TYPE_RENDERER_CAIRO GGOBI_TYPE_RENDERER
-  #endif
 
 #line 33 "ggobi-renderer-factory.c"
 /* self casting macros */

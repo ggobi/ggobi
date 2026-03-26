@@ -261,22 +261,12 @@ static gint
 da_manip_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-#ifdef ENABLE_CAIRO
   cairo_t *c = gdk_cairo_create (gtk_widget_get_window (w));
   gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
   cairo_rectangle (c, 0, 0, gtk_widget_get_allocated_width (w),
     gtk_widget_get_allocated_height (w));
   cairo_fill (c);
   cairo_destroy (c);
-#else
-  GdkGC *gc = gdk_gc_new (gtk_widget_get_window (w));
-
-  gdk_gc_set_foreground (gc, &gg->vcirc_manip_color);
-  gdk_draw_rectangle (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (w)), gc,
-                      true, 0, 0, gtk_widget_get_allocated_width (w),
-                      gtk_widget_get_allocated_height (w));
-  gdk_gc_destroy (gc);
-#endif
 
   return true;
 }
@@ -292,23 +282,12 @@ static gint
 da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-#ifdef ENABLE_CAIRO
   cairo_t *c = gdk_cairo_create (gtk_widget_get_window (w));
   gdk_cairo_set_source_color (c, &gg->vcirc_freeze_color);
   cairo_rectangle (c, 0, 0, gtk_widget_get_allocated_width (w),
     gtk_widget_get_allocated_height (w));
   cairo_fill (c);
   cairo_destroy (c);
-#else
-  GdkGC *gc = gdk_gc_new (gtk_widget_get_window (w));
-
-  gdk_gc_set_foreground (gc, &gg->vcirc_freeze_color);
-  gdk_draw_rectangle (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (w)), gc,
-                      true, 0, 0, gtk_widget_get_allocated_width (w),
-                      gtk_widget_get_allocated_height (w));
-
-  gdk_gc_destroy (gc);
-#endif
 
   return true;
 }
@@ -364,16 +343,6 @@ varcircles_show (gboolean show, GGobiData * d, displayd * display,
   /*-- set the handle position all the way to the right --*/
     gtk_paned_set_position (GTK_PANED (d->varpanel_ui.hpane), -1);
 
-
-    /*-- adjust the reference count --*/
-    /*
-       #if GTK_MAJOR_VERSION == 1
-       if (GTK_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
-       #else
-       if (G_OBJECT (d->vcbox_ui.ebox)->ref_count > 1)
-       #endif
-       gtk_widget_unref (d->vcbox_ui.ebox);
-     */
   }
 }
 

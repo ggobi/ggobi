@@ -23,9 +23,7 @@
 #line 5 "renderer.gob"
 
   #include <gtk/gtk.h>
-  #if GTK_CHECK_VERSION(2,8,0)
   static cairo_surface_t *ref_cairo_surface(GdkDrawable *self);
-  #endif
 
 #line 31 "ggobi-renderer.c"
 /* self casting macros */
@@ -323,10 +321,7 @@ ggobi_renderer_class_init (GGobiRendererClass * self_class G_GNUC_UNUSED)
     }
  {
 #line 244 "renderer.gob"
- /* need to do this one manually, to avoid GTK+ 2.8.x dep */
-    #if GTK_CHECK_VERSION(2,8,0)
     GDK_DRAWABLE_CLASS(self_class)->ref_cairo_surface = ref_cairo_surface;
-    #endif
   
 #line 332 "ggobi-renderer.c"
  }
@@ -1012,13 +1007,11 @@ ___1d_ggobi_renderer__copy_to_image (GdkDrawable * self G_GNUC_UNUSED, GdkImage 
 
 #line 251 "renderer.gob"
 
-  #if GTK_CHECK_VERSION(2,8,0)
   static cairo_surface_t *
   ref_cairo_surface(GdkDrawable *self)
   {
     return GDK_DRAWABLE_GET_CLASS(GGOBI_RENDERER(self)->_priv->buffer)->ref_cairo_surface(
       GGOBI_RENDERER(self)->_priv->buffer);
   }
-  #endif
 
 #line 1025 "ggobi-renderer.c"

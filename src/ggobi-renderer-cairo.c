@@ -21,9 +21,7 @@
 #endif /* G_LIKELY */
 
 #line 1 "renderer-cairo.gob"
- /* only use cairo when GTK+ 2.8.0 or higher installed */
   #include <gtk/gtk.h>
-  #if GTK_CHECK_VERSION(2,8,0)
 
 #line 29 "ggobi-renderer-cairo.c"
 
@@ -806,7 +804,5 @@ ___15_ggobi_renderer_cairo_ref_cairo_surface (GdkDrawable * self G_GNUC_UNUSED)
 #undef PARENT_HANDLER
 
 #line 272 "renderer-cairo.gob"
-
-  #endif
 
 #line 813 "ggobi-renderer-cairo.c"

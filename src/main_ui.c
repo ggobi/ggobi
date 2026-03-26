@@ -1244,11 +1244,7 @@ addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg)
         gchar *action_name = g_strdup_printf ("Shortcut_%d", i);
         GtkAction *action = gtk_action_new (action_name, input->fileName,
                                             "Open this shortcut",
-#if GTK_MAJOR_VERSION > 2 && GTK_MINOR_VERSION > 4
                                             GTK_STOCK_FILE);
-#else
-                                            NULL);
-#endif
         g_signal_connect (G_OBJECT (action), "activate",
                           G_CALLBACK (load_previous_file),
                           info->descriptions + i);
