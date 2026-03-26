@@ -16,6 +16,11 @@ typedef struct _GGobiRulerState {
 
 static GQuark ggobi_ruler_state_quark (void);
 static GGobiRulerState *ggobi_gtk_ruler_state_ensure (GtkWidget *widget);
+static GtkWidget *ggobi_gtk_ruler_new (GtkOrientation orientation);
+static gboolean ggobi_gtk_ruler_draw_cb (GtkWidget *widget, cairo_t *cr,
+                                         gpointer user_data);
+static gdouble ggobi_gtk_ruler_fraction (const GGobiRulerState *state,
+                                         gdouble value);
 
 static GQuark
 ggobi_ruler_state_quark (void)
@@ -43,6 +48,132 @@ ggobi_gtk_ruler_state_ensure (GtkWidget *widget)
   g_object_set_qdata_full (G_OBJECT (widget), ggobi_ruler_state_quark (),
                            state, g_free);
   return state;
+}
+
+static gdouble
+ggobi_gtk_ruler_fraction (const GGobiRulerState *state, gdouble value)
+{
+  gdouble denom;
+  gdouble frac;
+
+  denom = state->upper - state->lower;
+  if (!isfinite (denom) || fabs (denom) < 1e-12)
+    return 0.0;
+
+  frac = (value - state->lower) / denom;
+  if (!isfinite (frac))
+    return 0.0;
+
+  return CLAMP (frac, 0.0, 1.0);
+}
+
+static gboolean
+ggobi_gtk_ruler_draw_cb (GtkWidget *widget, cairo_t *cr, gpointer user_data)
+{
+  GGobiRulerState *state = ggobi_gtk_ruler_state_ensure (widget);
+  GtkStyleContext *context = gtk_widget_get_style_context (widget);
+  GtkStateFlags flags = gtk_style_context_get_state (context);
+  GdkRGBA fg;
+  gint width = gtk_widget_get_allocated_width (widget);
+  gint height = gtk_widget_get_allocated_height (widget);
+  gint major_ticks = 10;
+  gint minor_ticks = 4;
+  gint i, j;
+  gdouble marker_frac;
+
+  (void) user_data;
+
+  gtk_render_background (context, cr, 0, 0, width, height);
+  gtk_render_frame (context, cr, 0, 0, width, height);
+
+  gtk_style_context_get_color (context, flags, &fg);
+  gdk_cairo_set_source_rgba (cr, &fg);
+  cairo_set_line_width (cr, 1.0);
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_SQUARE);
+
+  if (state->orientation == GTK_ORIENTATION_HORIZONTAL) {
+    gdouble baseline = 4.5;
+    gdouble usable = MAX (1, width - 1);
+
+    cairo_move_to (cr, 0.5, baseline);
+    cairo_line_to (cr, width - 0.5, baseline);
+
+    for (i = 0; i <= major_ticks; i++) {
+      gdouble x = 0.5 + usable * i / major_ticks;
+
+      cairo_move_to (cr, x, baseline);
+      cairo_line_to (cr, x, baseline + 8.0);
+
+      if (i == major_ticks)
+        continue;
+
+      for (j = 1; j <= minor_ticks; j++) {
+        gdouble mx = x + usable / major_ticks * j / (minor_ticks + 1);
+
+        cairo_move_to (cr, mx, baseline);
+        cairo_line_to (cr, mx, baseline + 4.0);
+      }
+    }
+    cairo_stroke (cr);
+
+    marker_frac = ggobi_gtk_ruler_fraction (state, state->position);
+    cairo_move_to (cr, marker_frac * usable - 5.0, height - 0.5);
+    cairo_line_to (cr, marker_frac * usable + 5.0, height - 0.5);
+    cairo_line_to (cr, marker_frac * usable + 0.5, height - 6.5);
+    cairo_close_path (cr);
+    cairo_fill (cr);
+  } else {
+    gdouble baseline = width - 4.5;
+    gdouble usable = MAX (1, height - 1);
+
+    cairo_move_to (cr, baseline, 0.5);
+    cairo_line_to (cr, baseline, height - 0.5);
+
+    for (i = 0; i <= major_ticks; i++) {
+      gdouble y = 0.5 + usable * i / major_ticks;
+
+      cairo_move_to (cr, baseline, y);
+      cairo_line_to (cr, baseline - 8.0, y);
+
+      if (i == major_ticks)
+        continue;
+
+      for (j = 1; j <= minor_ticks; j++) {
+        gdouble my = y + usable / major_ticks * j / (minor_ticks + 1);
+
+        cairo_move_to (cr, baseline, my);
+        cairo_line_to (cr, baseline - 4.0, my);
+      }
+    }
+    cairo_stroke (cr);
+
+    marker_frac = ggobi_gtk_ruler_fraction (state, state->position);
+    cairo_move_to (cr, 0.5, marker_frac * usable - 5.0);
+    cairo_line_to (cr, 0.5, marker_frac * usable + 5.0);
+    cairo_line_to (cr, 6.5, marker_frac * usable + 0.5);
+    cairo_close_path (cr);
+    cairo_fill (cr);
+  }
+
+  return FALSE;
+}
+
+static GtkWidget *
+ggobi_gtk_ruler_new (GtkOrientation orientation)
+{
+  GtkWidget *widget = gtk_drawing_area_new ();
+
+  gtk_widget_add_events (widget,
+                         GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK);
+  if (orientation == GTK_ORIENTATION_HORIZONTAL)
+    gtk_widget_set_size_request (widget, -1, 24);
+  else
+    gtk_widget_set_size_request (widget, 24, -1);
+
+  ggobi_gtk_ruler_state_ensure (widget)->orientation = orientation;
+  g_signal_connect (G_OBJECT (widget), "draw",
+                    G_CALLBACK (ggobi_gtk_ruler_draw_cb), NULL);
+  return widget;
 }
 
 static gboolean
@@ -769,29 +900,13 @@ ggobi_pointer_ungrab (GtkWidget *widget)
 GtkWidget *
 ggobi_gtk_hruler_new (void)
 {
-  GtkWidget *widget = gtk_scale_new_with_range (GTK_ORIENTATION_HORIZONTAL,
-                                                0.0, 1.0, 0.01);
-
-  gtk_scale_set_draw_value (GTK_SCALE (widget), FALSE);
-  gtk_widget_set_size_request (widget, -1, 24);
-  gtk_widget_add_events (widget,
-                         GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK);
-  ggobi_gtk_ruler_state_ensure (widget)->orientation = GTK_ORIENTATION_HORIZONTAL;
-  return widget;
+  return ggobi_gtk_ruler_new (GTK_ORIENTATION_HORIZONTAL);
 }
 
 GtkWidget *
 ggobi_gtk_vruler_new (void)
 {
-  GtkWidget *widget = gtk_scale_new_with_range (GTK_ORIENTATION_VERTICAL,
-                                                0.0, 1.0, 0.01);
-
-  gtk_scale_set_draw_value (GTK_SCALE (widget), FALSE);
-  gtk_widget_set_size_request (widget, 24, -1);
-  gtk_widget_add_events (widget,
-                         GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK);
-  ggobi_gtk_ruler_state_ensure (widget)->orientation = GTK_ORIENTATION_VERTICAL;
-  return widget;
+  return ggobi_gtk_ruler_new (GTK_ORIENTATION_VERTICAL);
 }
 
 void
@@ -800,10 +915,6 @@ ggobi_gtk_ruler_set_range (GtkWidget *widget, gdouble lower,
                            gdouble max_size)
 {
   GGobiRulerState *state;
-  gdouble range_min;
-  gdouble range_max;
-  gdouble clamped_position;
-  gboolean inverted;
 
   if (widget == NULL)
     return;
@@ -817,16 +928,8 @@ ggobi_gtk_ruler_set_range (GtkWidget *widget, gdouble lower,
   if (!isfinite (lower) || !isfinite (upper) || !isfinite (position))
     return;
 
-  if (GTK_IS_RANGE (widget)) {
-    inverted = (upper < lower);
-    range_min = MIN (lower, upper);
-    range_max = MAX (lower, upper);
-    clamped_position = CLAMP (position, range_min, range_max);
-
-    gtk_range_set_inverted (GTK_RANGE (widget), inverted);
-    gtk_range_set_range (GTK_RANGE (widget), range_min, range_max);
-    gtk_range_set_value (GTK_RANGE (widget), clamped_position);
-  }
+  state->position = CLAMP (position, MIN (lower, upper), MAX (lower, upper));
+  gtk_widget_queue_draw (widget);
 }
 
 void
@@ -863,14 +966,7 @@ ggobi_gtk_ruler_set_position (GtkWidget *widget, gdouble position)
   if (!isfinite (position) || !isfinite (state->lower) ||
       !isfinite (state->upper))
     return;
-
-  if (GTK_IS_RANGE (widget)) {
-    gdouble range_min = MIN (state->lower, state->upper);
-    gdouble range_max = MAX (state->lower, state->upper);
-
-    gtk_range_set_value (GTK_RANGE (widget), CLAMP (position, range_min,
-                                                    range_max));
-  }
+  gtk_widget_queue_draw (widget);
 }
 
 gboolean
