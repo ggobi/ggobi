@@ -74,13 +74,11 @@ close_wmgr_cb (GtkWidget * w, GdkEvent * event, ggobid * gg)
   destroyit (true, gg);
 }
 
-static gint
-cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
+static gboolean
+cluster_symbol_draw_cb (GtkWidget * w, cairo_t *cr, gpointer cbd)
 {
   gint k = GPOINTER_TO_INT (cbd);
   ggobid *gg = GGobiFromWidget (w, true);
-  GdkWindow *window = gtk_widget_get_window (w);
-  GdkDrawable *drawable = (GdkDrawable *) window;
   gint width = gtk_widget_get_allocated_width (w);
   gint height = gtk_widget_get_allocated_height (w);
   icoords pos;
@@ -90,7 +88,9 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 
   /*-- fill in the background color --*/
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb_bg);
-  gdk_draw_rectangle (drawable, gg->plot_GC, true, 0, 0, width, height);
+  ggobi_cairo_apply_gc (cr, gg->plot_GC);
+  cairo_rectangle (cr, 0, 0, width, height);
+  cairo_fill (cr);
 
   /*-- draw the appropriate symbol in the appropriate color --*/
   gdk_gc_set_foreground (gg->plot_GC, &scheme->rgb[d->clusv[k].color]);
@@ -99,7 +99,7 @@ cluster_symbol_show (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
 
   pos.x = width / 2;
   pos.y = height / 2;
-  draw_glyph (drawable, &g, &pos, 0, gg);
+  draw_glyph (cr, &g, &pos, 0, gg);
 
   return FALSE;
 }
@@ -251,7 +251,6 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
   GGobiData *d = datad_get_from_notebook (gg->cluster_ui.notebook, gg);
   gint k, m, i;
   cpaneld *cpanel = &gg->current_display->cpanel;
-  gboolean rval = false;
   gint nclusters = symbol_table_populate (d);
   gboolean proceed = true;
   gint targets = cpanel->br.point_targets;
@@ -333,8 +332,7 @@ cluster_symbol_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
     }
   }
 
-  g_signal_emit_by_name (G_OBJECT (w), "expose_event",
-                         (gpointer) gg, (gpointer) & rval);
+  gtk_widget_queue_draw (w);
 
   /* clusters_set reorders clusv, so it's bad news here */
   /*clusters_set (d, gg); */
@@ -359,8 +357,8 @@ cluster_add (gint k, GGobiData * d, ggobid * gg)
                          GDK_EXPOSURE_MASK | GDK_ENTER_NOTIFY_MASK
                          | GDK_LEAVE_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK);
 
-  g_signal_connect (G_OBJECT (d->clusvui[k].da), "expose_event",
-                    G_CALLBACK (cluster_symbol_show), GINT_TO_POINTER (k));
+  g_signal_connect (G_OBJECT (d->clusvui[k].da), "draw",
+                    G_CALLBACK (cluster_symbol_draw_cb), GINT_TO_POINTER (k));
   g_signal_connect (G_OBJECT (d->clusvui[k].da), "button_press_event",
                     G_CALLBACK (cluster_symbol_cb), GINT_TO_POINTER (k));
   GGobi_widget_set (d->clusvui[k].da, gg, true);
