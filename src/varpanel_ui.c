@@ -140,7 +140,7 @@ varpanel_toggle_set_active (gint jbutton, gint jvar, gboolean active,
   if (jvar >= 0 && jvar < d->ncols) {
     w = varpanel_widget_get_nth (jbutton, jvar, d);
 
-    if (w && GTK_WIDGET_REALIZED (w)) {
+    if (w) {
 
       active_prev = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (w));
 
@@ -157,10 +157,19 @@ varsel (GtkWidget * w, cpaneld * cpanel, splotd * sp, gint jvar,
         gint alt_mod, gint ctrl_mod, gint shift_mod, GGobiData * d,
         ggobid * gg)
 {
-  displayd *display = (displayd *) sp->displayptr;
+  displayd *display = gg->current_display;
   gboolean redraw = false;
 
-  if (display == NULL /*|| !GGOBI_IS_WINDOW_DISPLAY (display) ||
+  if (sp == NULL && display != NULL) {
+    sp = display->current_splot;
+    if (sp == NULL && display->splots != NULL)
+      sp = (splotd *) display->splots->data;
+  }
+
+  if (sp != NULL)
+    display = (displayd *) sp->displayptr;
+
+  if (display == NULL || sp == NULL /*|| !GGOBI_IS_WINDOW_DISPLAY (display) ||
       !GTK_IS_WIDGET (GGOBI_WINDOW_DISPLAY (display)->window)*/) {
     g_printerr ("Bug?  I see no active display\n");
     return;

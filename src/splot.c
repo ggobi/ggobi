@@ -133,18 +133,31 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
 static gboolean
 splot_draw_cb (GtkWidget *w, cairo_t *cr, splotd *sp)
 {
-  return splot_expose_cb (w, NULL, sp);
+  ggobid *gg = GGobiFromSPlot (sp);
+
+  if (sp->pixmap0 == NULL || sp->pixmap1 == NULL)
+    return FALSE;
+  if (gtk_widget_get_allocated_width (w) < 2 ||
+      gtk_widget_get_allocated_height (w) < 2)
+    return FALSE;
+
+  if (sp->redraw_style != EXPOSE && sp->redraw_style != NONE)
+    splot_redraw (sp, sp->redraw_style, gg);
+
+  if (sp->pixmap1 != NULL && sp->pixmap1->surface != NULL) {
+    cairo_set_source_surface (cr, sp->pixmap1->surface, 0, 0);
+    cairo_paint (cr);
+  }
+
+  return FALSE;
 }
 
 void
 splot_connect_expose_handler (gboolean idled, splotd *sp) 
 {
-  if (idled)  // if idle_proc running
-    g_signal_handlers_disconnect_by_func (G_OBJECT (sp->da),
-       G_CALLBACK(splot_draw_cb), GTK_OBJECT (sp));
-  else
-    g_signal_connect (G_OBJECT (sp->da),
-      "draw", G_CALLBACK(splot_draw_cb), (gpointer) sp);
+  (void) idled;
+  (void) sp;
+  return;
 }
 
 /*-- this will be called by a key_press_cb for each scatterplot mode --*/

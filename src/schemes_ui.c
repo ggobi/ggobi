@@ -45,9 +45,7 @@ void
 colorscheme_set_cb (GtkTreeSelection * sel, GtkTreeView * tree_view)
 {
   ggobid *gg = GGobiFromWidget (GTK_WIDGET (tree_view), true);
-  gboolean rval = false;
   GtkTreeModel *model;
-  GGobiData *d;
   colorschemed *scheme;
   GtkTreeIter iter;
 
@@ -68,25 +66,9 @@ colorscheme_set_cb (GtkTreeSelection * sel, GtkTreeView * tree_view)
     colorscheme_init (scheme);
   }
 
-/*-- delete this line once debugging is complete --*/
   displays_plot (NULL, FULL, gg);
 
-  /*-- rebuild the drawing area in this window --*/
-/*
- * This is using two expose events, which is odd:  it's something
- * to do with getting the numbers of points in each bin to appear,
- * and there's probably a way to do it better.
-*/
-  tree_view = gtk_tree_selection_get_tree_view (sel);
-  if (tree_view != NULL) {
-    d = (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
-  }
-  else {
-    d = (GGobiData *) g_slist_nth_data (gg->d, 0);
-  }
-
-  g_signal_emit_by_name (G_OBJECT (gg->svis.da), "expose_event",
-                         (gpointer) gg, (gpointer) & rval);
+  gtk_widget_queue_draw (gg->svis.da);
 }
 
 
@@ -142,11 +124,9 @@ bin_boundaries_set (GGobiData * d, ggobid * gg)
   }
 }
 
-static void
-da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
+static gboolean
+da_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
 {
-  GdkWindow *window = gtk_widget_get_window (w);
-  GdkDrawable *drawable = (GdkDrawable *) window;
   gint width = gtk_widget_get_allocated_width (w);
   gint height = gtk_widget_get_allocated_height (w) - 2 * ymargin;
   gint x0, x1, k, hgt;
@@ -155,8 +135,11 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
   GGobiData *d = NULL;
   GdkPixmap *pix = gg->svis.pix;
 
+  if (pix == NULL)
+    return false;
+
   if (gg->svis.GC == NULL)
-    gg->svis.GC = gdk_gc_new (window);
+    gg->svis.GC = gdk_gc_new (gtk_widget_get_window (w));
 
   hgt = height / (scheme->n - 1);
 
@@ -182,8 +165,12 @@ da_expose_cb (GtkWidget * w, GdkEventExpose * event, ggobid * gg)
     x0 = x1;
   }
 
-  gdk_draw_pixmap (drawable, gg->svis.GC, pix,
-                   0, 0, 0, 0, width, gtk_widget_get_allocated_height (w));
+  if (pix->surface != NULL) {
+    cairo_set_source_surface (cr, pix->surface, 0, 0);
+    cairo_paint (cr);
+  }
+
+  return false;
 }
 
 
@@ -289,7 +276,6 @@ scale_set_cb (GtkWidget * w, ggobid * gg)
 {
   GtkWidget *tree_view = get_tree_view_from_object (G_OBJECT (w));
   GGobiData *d = NULL;
-  gboolean rval = false;
 
   if (tree_view)
     d = (GGobiData *) g_object_get_data (G_OBJECT (tree_view), "datad");
@@ -310,8 +296,7 @@ scale_set_cb (GtkWidget * w, ggobid * gg)
   }
 
   displays_plot (NULL, FULL, gg);
-  g_signal_emit_by_name (G_OBJECT (gg->svis.da), "expose_event",
-                         (gpointer) gg, (gpointer) & rval);
+  gtk_widget_queue_draw (gg->svis.da);
 
   entry_set_scheme_name (gg);
 
@@ -419,10 +404,10 @@ svis_window_open (ggobid * gg)
                       "configure_event",
                       G_CALLBACK (da_configure_cb), (gpointer) gg);
     g_signal_connect (G_OBJECT (gg->svis.da),
-                      "expose_event",
-                      G_CALLBACK (da_expose_cb), (gpointer) gg);
+                      "draw",
+                      G_CALLBACK (da_draw_cb), (gpointer) gg);
 
-    gtk_widget_set_events (gg->svis.da, GDK_EXPOSURE_MASK);
+    gtk_widget_set_events (gg->svis.da, 0);
 
     /* Initializes both entries */
     entry_set_scheme_name (gg);

@@ -870,6 +870,7 @@ splot_redraw (splotd *sp, RedrawStyle style, ggobid *gg) {
       splot_draw_to_pixmap0_unbinned (sp, true, gg);  /* true = hiddens */
       splot_draw_to_pixmap0_unbinned (sp, false, gg);
       splot_add_markup_to_pixmap (sp, sp->pixmap0, gg);
+      splot_pixmap0_to_pixmap1 (sp, false, gg);
       splot_pixmap_to_window (sp, sp->pixmap0, gg);
     break;
 
@@ -891,4 +892,6 @@ splot_redraw (splotd *sp, RedrawStyle style, ggobid *gg) {
       GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (sp->da)), gg);
 
   sp->redraw_style = EXPOSE;
+
+  gtk_widget_queue_draw (sp->da);
 }

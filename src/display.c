@@ -733,6 +733,11 @@ display_set_current (displayd * new_display, ggobid * gg)
   }
 
   gg->current_display = new_display;
+  gg->current_splot = new_display->current_splot;
+  if (gg->current_splot == NULL && new_display->splots != NULL) {
+    gg->current_splot = (splotd *) new_display->splots->data;
+    new_display->current_splot = gg->current_splot;
+  }
 
   g_signal_emit (G_OBJECT (gg), GGobiSignals[DISPLAY_SELECTED_SIGNAL], 0,
                  new_display);

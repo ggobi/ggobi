@@ -567,6 +567,7 @@ void t1d_clear_pppixmap(displayd *dsp, ggobid *gg)
   gdk_draw_pixmap (drawable, gg->plot_GC, dsp->t1d_pp_pixmap,
                    0, 0, 0, 0,
                    wid, hgt);
+  gtk_widget_queue_draw (dsp->t1d_ppda);
 }
 
 void t1d_clear_ppda(displayd *dsp, ggobid *gg)
@@ -606,6 +607,7 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
   gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda)),
     gg->plot_GC, dsp->t1d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
+  gtk_widget_queue_draw (dsp->t1d_ppda);
 
 }
 
@@ -632,6 +634,7 @@ void t1d_ppdraw_think(displayd *dsp, ggobid *gg)
   gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda)),
     gg->plot_GC, dsp->t1d_pp_pixmap,
     0, 0, 0, 0, wid, hgt);
+  gtk_widget_queue_draw (dsp->t1d_ppda);
 }
 
 /* This is the pp index plot drawing routine */ 

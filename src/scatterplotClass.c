@@ -23,9 +23,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
-#ifdef ENABLE_CAIRO
 #include <math.h>
-#endif
 
 /*
   display_datad_added_cb() in display.c
@@ -252,36 +250,24 @@ static gboolean
 varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
 {
   gdouble r = VAR_CIRCLE_DIAM / 2.0;
-  gint x, y, k;
+  gint x = 0, y = 0, k;
   cpaneld *cpanel = &display->cpanel;
   gboolean chosen = false;
-
-#ifdef ENABLE_CAIRO
   cairo_t *c = gdk_cairo_create (da_pix);
-  cairo_set_source_rgb (c, 1.0, 0, 1.0);
+  cairo_set_line_cap (c, CAIRO_LINE_CAP_ROUND);
+  cairo_set_line_join (c, CAIRO_LINE_JOIN_ROUND);
   cairo_set_line_width (c, 1);
-#endif
 
   switch (cpanel->pmode) {
   case TOUR1D:
     x = (gint) (display->t1d.F.vals[0][jvar] * (gfloat) r);
     y = 0;
-#ifndef ENABLE_CAIRO
-    gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
-#endif
     if (jvar == display->t1d_manip_var) {
-#ifdef ENABLE_CAIRO
+      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, (5.0 / 6) * M_PI, (7.0 / 6) * M_PI);
       cairo_stroke (c);
       cairo_arc (c, r, r, r - 5, (11.0 / 6) * M_PI, (13.0 / 6) * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10,
-                    150 * 64, 60 * 64);
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false, 5, 5,
-                    VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 330 * 64,
-                    60 * 64);
-#endif
     }
 
     for (k = 0; k < display->t1d.nactive; k++) {
@@ -295,17 +281,10 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
   case TOUR2D3:
     x = (gint) (display->t2d3.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->t2d3.F.vals[1][jvar] * (gfloat) r);
-#ifndef ENABLE_CAIRO
-    gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
-#endif
     if (jvar == display->t2d3_manip_var) {
-#ifdef ENABLE_CAIRO
+      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, 0, 2 * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 0 * 64,
-                    360 * 64);
-#endif
     }
 
     for (k = 0; k < display->t2d3.nactive; k++) {
@@ -319,17 +298,10 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
   case TOUR2D:
     x = (gint) (display->t2d.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->t2d.F.vals[1][jvar] * (gfloat) r);
-#ifndef ENABLE_CAIRO
-    gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
-#endif
     if (jvar == display->t2d_manip_var) {
-#ifdef ENABLE_CAIRO
+      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, 0, 2 * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 0 * 64,
-                    360 * 64);
-#endif
     }
 
     for (k = 0; k < display->t2d.nactive; k++) {
@@ -348,36 +320,19 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     /*          if (xvar) { */
     x = (gint) (display->tcorr1.F.vals[0][jvar] * (gfloat) r);
     y = (gint) (display->tcorr2.F.vals[0][jvar] * (gfloat) r);
-#ifndef ENABLE_CAIRO
-    gdk_draw_line (da_pix, gg->selvarfg_GC, r, r, r + x, r - y);
-#endif
     if (jvar == display->tc1_manip_var) {
-#ifdef ENABLE_CAIRO
+      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, (5.0 / 6) * M_PI, (7.0 / 6) * M_PI);
       cairo_stroke (c);
       cairo_arc (c, r, r, r - 5, (11.0 / 6) * M_PI, (13.0 / 6) * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10,
-                    150 * 64, 60 * 64);
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false, 5, 5,
-                    VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 330 * 64,
-                    60 * 64);
-#endif
     }
     if (jvar == display->tc2_manip_var) {
-#ifdef ENABLE_CAIRO
+      gdk_cairo_set_source_color (c, &gg->vcirc_manip_color);
+      cairo_set_line_width (c, 1);
       cairo_arc (c, r, r, r - 5, (1.0 / 3) * M_PI, (2.0 / 3) * M_PI);
       cairo_stroke (c);
       cairo_arc (c, r, r, r - 5, (4.0 / 3) * M_PI, (5.0 / 3) * M_PI);
-#else
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false,
-                    5, 5, VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 60 * 64,
-                    60 * 64);
-      gdk_draw_arc (da_pix, gg->manipvarfg_GC, false, 5, 5,
-                    VAR_CIRCLE_DIAM - 10, VAR_CIRCLE_DIAM - 10, 240 * 64,
-                    60 * 64);
-#endif
     }
 
     for (k = 0; k < display->tcorr1.nactive; k++) {
@@ -413,15 +368,15 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
     break;
   }
 
-#ifdef ENABLE_CAIRO
   cairo_stroke (c);
   cairo_set_source_rgb (c, 0, 0, 0);
   cairo_set_line_width (c, 2);
+  cairo_set_line_cap (c, CAIRO_LINE_CAP_ROUND);
+  cairo_set_line_join (c, CAIRO_LINE_JOIN_ROUND);
   cairo_move_to (c, r, r);
   cairo_line_to (c, r + x, r - y);
   cairo_stroke (c);
   cairo_destroy (c);
-#endif
 
   return (chosen);
 }

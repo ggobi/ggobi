@@ -452,13 +452,27 @@ gdk_draw_pixmap (GdkDrawable *drawable, GdkGC *gc, GdkPixmap *src,
     return;
 
   (void) gc;
-  (void) xsrc;
-  (void) ysrc;
-  (void) width;
-  (void) height;
   if (src && src->surface) {
-    cairo_set_source_surface (cr, src->surface, xdest, ydest);
-    cairo_paint (cr);
+    gint src_width;
+    gint src_height;
+
+    src_width = src->width;
+    src_height = src->height;
+    if (width < 0)
+      width = src_width - xsrc;
+    if (height < 0)
+      height = src_height - ysrc;
+    width = MIN (width, src_width - xsrc);
+    height = MIN (height, src_height - ysrc);
+
+    if (width > 0 && height > 0) {
+      cairo_save (cr);
+      cairo_rectangle (cr, xdest, ydest, width, height);
+      cairo_clip (cr);
+      cairo_set_source_surface (cr, src->surface, xdest - xsrc, ydest - ysrc);
+      cairo_paint (cr);
+      cairo_restore (cr);
+    }
   }
   cairo_destroy (cr);
 }

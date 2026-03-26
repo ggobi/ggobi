@@ -225,6 +225,18 @@ ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
   return false;
 }
 
+static gboolean
+ppda_draw_cb (GtkWidget *w, cairo_t *cr, displayd *dsp)
+{
+  if (dsp->t1d_pp_pixmap != NULL && dsp->t1d_pp_pixmap->surface != NULL) {
+    cairo_set_source_surface (cr, dsp->t1d_pp_pixmap->surface, 0, 0);
+    cairo_paint (cr);
+    return FALSE;
+  }
+
+  return ppda_expose_cb (w, NULL, dsp);
+}
+
 static const gchar* tour1dpp_ui =
 "<ui>"
 "	<menubar>"
@@ -473,8 +485,8 @@ tour1dpp_window_open (ggobid *gg) {
                         (gpointer) dsp);
 
     g_signal_connect (G_OBJECT (dsp->t1d_ppda),
-                        "expose_event",
-                        G_CALLBACK(ppda_expose_cb),
+                        "draw",
+                        G_CALLBACK(ppda_draw_cb),
                         (gpointer) dsp);
 
     gtk_container_add (GTK_CONTAINER (frame), dsp->t1d_ppda);
