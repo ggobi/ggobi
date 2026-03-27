@@ -1298,8 +1298,8 @@ load_previous_file (GtkAction * action, gpointer cbd)
        * eliminate the border.  The API, though, allows many
        * plots to be added before anything is drawn.  As a
        * result, if the first display is a parcoords plot, the
-       * first splot is copied from pixmap0 to pixmap1 before it
-       * has been drawn to pixmap1, resulting in garbage on the
+       * first splot is copied from surface0 to surface1 before it
+       * has been drawn to surface1, resulting in garbage on the
        * screen.
        */
       gg->current_splot = NULL;

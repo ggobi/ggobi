@@ -48,7 +48,7 @@ typedef struct
  displayd *displayptr;  /* a pointer to the enclosing display */
 
  GtkWidget *da;                 /* drawing_area */
- GdkPixmap *pixmap0, *pixmap1;  /* 2-stage drawing */
+ GGobiSurfaceBuffer *surface0, *surface1;  /* 2-stage backing surfaces */
 
  GdkCursor *cursor;
  GdkCursorType jcursor;

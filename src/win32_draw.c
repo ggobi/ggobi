@@ -383,12 +383,12 @@ win32_draw_to_pixmap_unbinned (gint current_color, splotd *sp, gboolean draw_hid
     }
   }
   if (nwhisker_segs)
-    gdk_draw_segments (sp->pixmap0, GGOBI_PLOT_STYLE (gg),
+    gdk_draw_segments (sp->surface0, GGOBI_PLOT_STYLE (gg),
       sp->win32.whisker_segs, nwhisker_segs);
   if (nash_segs) {
-    gdk_draw_segments (sp->pixmap0, GGOBI_PLOT_STYLE (gg), sp->win32.ash_segs, nash_segs);
+    gdk_draw_segments (sp->surface0, GGOBI_PLOT_STYLE (gg), sp->win32.ash_segs, nash_segs);
   }
-  draw_glyphs (sp, sp->pixmap0,
+  draw_glyphs (sp, sp->surface0,
     sp->win32.points, npt,           sp->win32.segs, nseg,
     sp->win32.open_rects, nr_open,   sp->win32.filled_rects, nr_filled,
     sp->win32.open_arcs, nc_open,    sp->win32.filled_arcs, nc_filled,
@@ -434,9 +434,9 @@ win32_draw_to_pixmap_binned (icoords *bin0, icoords *bin1,
       }
     }
   }
-  gdk_draw_segments (sp->pixmap0, GGOBI_PLOT_STYLE (gg),
+  gdk_draw_segments (sp->surface0, GGOBI_PLOT_STYLE (gg),
     sp->win32.whisker_segs, nwhisker_segs);
-  draw_glyphs (sp, sp->pixmap0,
+  draw_glyphs (sp, sp->surface0,
     sp->win32.points, npt,           sp->win32.segs, nseg,
     sp->win32.open_rects, nr_open,   sp->win32.filled_rects, nr_filled,
     sp->win32.open_arcs, nc_open,    sp->win32.filled_arcs, nc_filled,

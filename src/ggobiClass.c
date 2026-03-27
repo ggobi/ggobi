@@ -324,8 +324,8 @@ ggobi_splot_init (splotd * sp)
 {
   sp->da = (GtkWidget *) & sp->canvas;
 
-  sp->pixmap0 = NULL;
-  sp->pixmap1 = NULL;
+  sp->surface0 = NULL;
+  sp->surface1 = NULL;
   sp->redraw_style = FULL;
 
   sp->whiskers = NULL;

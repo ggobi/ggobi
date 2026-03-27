@@ -25,11 +25,11 @@
 #include "config.h"
 
 void
-splash_destroy (GtkWidget * w, GdkEventButton * event, GdkPixmap * pix)
+splash_destroy (GtkWidget * w, GdkEventButton * event, GGobiSurfaceBuffer * pix)
 {
   GtkWidget *win = (GtkWidget *) g_object_get_data (G_OBJECT (w), "window");
 
-  gdk_pixmap_unref (pix);
+  ggobi_surface_buffer_free (pix);
   gtk_widget_destroy (win);
 }
 
@@ -37,18 +37,18 @@ void
 splash_show (ggobid * gg)
 {
   char *versionInfo;
-  GdkPixmap *splash_pix;
+  GGobiSurfaceBuffer *splash_pix;
   GtkWidget *splashw, *label;
   GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   GtkWidget *ebox = gtk_event_box_new ();
   GtkWidget *hbox = gtk_vbox_new (false, 0);
 
-  splash_pix = gdk_pixmap_colormap_create_from_xpm_d (NULL,
-                                                      gtk_widget_get_colormap
-                                                      (gg->main_window), NULL,
-                                                      NULL,
-                                                      (gchar **) splash);
-  splashw = gtk_image_new_from_pixmap (splash_pix, NULL);
+  splash_pix = ggobi_surface_buffer_from_xpm_data (NULL,
+                                                   gtk_widget_get_colormap
+                                                   (gg->main_window), NULL,
+                                                   NULL,
+                                                   (gchar **) splash);
+  splashw = ggobi_gtk_image_new_from_surface_buffer (splash_pix, NULL);
 
   gtk_container_add (GTK_CONTAINER (window), ebox);
   gtk_container_add (GTK_CONTAINER (ebox), hbox);

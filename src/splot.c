@@ -53,24 +53,17 @@ splot_configure_cb (GtkWidget *w, GdkEventConfigure *event, splotd *sp)
    * nicely here -- it makes certain that plots in the scatterplot
    * matrix are correctly initialized.  (And I don't know why, either)
   */
-  if (sp->pixmap0 == NULL) {  /*-- ie, splot being initialized --*/
+  if (sp->surface0 == NULL) {  /*-- ie, splot being initialized --*/
     splot_world_to_plane (cpanel, sp, gg);
   }
 
-  /*-- Create new backing pixmaps of the appropriate size --*/
-  if (sp->pixmap0 != NULL)
-    gdk_pixmap_unref (sp->pixmap0);
-  if (sp->pixmap1 != NULL)
-    gdk_pixmap_unref (sp->pixmap1);
-/*
-  sp->pixmap0 = gdk_pixmap_new (w->window,
-    w->allocation.width, w->allocation.height, -1);
-  sp->pixmap1 = gdk_pixmap_new (w->window,
-    w->allocation.width, w->allocation.height, -1);
-*/
-
-  sp->pixmap0 = gdk_pixmap_new (window, width, height, -1);
-  sp->pixmap1 = gdk_pixmap_new (window, width, height, -1);
+  /*-- Create new backing surfaces of the appropriate size --*/
+  if (sp->surface0 != NULL)
+    ggobi_surface_buffer_free (sp->surface0);
+  if (sp->surface1 != NULL)
+    ggobi_surface_buffer_free (sp->surface1);
+  sp->surface0 = ggobi_surface_buffer_new (window, width, height, -1);
+  sp->surface1 = ggobi_surface_buffer_new (window, width, height, -1);
   
   if (cpanel->imode == BRUSH) {
     sp->brush_pos.x1 = (gint) ((gfloat) sp->brush_pos.x1 *
@@ -119,7 +112,7 @@ splot_expose_cb (GtkWidget *w, GdkEventExpose *event, splotd *sp)
   ggobid *gg = GGobiFromSPlot (sp);
 
   /*-- sanity checks --*/
-  if (sp->pixmap0 == NULL || sp->pixmap1 == NULL)
+  if (sp->surface0 == NULL || sp->surface1 == NULL)
     return retval;
   if (gtk_widget_get_allocated_width (w) < 2 ||
       gtk_widget_get_allocated_height (w) < 2)
@@ -135,7 +128,7 @@ splot_draw_cb (GtkWidget *w, cairo_t *cr, splotd *sp)
 {
   ggobid *gg = GGobiFromSPlot (sp);
 
-  if (sp->pixmap0 == NULL || sp->pixmap1 == NULL)
+  if (sp->surface0 == NULL || sp->surface1 == NULL)
     return FALSE;
   if (gtk_widget_get_allocated_width (w) < 2 ||
       gtk_widget_get_allocated_height (w) < 2)
@@ -144,8 +137,8 @@ splot_draw_cb (GtkWidget *w, cairo_t *cr, splotd *sp)
   if (sp->redraw_style != EXPOSE && sp->redraw_style != NONE)
     splot_redraw (sp, sp->redraw_style, gg);
 
-  if (sp->pixmap1 != NULL && sp->pixmap1->surface != NULL) {
-    cairo_set_source_surface (cr, sp->pixmap1->surface, 0, 0);
+  if (sp->surface1 != NULL && sp->surface1->surface != NULL) {
+    cairo_set_source_surface (cr, sp->surface1->surface, 0, 0);
     cairo_paint (cr);
   }
 
@@ -515,8 +508,8 @@ sp->pmid.x = sp->pmid.y = sp->max.x = sp->max.y = 0;
   splot_alloc (sp, display, gg);
 
   sp->displayptr = display;
-  sp->pixmap0 = NULL;
-  sp->pixmap1 = NULL;
+  sp->surface0 = NULL;
+  sp->surface1 = NULL;
 
 /*  could become splot_p1d_init ();*/
   sp->p1dvar = 0;

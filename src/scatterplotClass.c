@@ -45,7 +45,7 @@
 
   display_data_added_cb should only be called for scatterplot guys.
   
-   splot_draw_to_pixmap0_unbinned needs an additional pre-plot hook for drawing edges.
+   splot_draw_to_surface0_unbinned needs an additional pre-plot hook for drawing edges.
 
   tour1d tourcorr and tour2d realloc up's don't get done for anything but scatterplot. 
   
@@ -1456,7 +1456,7 @@ withinDrawToUnbinned (splotd *sp, gint m, cairo_t *cr)
 void
 addMarkupCues (splotd *sp, cairo_t *cr, ggobid *gg)
 {
-/* See splot_add_markup_to_pixmap */
+/* See splot_add_markup_to_surface */
   displayd *display = sp->displayptr;
   GGobiData *e = display->e;
   if (e)

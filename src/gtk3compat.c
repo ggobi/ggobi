@@ -207,16 +207,16 @@ ggobi_gdk_color_to_rgba (const GdkColor *color, GdkRGBA *rgba)
 }
 
 static cairo_t *
-ggobi_drawable_begin (GdkDrawable *drawable)
+ggobi_draw_target_begin (GGobiDrawTarget *target)
 {
-  if (drawable == NULL)
+  if (target == NULL)
     return NULL;
 
-  if (drawable->is_window)
-    return gdk_cairo_create (drawable->window);
+  if (target->is_window)
+    return gdk_cairo_create (target->window);
 
-  if (drawable->surface)
-    return cairo_create (drawable->surface);
+  if (target->surface)
+    return cairo_create (target->surface);
 
   return NULL;
 }
@@ -306,7 +306,7 @@ ggobi_gtk_tooltips_disable (GtkTooltips *tips)
 }
 
 cairo_t *
-ggobi_gdk_cairo_create (gpointer target)
+ggobi_draw_target_cairo_create (gpointer target)
 {
   if (target == NULL)
     return NULL;
@@ -314,7 +314,13 @@ ggobi_gdk_cairo_create (gpointer target)
   if (GDK_IS_WINDOW (target))
     return gdk_cairo_create (GDK_WINDOW (target));
 
-  return ggobi_drawable_begin ((GdkDrawable *) target);
+  return ggobi_draw_target_begin ((GGobiDrawTarget *) target);
+}
+
+cairo_t *
+ggobi_gdk_cairo_create (gpointer target)
+{
+  return ggobi_draw_target_cairo_create (target);
 }
 
 void
@@ -582,64 +588,88 @@ gdk_gc_get_colormap (GdkGC *gc)
   return NULL;
 }
 
-GdkPixmap *
-gdk_pixmap_new (gpointer parent, gint width, gint height, gint depth)
+GGobiSurfaceBuffer *
+ggobi_surface_buffer_new (gpointer parent, gint width, gint height, gint depth)
 {
-  GdkPixmap *pixmap = g_new0 (GdkPixmap, 1);
+  GGobiSurfaceBuffer *buffer = g_new0 (GGobiSurfaceBuffer, 1);
 
   (void) parent;
   (void) depth;
-  pixmap->is_window = FALSE;
-  pixmap->width = width;
-  pixmap->height = height;
-  pixmap->surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+  buffer->is_window = FALSE;
+  buffer->width = width;
+  buffer->height = height;
+  buffer->surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
                                                 MAX (1, width),
                                                 MAX (1, height));
-  return pixmap;
+  return buffer;
+}
+
+void
+ggobi_surface_buffer_free (GGobiSurfaceBuffer *buffer)
+{
+  if (buffer == NULL)
+    return;
+
+  if (buffer->surface)
+    cairo_surface_destroy (buffer->surface);
+  g_free (buffer);
+}
+
+void
+ggobi_draw_target_get_size (GGobiDrawTarget *target, gint *width, gint *height)
+{
+  if (target == NULL)
+    return;
+
+  if (target->is_window && target->window) {
+    if (width || height)
+      gdk_window_get_geometry (target->window, NULL, NULL, width, height);
+    return;
+  }
+
+  if (width)
+    *width = target->width;
+  if (height)
+    *height = target->height;
+}
+
+GdkVisual *
+ggobi_draw_target_get_visual (GGobiDrawTarget *target)
+{
+  if (target && target->is_window && target->window)
+    return gdk_window_get_visual (target->window);
+  return NULL;
+}
+
+GdkPixmap *
+gdk_pixmap_new (gpointer parent, gint width, gint height, gint depth)
+{
+  return ggobi_surface_buffer_new (parent, width, height, depth);
 }
 
 void
 gdk_pixmap_unref (GdkPixmap *pixmap)
 {
-  if (pixmap == NULL)
-    return;
-
-  if (pixmap->surface)
-    cairo_surface_destroy (pixmap->surface);
-  g_free (pixmap);
+  ggobi_surface_buffer_free (pixmap);
 }
 
 void
 gdk_drawable_get_size (GdkDrawable *drawable, gint *width, gint *height)
 {
-  if (drawable == NULL)
-    return;
-
-  if (drawable->is_window && drawable->window) {
-    if (width || height)
-      gdk_window_get_geometry (drawable->window, NULL, NULL, width, height);
-    return;
-  }
-
-  if (width)
-    *width = drawable->width;
-  if (height)
-    *height = drawable->height;
+  ggobi_draw_target_get_size (drawable, width, height);
 }
 
 GdkVisual *
 gdk_drawable_get_visual (GdkDrawable *drawable)
 {
-  if (drawable && drawable->is_window && drawable->window)
-    return gdk_window_get_visual (drawable->window);
-  return NULL;
+  return ggobi_draw_target_get_visual (drawable);
 }
 
 void
 gdk_draw_rectangle (GdkDrawable *drawable, GdkGC *gc, gboolean filled,
                     gint x, gint y, gint width, gint height)
 {
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   ggobi_gc_apply (cr, gc);
   cairo_rectangle (cr, x, y, width, height);
@@ -653,7 +683,7 @@ void
 gdk_draw_line (GdkDrawable *drawable, GdkGC *gc,
                gint x1, gint y1, gint x2, gint y2)
 {
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   ggobi_gc_apply (cr, gc);
   cairo_move_to (cr, x1, y1);
@@ -667,7 +697,7 @@ gdk_draw_arc (GdkDrawable *drawable, GdkGC *gc, gboolean filled,
               gint x, gint y, gint width, gint height,
               gint angle1, gint angle2)
 {
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   ggobi_gc_apply (cr, gc);
   cairo_save (cr);
@@ -693,7 +723,7 @@ gdk_draw_polygon (GdkDrawable *drawable, GdkGC *gc, gboolean filled,
   if (points == NULL || npoints <= 0)
     return;
 
-  cr = ggobi_drawable_begin (drawable);
+  cr = ggobi_draw_target_begin (drawable);
   ggobi_gc_apply (cr, gc);
   cairo_move_to (cr, points[0].x, points[0].y);
   for (i = 1; i < npoints; i++)
@@ -710,7 +740,7 @@ gdk_draw_points (GdkDrawable *drawable, GdkGC *gc,
                  GdkPoint *points, gint npoints)
 {
   gint i;
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   ggobi_gc_apply (cr, gc);
   for (i = 0; i < npoints; i++)
@@ -724,7 +754,7 @@ gdk_draw_segments (GdkDrawable *drawable, GdkGC *gc,
                    GdkSegment *segs, gint nsegs)
 {
   gint i;
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   ggobi_gc_apply (cr, gc);
   for (i = 0; i < nsegs; i++) {
@@ -745,7 +775,7 @@ gdk_draw_lines (GdkDrawable *drawable, GdkGC *gc,
   if (points == NULL || npoints <= 0)
     return;
 
-  cr = ggobi_drawable_begin (drawable);
+  cr = ggobi_draw_target_begin (drawable);
   ggobi_gc_apply (cr, gc);
   cairo_move_to (cr, points[0].x, points[0].y);
   for (i = 1; i < npoints; i++)
@@ -757,7 +787,7 @@ gdk_draw_lines (GdkDrawable *drawable, GdkGC *gc,
 void
 gdk_draw_point (GdkDrawable *drawable, GdkGC *gc, gint x, gint y)
 {
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   ggobi_gc_apply (cr, gc);
   cairo_rectangle (cr, x, y, 1.0, 1.0);
@@ -769,7 +799,7 @@ void
 gdk_draw_layout (GdkDrawable *drawable, GdkGC *gc,
                  gint x, gint y, PangoLayout *layout)
 {
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   ggobi_gc_apply (cr, gc);
   cairo_move_to (cr, x, y);
@@ -781,7 +811,7 @@ void
 gdk_draw_string (GdkDrawable *drawable, gpointer font, GdkGC *gc,
                  gint x, gint y, const gchar *text)
 {
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   (void) font;
   ggobi_gc_apply (cr, gc);
@@ -795,7 +825,7 @@ gdk_draw_pixmap (GdkDrawable *drawable, GdkGC *gc, GdkPixmap *src,
                  gint xsrc, gint ysrc, gint xdest, gint ydest,
                  gint width, gint height)
 {
-  cairo_t *cr = ggobi_drawable_begin (drawable);
+  cairo_t *cr = ggobi_draw_target_begin (drawable);
 
   if (cr == NULL)
     return;
@@ -870,15 +900,15 @@ gdk_region_destroy (GdkRegion *region)
   g_free (region);
 }
 
-GdkPixmap *
-gdk_pixmap_colormap_create_from_xpm_d (gpointer drawable,
-                                       GdkColormap *colormap,
-                                       gpointer mask,
-                                       gpointer transparent_color,
-                                       gchar **data)
+GGobiSurfaceBuffer *
+ggobi_surface_buffer_from_xpm_data (gpointer drawable,
+                                    GdkColormap *colormap,
+                                    gpointer mask,
+                                    gpointer transparent_color,
+                                    gchar **data)
 {
   GdkPixbuf *pixbuf;
-  GdkPixmap *pixmap;
+  GGobiSurfaceBuffer *buffer;
   cairo_t *cr;
 
   (void) drawable;
@@ -887,24 +917,42 @@ gdk_pixmap_colormap_create_from_xpm_d (gpointer drawable,
   (void) transparent_color;
 
   pixbuf = gdk_pixbuf_new_from_xpm_data ((const char **) data);
-  pixmap = gdk_pixmap_new (NULL,
-                           gdk_pixbuf_get_width (pixbuf),
-                           gdk_pixbuf_get_height (pixbuf),
-                           -1);
-  cr = cairo_create (pixmap->surface);
+  buffer = ggobi_surface_buffer_new (NULL,
+                                     gdk_pixbuf_get_width (pixbuf),
+                                     gdk_pixbuf_get_height (pixbuf),
+                                     -1);
+  cr = cairo_create (buffer->surface);
   gdk_cairo_set_source_pixbuf (cr, pixbuf, 0, 0);
   cairo_paint (cr);
   cairo_destroy (cr);
   g_object_unref (pixbuf);
 
-  return pixmap;
+  return buffer;
+}
+
+GtkWidget *
+ggobi_gtk_image_new_from_surface_buffer (GGobiSurfaceBuffer *buffer,
+                                         gpointer mask)
+{
+  (void) mask;
+  return gtk_image_new_from_surface (buffer->surface);
+}
+
+GdkPixmap *
+gdk_pixmap_colormap_create_from_xpm_d (gpointer drawable,
+                                       GdkColormap *colormap,
+                                       gpointer mask,
+                                       gpointer transparent_color,
+                                       gchar **data)
+{
+  return ggobi_surface_buffer_from_xpm_data (drawable, colormap, mask,
+                                             transparent_color, data);
 }
 
 GtkWidget *
 ggobi_gtk_image_new_from_pixmap (GdkPixmap *pixmap, gpointer mask)
 {
-  (void) mask;
-  return gtk_image_new_from_surface (pixmap->surface);
+  return ggobi_gtk_image_new_from_surface_buffer (pixmap, mask);
 }
 
 gboolean

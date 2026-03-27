@@ -307,9 +307,9 @@ struct _ggobid {
   struct _Plot {
     /*
      * Part of binning: the corners of the bin to be copied from
-     * pixmap0 to pixmap1.
-     * They're defined in splot_draw_to_pixmap0_binned and used in
-     * splot_pixmap0_to_pixmap1 when binned == true.
+     * surface0 to surface1.
+     * They're defined in splot_draw_to_surface0_binned and used in
+     * splot_surface0_to_surface1 when binned == true.
      */
     icoords bin0, bin1;
     icoords loc0, loc1;

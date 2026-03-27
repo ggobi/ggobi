@@ -126,20 +126,23 @@ typedef struct _GdkGCValues {
 } GdkGCValues;
 #endif
 
-typedef struct _GGobiGdkDrawable {
+typedef struct _GGobiDrawTarget {
   gboolean is_window;
   GdkWindow *window;
   cairo_surface_t *surface;
   gint width;
   gint height;
-} GdkDrawable;
+} GGobiDrawTarget;
 
-#define GGOBI_GDK_WINDOW_TO_DRAWABLE(window_) \
-  (&(GdkDrawable) { TRUE, (window_), NULL, 0, 0 })
+#define GGOBI_WINDOW_DRAW_TARGET(window_) \
+  (&(GGobiDrawTarget) { TRUE, (window_), NULL, 0, 0 })
 
-typedef GdkDrawable GdkPixmap;
+typedef GGobiDrawTarget GGobiSurfaceBuffer;
+typedef GGobiDrawTarget GdkDrawable;
+typedef GGobiSurfaceBuffer GdkPixmap;
 typedef gpointer GdkColormap;
 
+cairo_t *ggobi_draw_target_cairo_create (gpointer target);
 cairo_t *ggobi_gdk_cairo_create (gpointer target);
 void ggobi_draw_style_init (GGobiDrawStyle *style);
 void ggobi_draw_style_apply (cairo_t *cr, const GGobiDrawStyle *style);
@@ -178,6 +181,20 @@ void gdk_gc_set_dashes (GdkGC *gc, gint dash_offset, const gchar *dash_list,
                         gint n);
 void gdk_gc_get_values (GdkGC *gc, GdkGCValues *values);
 GdkColormap *gdk_gc_get_colormap (GdkGC *gc);
+
+GGobiSurfaceBuffer *ggobi_surface_buffer_new (gpointer parent, gint width,
+                                              gint height, gint depth);
+void ggobi_surface_buffer_free (GGobiSurfaceBuffer *buffer);
+void ggobi_draw_target_get_size (GGobiDrawTarget *target, gint *width,
+                                 gint *height);
+GdkVisual *ggobi_draw_target_get_visual (GGobiDrawTarget *target);
+GGobiSurfaceBuffer *ggobi_surface_buffer_from_xpm_data (gpointer drawable,
+                                                        GdkColormap *colormap,
+                                                        gpointer mask,
+                                                        gpointer transparent_color,
+                                                        gchar **data);
+GtkWidget *ggobi_gtk_image_new_from_surface_buffer (GGobiSurfaceBuffer *buffer,
+                                                    gpointer mask);
 
 GdkPixmap *gdk_pixmap_new (gpointer parent, gint width, gint height, gint depth);
 void gdk_pixmap_unref (GdkPixmap *pixmap);

@@ -241,7 +241,7 @@ typedef struct
     GGobiWindowDisplayClass parent_class;
 
     gboolean supports_edges_p;  /* only true for scatterplots? */
-    gboolean show_edges_p; /* used in splot_draw_to_pixmap0_unbinned by scatmat and scatterplot (only) */
+    gboolean show_edges_p; /* used in splot_draw_to_surface0_unbinned by scatmat and scatterplot (only) */
 
     gboolean binning_ok; /* see binning_permitted in brush.c */
     gboolean (*binningPermitted)(displayd *dpy);
@@ -250,7 +250,7 @@ typedef struct
     gboolean options_menu_p; /* whether this supports an option menu in the control panel. Default is yes! */
 
 
-    gboolean loop_over_points; 	/* See splot_draw_to_pixmap0_unbinned. */
+    gboolean loop_over_points; 	/* See splot_draw_to_surface0_unbinned. */
 
 
     gchar * treeLabel;

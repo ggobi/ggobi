@@ -457,7 +457,7 @@ void       splot_expose (splotd *);
 void       splot_free (splotd *, displayd *, ggobid *);
 void       splot_get_dimensions (splotd *, gint *, gint *);
 splotd*    splot_new (displayd *, gint, gint, ggobid *);
-void       splot_pixmap0_to_pixmap1 (splotd *, gboolean, ggobid *);
+void       splot_surface0_to_surface1 (splotd *, gboolean, ggobid *);
 void       splot_plane_to_screen (displayd *, cpaneld *, splotd *, ggobid *);
 gboolean   splot_plot_case (gint m, GGobiData *, splotd *, displayd *, ggobid *);
 void       splot_points_realloc (gint, splotd *, GGobiData *);

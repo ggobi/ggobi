@@ -26,6 +26,42 @@
 #undef WIN32
 
 static void splot_draw_border (splotd *, cairo_t *, ggobid *);
+static cairo_t *splot_begin_surface (GGobiSurfaceBuffer *surface);
+static void splot_copy_surface_region (GGobiSurfaceBuffer *dest,
+                                       GGobiSurfaceBuffer *src,
+                                       gint xsrc, gint ysrc,
+                                       gint xdest, gint ydest,
+                                       gint width, gint height);
+
+static cairo_t *
+splot_begin_surface (GGobiSurfaceBuffer *surface)
+{
+  if (surface == NULL || surface->surface == NULL)
+    return NULL;
+
+  return cairo_create (surface->surface);
+}
+
+static void
+splot_copy_surface_region (GGobiSurfaceBuffer *dest, GGobiSurfaceBuffer *src,
+                           gint xsrc, gint ysrc, gint xdest, gint ydest,
+                           gint width, gint height)
+{
+  cairo_t *cr;
+
+  if (dest == NULL || src == NULL || dest->surface == NULL || src->surface == NULL)
+    return;
+
+  cr = cairo_create (dest->surface);
+  cairo_save (cr);
+  cairo_rectangle (cr, xdest, ydest, width, height);
+  cairo_clip (cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
+  cairo_set_source_surface (cr, src->surface, xdest - xsrc, ydest - ysrc);
+  cairo_paint (cr);
+  cairo_restore (cr);
+  cairo_destroy (cr);
+}
 
 static void
 splot_check_colors (gushort maxcolorid, gint *ncolors_used,
@@ -80,24 +116,29 @@ splot_plot_case (gint m, GGobiData *d,
 }
 
 /*------------------------------------------------------------------------*/
-/*               drawing to pixmap0 when binning can't be used            */
+/*               drawing to surface0 when binning can't be used            */
 /*------------------------------------------------------------------------*/
 
 void
-splot_clear_pixmap0 (splotd *sp, ggobid *gg)
+splot_clear_surface0 (splotd *sp, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint width = gtk_widget_get_allocated_width (sp->da);
   gint height = gtk_widget_get_allocated_height (sp->da);
+  cairo_t *cr;
 
   /* clear the pixmap */
-  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
-  gdk_draw_rectangle (sp->pixmap0, GGOBI_PLOT_STYLE (gg),
-                      true, 0, 0, width, height);
+  cr = splot_begin_surface (sp->surface0);
+  if (cr == NULL)
+    return;
+
+  ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb_bg);
+  ggobi_cairo_draw_rectangle (cr, true, 0, 0, width, height);
+  cairo_destroy (cr);
 }
 
 void
-splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
+splot_draw_to_surface0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 {
   gint k;
   gushort current_color;
@@ -156,7 +197,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         display->options.edges_arrowheads_show_p ||
         display->options.edges_directed_show_p)
     {
-      cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+      cairo_t *cr = splot_begin_surface (sp->surface0);
       splot_edges_draw (sp, draw_hidden, cr, gg);
       cairo_destroy (cr);
     }
@@ -192,13 +233,13 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
           */
           if (display->options.points_show_p)
           {
-            cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+            cairo_t *cr = splot_begin_surface (sp->surface0);
             draw_glyph (cr, &d->glyph_now.els[m], sp->screen, m, gg);
             cairo_destroy (cr);
           }
           /* draw the whiskers ... or, potentially, other decorations */
           if (klass && klass->within_draw_to_unbinned) {
-            cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+            cairo_t *cr = splot_begin_surface (sp->surface0);
             klass->within_draw_to_unbinned (sp, m, cr);
             cairo_destroy (cr);
           }
@@ -233,13 +274,13 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             */
             if (display->options.points_show_p)
             {
-              cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+              cairo_t *cr = splot_begin_surface (sp->surface0);
               draw_glyph (cr, &d->glyph_now.els[m], sp->screen, m, gg);
               cairo_destroy (cr);
             }
 
             if (klass && klass->within_draw_to_unbinned) {
-              cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+              cairo_t *cr = splot_begin_surface (sp->surface0);
               klass->within_draw_to_unbinned (sp, m, cr);
               cairo_destroy (cr);
             }
@@ -255,7 +296,7 @@ splot_draw_to_pixmap0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 }
 
 void
-splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
+splot_clear_surface0_binned (splotd *sp, ggobid *gg)
 {
   icoords loc_clear0, loc_clear1;
   icoords *bin0 = &gg->plot.bin0;
@@ -265,9 +306,10 @@ splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
   displayd *display = (displayd *) sp->displayptr;
   GGobiData *d = display->d;
   colorschemed *scheme = gg->activeColorScheme;
+  cairo_t *cr;
 
 /*
- * Instead of clearing and redrawing the entire pixmap0, only
+ * Instead of clearing and redrawing the entire surface0, only
  * clear what's necessary.
 */
   get_extended_brush_corners (bin0, bin1, d, sp);
@@ -296,16 +338,20 @@ splot_clear_pixmap0_binned (splotd *sp, ggobid *gg)
   loc_clear1.y = (bin1->y == d->brush.nbins-1) ? sp->max.y :
                                                loc1->y - BRUSH_MARGIN;
 
-  ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
-  gdk_draw_rectangle (sp->pixmap0, GGOBI_PLOT_STYLE (gg),
-                      true,  /* fill */
-                      loc_clear0.x, loc_clear0.y,
-                      1 + loc_clear1.x - loc_clear0.x ,
-                      1 + loc_clear1.y - loc_clear0.y);
+  cr = splot_begin_surface (sp->surface0);
+  if (cr == NULL)
+    return;
+
+  ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb_bg);
+  ggobi_cairo_draw_rectangle (cr, true,
+                              loc_clear0.x, loc_clear0.y,
+                              1 + loc_clear1.x - loc_clear0.x,
+                              1 + loc_clear1.y - loc_clear0.y);
+  cairo_destroy (cr);
 }
 
 void
-splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
+splot_draw_to_surface0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 {
 #ifndef WIN32
   gint ih, iv;
@@ -359,13 +405,13 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             if (d->hidden_now.els[i] &&
                 splot_plot_case (i, d, sp, display, gg))
             {
-              cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+              cairo_t *cr = splot_begin_surface (sp->surface0);
               draw_glyph (cr, &d->glyph_now.els[i], sp->screen, i, gg);
               cairo_destroy (cr);
 
               /* parallel coordinate plot and time series plot whiskers */
               if(klass && klass->within_draw_to_binned) {
-                cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+                cairo_t *cr = splot_begin_surface (sp->surface0);
                 klass->within_draw_to_binned (sp, i, cr);
                 cairo_destroy (cr);
               }
@@ -402,13 +448,13 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
                   d->color_now.els[i] == current_color &&
                   splot_plot_case (i, d, sp, display, gg))
               {
-                cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+                cairo_t *cr = splot_begin_surface (sp->surface0);
                 draw_glyph (cr, &d->glyph_now.els[i], sp->screen, i, gg);
                 cairo_destroy (cr);
 
                 /* parallel coordinate plot whiskers */
                 if(klass && klass->within_draw_to_binned) {
-                  cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+                  cairo_t *cr = splot_begin_surface (sp->surface0);
                   klass->within_draw_to_binned (sp, i, cr);
                   cairo_destroy (cr);
                 }
@@ -422,7 +468,7 @@ splot_draw_to_pixmap0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
   }
 
   if (proj == TOUR1D || proj == TOUR2D3 || proj == TOUR2D || proj == COTOUR) {
-    cairo_t *cr = gdk_cairo_create (sp->pixmap0);
+    cairo_t *cr = splot_begin_surface (sp->surface0);
     splot_draw_tour_axes (sp, cr, gg);
     cairo_destroy (cr);
   }
@@ -710,31 +756,31 @@ splot_draw_border (splotd *sp, cairo_t *cr, ggobid *gg)
 
 
 /*------------------------------------------------------------------------*/
-/*    getting from pixmap0 to pixmap1, then pixmap1 to the window         */
+/*    getting from surface0 to surface1, then surface1 to the window      */
 /*------------------------------------------------------------------------*/
 
 void
-splot_pixmap0_to_pixmap1 (splotd *sp, gboolean binned, ggobid *gg) {
+splot_surface0_to_surface1 (splotd *sp, gboolean binned, ggobid *gg) {
   gint width = gtk_widget_get_allocated_width (sp->da);
   gint height = gtk_widget_get_allocated_height (sp->da);
   icoords *loc0 = &gg->plot.loc0;
   icoords *loc1 = &gg->plot.loc1;
 
   if (!binned) {
-    gdk_draw_pixmap (sp->pixmap1, GGOBI_PLOT_STYLE (gg), sp->pixmap0,
-                     0, 0, 0, 0,
-                     width, height);
+    splot_copy_surface_region (sp->surface1, sp->surface0, 0, 0, 0, 0,
+                               width, height);
   }
   else {
-    gdk_draw_pixmap (sp->pixmap1, GGOBI_PLOT_STYLE (gg), sp->pixmap0,
-                      loc0->x, loc0->y,
-                      loc0->x, loc0->y,
-                      1 + loc1->x - loc0->x, 1 + loc1->y - loc0->y);
+    splot_copy_surface_region (sp->surface1, sp->surface0,
+                               loc0->x, loc0->y,
+                               loc0->x, loc0->y,
+                               1 + loc1->x - loc0->x,
+                               1 + loc1->y - loc0->y);
   }
 }
 
 static void
-splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
+splot_add_markup_to_surface (splotd *sp, GGobiSurfaceBuffer *surface, ggobid *gg)
 {
   displayd *dsp = (displayd *) sp->displayptr;
   GGobiData *e = dsp->e;
@@ -742,7 +788,7 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
   cpaneld *cpanel = &dsp->cpanel;
   gint proj = cpanel->pmode;
   GGobiExtendedSPlotClass *splotKlass;
-  cairo_t *cr = gdk_cairo_create (drawable);
+  cairo_t *cr = splot_begin_surface (surface);
 
   /*
    * if identification is going on in a plot of points that 
@@ -816,19 +862,19 @@ splot_add_markup_to_pixmap (splotd *sp, GdkDrawable *drawable, ggobid *gg)
 
 
 void
-splot_pixmap_to_window (splotd *sp, GdkPixmap *pixmap, ggobid *gg) {
+splot_surface_to_window (splotd *sp, GGobiSurfaceBuffer *surface, ggobid *gg) {
   GdkWindow *window = gtk_widget_get_window (sp->da);
-  GdkDrawable *drawable;
+  cairo_t *cr;
 
-  if (window == NULL)
+  (void) gg;
+
+  if (window == NULL || surface == NULL || surface->surface == NULL)
     return;
 
-  drawable = GGOBI_GDK_WINDOW_TO_DRAWABLE (window);
-
-  gdk_draw_pixmap (drawable, GGOBI_PLOT_STYLE (gg), pixmap,
-                   0, 0, 0, 0,
-                   gtk_widget_get_allocated_width (sp->da),
-                   gtk_widget_get_allocated_height (sp->da));
+  cr = gdk_cairo_create (window);
+  cairo_set_source_surface (cr, surface->surface, 0, 0);
+  cairo_paint (cr);
+  cairo_destroy (cr);
 }
 
 /*------------------------------------------------------------------------*/
@@ -839,7 +885,7 @@ void
 splot_redraw (splotd *sp, RedrawStyle style, ggobid *gg) {
 
   /*-- sometimes the first draw happens before configure is called --*/
-  if (sp == NULL || sp->da == NULL || sp->pixmap0 == NULL) {
+  if (sp == NULL || sp->da == NULL || sp->surface0 == NULL) {
     return;
   }
 
@@ -852,39 +898,39 @@ splot_redraw (splotd *sp, RedrawStyle style, ggobid *gg) {
   */
   switch (style) {
     case FULL:  /*-- FULL_2PIXMAP --*/
-      splot_clear_pixmap0 (sp, gg);
-      splot_draw_to_pixmap0_unbinned (sp, true, gg);  /* true = hiddens */
-      splot_draw_to_pixmap0_unbinned (sp, false, gg);
-      splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
-      splot_add_markup_to_pixmap (sp, sp->pixmap1, gg);
-      splot_pixmap_to_window (sp, sp->pixmap1, gg);
+      splot_clear_surface0 (sp, gg);
+      splot_draw_to_surface0_unbinned (sp, true, gg);  /* true = hiddens */
+      splot_draw_to_surface0_unbinned (sp, false, gg);
+      splot_surface0_to_surface1 (sp, false, gg);  /* false = not binned */
+      splot_add_markup_to_surface (sp, sp->surface1, gg);
+      splot_surface_to_window (sp, sp->surface1, gg);
     break;
     case QUICK:
-      splot_pixmap0_to_pixmap1 (sp, false, gg);  /* false = not binned */
-      splot_add_markup_to_pixmap (sp, sp->pixmap1, gg);
-      splot_pixmap_to_window (sp, sp->pixmap1, gg);
+      splot_surface0_to_surface1 (sp, false, gg);  /* false = not binned */
+      splot_add_markup_to_surface (sp, sp->surface1, gg);
+      splot_surface_to_window (sp, sp->surface1, gg);
     break;
 
     case BINNED:
-      splot_clear_pixmap0_binned (sp, gg);
-      splot_draw_to_pixmap0_binned (sp, true, gg); /* true = hiddens */
-      splot_draw_to_pixmap0_binned (sp, false, gg);
-      splot_pixmap0_to_pixmap1 (sp, true, gg);  /* true = binned */
-      splot_add_markup_to_pixmap (sp, sp->pixmap1, gg);
-      splot_pixmap_to_window (sp, sp->pixmap1, gg);
+      splot_clear_surface0_binned (sp, gg);
+      splot_draw_to_surface0_binned (sp, true, gg); /* true = hiddens */
+      splot_draw_to_surface0_binned (sp, false, gg);
+      splot_surface0_to_surface1 (sp, true, gg);  /* true = binned */
+      splot_add_markup_to_surface (sp, sp->surface1, gg);
+      splot_surface_to_window (sp, sp->surface1, gg);
     break;
 
     case FULL_1PIXMAP:  /*-- to optimize motion --*/
-      splot_clear_pixmap0 (sp, gg);
-      splot_draw_to_pixmap0_unbinned (sp, true, gg);  /* true = hiddens */
-      splot_draw_to_pixmap0_unbinned (sp, false, gg);
-      splot_add_markup_to_pixmap (sp, sp->pixmap0, gg);
-      splot_pixmap0_to_pixmap1 (sp, false, gg);
-      splot_pixmap_to_window (sp, sp->pixmap0, gg);
+      splot_clear_surface0 (sp, gg);
+      splot_draw_to_surface0_unbinned (sp, true, gg);  /* true = hiddens */
+      splot_draw_to_surface0_unbinned (sp, false, gg);
+      splot_add_markup_to_surface (sp, sp->surface0, gg);
+      splot_surface0_to_surface1 (sp, false, gg);
+      splot_surface_to_window (sp, sp->surface0, gg);
     break;
 
     case EXPOSE:
-      splot_pixmap_to_window (sp, sp->pixmap1, gg);
+      splot_surface_to_window (sp, sp->surface1, gg);
     break;
 
     case NONE:
