@@ -339,7 +339,7 @@ struct _ggobid {
   struct _Sphere {
     GtkWidget *window;
     GtkWidget *scree_da;
-    GdkPixmap *scree_pixmap;
+    cairo_surface_t *scree_surface;
 
     GtkAdjustment *npcs_adj;
     GtkWidget *stdized_entry, *variance_entry, *condnum_entry;
@@ -361,7 +361,7 @@ struct _ggobid {
 
   struct _SchemeChooser {
     GtkWidget *window, *entry_preview, *entry_applied, *da;
-    GdkPixmap *pix;
+    cairo_surface_t *surface;
     colorschemed *scheme; /*-- current color scheme --*/
     gfloat *pct;
     gint npct;
@@ -371,7 +371,7 @@ struct _ggobid {
 
   struct _WeightedVis {
     GtkWidget *window, *da;
-    GdkPixmap *pix;
+    cairo_surface_t *surface;
 
     gfloat *pct;
     gint npct;

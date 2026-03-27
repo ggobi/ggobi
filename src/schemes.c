@@ -16,6 +16,6 @@ svis_init (ggobid * gg)
 {
   gg->svis.window = NULL;
   gg->svis.npct = 0;
-  gg->svis.pix = NULL;
+  gg->svis.surface = NULL;
   gg->svis.scheme = NULL;
 }

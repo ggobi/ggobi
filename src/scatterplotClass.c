@@ -247,13 +247,12 @@ variableSelect (GtkWidget * w, displayd * display, splotd * sp, gint jvar,
 }
 
 static gboolean
-varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
+varcircleDraw (displayd * display, gint jvar, cairo_t *c, ggobid * gg)
 {
   gdouble r = VAR_CIRCLE_DIAM / 2.0;
   gint x = 0, y = 0, k;
   cpaneld *cpanel = &display->cpanel;
   gboolean chosen = false;
-  cairo_t *c = gdk_cairo_create (da_pix);
   cairo_set_line_cap (c, CAIRO_LINE_CAP_ROUND);
   cairo_set_line_join (c, CAIRO_LINE_JOIN_ROUND);
   cairo_set_line_width (c, 1);
@@ -375,7 +374,6 @@ varcircleDraw (displayd * display, gint jvar, GdkPixmap * da_pix, ggobid * gg)
   cairo_move_to (c, r, r);
   cairo_line_to (c, r + x, r - y);
   cairo_stroke (c);
-  cairo_destroy (c);
 
   return (chosen);
 }

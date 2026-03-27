@@ -91,14 +91,13 @@ close_wmgr_cb (GtkWidget * w, GdkEventButton * event, ggobid * gg)
 static gint
 da_configure_cb (GtkWidget * w, GdkEventConfigure * event, ggobid * gg)
 {
-  GdkWindow *window = gtk_widget_get_window (w);
   gint width = gtk_widget_get_allocated_width (w);
   gint height = gtk_widget_get_allocated_height (w);
 
-  /*-- Create new backing pixmaps of the appropriate size --*/
-  if (gg->svis.pix != NULL)
-    gdk_pixmap_unref (gg->svis.pix);
-  gg->svis.pix = gdk_pixmap_new (window, width, height, -1);
+  if (gg->svis.surface != NULL)
+    cairo_surface_destroy (gg->svis.surface);
+  gg->svis.surface =
+    cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
 
   gtk_widget_queue_draw (w);
 
@@ -133,10 +132,10 @@ da_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
   colorschemed *scheme = (gg->svis.scheme != NULL) ?
     gg->svis.scheme : gg->activeColorScheme;
   GGobiData *d = NULL;
-  GdkPixmap *pix = gg->svis.pix;
-  cairo_t *pix_cr;
+  cairo_surface_t *surface = gg->svis.surface;
+  cairo_t *surface_cr;
 
-  if (pix == NULL)
+  if (surface == NULL)
     return false;
 
   hgt = height / (scheme->n - 1);
@@ -148,28 +147,26 @@ da_draw_cb (GtkWidget * w, cairo_t * cr, ggobid * gg)
     bin_boundaries_set (d, gg);
   }
 
-  /*-- clear the pixmap --*/
-  pix_cr = cairo_create (pix->surface);
-  ggobi_cairo_set_source_gdk_color (pix_cr, &scheme->rgb_bg);
-  cairo_rectangle (pix_cr, 0, 0, width, gtk_widget_get_allocated_height (w));
-  cairo_fill (pix_cr);
+  /*-- clear the backing surface --*/
+  surface_cr = cairo_create (surface);
+  ggobi_cairo_set_source_gdk_color (surface_cr, &scheme->rgb_bg);
+  cairo_rectangle (surface_cr, 0, 0, width, gtk_widget_get_allocated_height (w));
+  cairo_fill (surface_cr);
 
 
   /*-- draw the color bars --*/
   x0 = xmargin;
   for (k = 0; k < scheme->n; k++) {
     x1 = xmargin + gg->svis.pct[k] * (width - 2 * xmargin);
-    ggobi_cairo_set_source_gdk_color (pix_cr, &scheme->rgb[k]);
-    cairo_rectangle (pix_cr, x0, ymargin, x1 - x0, height);
-    cairo_fill (pix_cr);
+    ggobi_cairo_set_source_gdk_color (surface_cr, &scheme->rgb[k]);
+    cairo_rectangle (surface_cr, x0, ymargin, x1 - x0, height);
+    cairo_fill (surface_cr);
     x0 = x1;
   }
-  cairo_destroy (pix_cr);
+  cairo_destroy (surface_cr);
 
-  if (pix->surface != NULL) {
-    cairo_set_source_surface (cr, pix->surface, 0, 0);
-    cairo_paint (cr);
-  }
+  cairo_set_source_surface (cr, surface, 0, 0);
+  cairo_paint (cr);
 
   return false;
 }

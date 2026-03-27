@@ -21,7 +21,7 @@ wvis_init (ggobid  *gg)
   gg->wvis.motion_notify_id = 0;
   gg->wvis.mousepos.x = -1;
   gg->wvis.mousepos.y = -1;
-  gg->wvis.pix = NULL;
+  gg->wvis.surface = NULL;
 
   gg->wvis.binning_method = WVIS_EQUAL_WIDTH_BINS;
   gg->wvis.update_method = WVIS_UPDATE_ON_MOUSE_UP;

@@ -329,11 +329,10 @@ da_configure_cb (GtkWidget *w, GdkEventConfigure *event, ggobid *gg)
   gint width = gtk_widget_get_allocated_width (w);
   gint height = gtk_widget_get_allocated_height (w);
 
-  /*-- Create new backing pixmaps of the appropriate size --*/
-  if (gg->wvis.pix != NULL)
-    gdk_pixmap_unref (gg->wvis.pix);
-  gg->wvis.pix = gdk_pixmap_new (gtk_widget_get_window (w),
-    width, height, -1);
+  if (gg->wvis.surface != NULL)
+    cairo_surface_destroy (gg->wvis.surface);
+  gg->wvis.surface =
+    cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
 
   gtk_widget_queue_draw (w);
 
@@ -456,7 +455,7 @@ da_draw_cb (GtkWidget *w, cairo_t *cr, ggobid *gg)
   gint selected_var = -1;
 
   GtkWidget *da = gg->wvis.da;
-  GdkPixmap *pix = gg->wvis.pix;
+  cairo_surface_t *surface = gg->wvis.surface;
 
   if(tree_view) {
     d = (GGobiData *) g_object_get_data(G_OBJECT (tree_view), "datad");
@@ -479,34 +478,34 @@ da_draw_cb (GtkWidget *w, cairo_t *cr, ggobid *gg)
     bin_counts_reset (selected_var, d, gg);
   }
 
-  if (pix == NULL)
+  if (surface == NULL)
     return FALSE;
 
   {
-    cairo_t *pix_cr = gdk_cairo_create (pix);
+    cairo_t *surface_cr = cairo_create (surface);
 
-    ggobi_cairo_set_source_gdk_color (pix_cr, &scheme->rgb_bg);
-    cairo_paint (pix_cr);
+    ggobi_cairo_set_source_gdk_color (surface_cr, &scheme->rgb_bg);
+    cairo_paint (surface_cr);
 
     /*-- draw the color bars --*/
     x0 = xmargin;
     for (k=0; k<scheme->n; k++) {
       x1 = xmargin + gg->wvis.pct[k] * (width - 2*xmargin);
-      ggobi_cairo_set_source_gdk_color (pix_cr, &scheme->rgb[k]);
-      cairo_rectangle (pix_cr, x0, ymargin, x1 - x0, height);
-      cairo_fill (pix_cr);
+      ggobi_cairo_set_source_gdk_color (surface_cr, &scheme->rgb[k]);
+      cairo_rectangle (surface_cr, x0, ymargin, x1 - x0, height);
+      cairo_fill (surface_cr);
       x0 = x1;
     }
 
     /*-- draw the horizontal lines --*/
     x0 = xmargin; y = ymargin + 10;
     x1 = xmargin + (width - 2*xmargin) - 1;
-    ggobi_cairo_set_source_gdk_color (pix_cr, &gg->mediumgray);
-    cairo_set_line_width (pix_cr, 1.0);
+    ggobi_cairo_set_source_gdk_color (surface_cr, &gg->mediumgray);
+    cairo_set_line_width (surface_cr, 1.0);
     for (k=0; k<scheme->n-1; k++) {
-      cairo_move_to (pix_cr, x0, y);
-      cairo_line_to (pix_cr, x1, y);
-      cairo_stroke (pix_cr);
+      cairo_move_to (surface_cr, x0, y);
+      cairo_line_to (surface_cr, x1, y);
+      cairo_stroke (surface_cr);
       y += hgt;
     }
 
@@ -514,7 +513,7 @@ da_draw_cb (GtkWidget *w, cairo_t *cr, ggobid *gg)
     y = ymargin + 10;
     for (k=0; k<scheme->n-1; k++) {
       x = xmargin + gg->wvis.pct[k] * (width - 2*xmargin);
-      draw_3drectangle (w, pix_cr, x, y, 20, 10, gg);
+      draw_3drectangle (w, surface_cr, x, y, 20, 10, gg);
       y += hgt;
     }
 
@@ -531,14 +530,14 @@ da_draw_cb (GtkWidget *w, cairo_t *cr, ggobid *gg)
         min = vt->lim_tform.min;
         max = vt->lim_tform.max;
 
-        ggobi_cairo_set_source_gdk_color (pix_cr, &scheme->rgb_accent);
+        ggobi_cairo_set_source_gdk_color (surface_cr, &scheme->rgb_accent);
         y = ymargin;
         for (k=0; k<scheme->n-1; k++) {
           val = min + gg->wvis.pct[k] * (max - min);
           str = g_strdup_printf ("%3.3g", val);
           layout_text(layout, str, &rect);
           x = xmargin + gg->wvis.pct[k] * (width - 2*xmargin);
-          ggobi_cairo_draw_layout (pix_cr, layout,
+          ggobi_cairo_draw_layout (surface_cr, layout,
                                    x - rect.width/2, y - 2 - rect.height);
           g_free (str);
         }
@@ -551,7 +550,7 @@ da_draw_cb (GtkWidget *w, cairo_t *cr, ggobid *gg)
           x = xmargin + gg->wvis.pct[k] * (width - 2*xmargin);
           diff = (k == 0) ? gg->wvis.pct[k] : gg->wvis.pct[k]-gg->wvis.pct[k-1];
           x -= diff/2 * (width - 2*xmargin);
-          ggobi_cairo_draw_layout (pix_cr, layout,
+          ggobi_cairo_draw_layout (surface_cr, layout,
                                    x - rect.width/2,
                                    (full_height - ymargin) + 2);
           g_free (str);
@@ -560,13 +559,11 @@ da_draw_cb (GtkWidget *w, cairo_t *cr, ggobid *gg)
       g_object_unref(G_OBJECT(layout));
     }
 
-    cairo_destroy (pix_cr);
+    cairo_destroy (surface_cr);
   }
 
-  if (pix->surface != NULL) {
-    cairo_set_source_surface (cr, pix->surface, 0, 0);
-    cairo_paint (cr);
-  }
+  cairo_set_source_surface (cr, surface, 0, 0);
+  cairo_paint (cr);
 
   return FALSE;
 }

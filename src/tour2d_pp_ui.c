@@ -51,6 +51,10 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp)
 
   free_optimize0_p(&dsp->t2d_pp_op);
   free_pp(&dsp->t2d_pp_param);
+  if (dsp->t2d_pp_surface != NULL) {
+    cairo_surface_destroy (dsp->t2d_pp_surface);
+    dsp->t2d_pp_surface = NULL;
+  }
   gtk_widget_destroy (dsp->t2d_window);
   dsp->t2d_window = NULL;
 }
@@ -207,42 +211,31 @@ t2d_ppda_configure_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
   gint wid = gtk_widget_get_allocated_width (w);
   gint hgt = gtk_widget_get_allocated_height (w);
 
-  if (dsp->t2d_pp_pixmap != NULL)
-    gdk_pixmap_unref (dsp->t2d_pp_pixmap);
+  if (dsp->t2d_pp_surface != NULL)
+    cairo_surface_destroy (dsp->t2d_pp_surface);
 
-  dsp->t2d_pp_pixmap = gdk_pixmap_new (gtk_widget_get_window (dsp->t2d_ppda),
-    wid, hgt, -1);
+  dsp->t2d_pp_surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+    wid, hgt);
 
   return false;
 }
 
-static gint
-t2d_ppda_expose_cb (GtkWidget *w, GdkEventConfigure *event, displayd *dsp)
+static gboolean
+t2d_ppda_present (GtkWidget *w, cairo_t *cr, displayd *dsp)
 {
-  ggobid *gg = dsp->d->gg;
-/*
-  gint margin=10;
-  gint j;
-  gint xpos, ypos, xstrt, ystrt;
-  gchar *tickmk;
-  GtkStyle *style = gtk_widget_get_style (dsp->t2d_ppda);
-  GGobiData *d = dsp->d;
-*/
-  gint wid = gtk_widget_get_allocated_width (w);
-  gint hgt = gtk_widget_get_allocated_height (w);
-  /*  static gboolean init = true;*/
+  if (dsp->t2d_pp_surface == NULL)
+    return FALSE;
 
-  /*  if (init) {
-    t2d_clear_ppda(dsp, gg);
-    init=false;
-    }*/
+  cairo_set_source_surface (cr, dsp->t2d_pp_surface, 0, 0);
+  cairo_paint (cr);
 
-  gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t2d_ppda)),
-                   GGOBI_PLOT_STYLE (gg), dsp->t2d_pp_pixmap,
-                   0, 0, 0, 0,
-                   wid, hgt);
+  return FALSE;
+}
 
-  return false;
+static gboolean
+t2d_ppda_draw_cb (GtkWidget *w, cairo_t *cr, displayd *dsp)
+{
+  return t2d_ppda_present (w, cr, dsp);
 }
 
 static const gchar* tour2dpp_ui =
@@ -534,8 +527,8 @@ tour2dpp_window_open (ggobid *gg) {
                           (gpointer) dsp);
 
       g_signal_connect (G_OBJECT (dsp->t2d_ppda),
-                          "expose_event",
-                          G_CALLBACK(t2d_ppda_expose_cb),
+                          "draw",
+                          G_CALLBACK(t2d_ppda_draw_cb),
                           (gpointer) dsp);
   
       gtk_container_add (GTK_CONTAINER (frame), dsp->t2d_ppda);

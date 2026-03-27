@@ -148,10 +148,10 @@ struct _displayd {
  gboolean tcorr_axes;
  gboolean tourcorr_video;
 
-/* projection pursuit */
+ /* projection pursuit */
  GtkWidget *t1d_pplabel, *t2d_pplabel;
  GtkWidget *t1d_ppda, *t2d_ppda;
- GdkPixmap *t1d_pp_pixmap, *t2d_pp_pixmap;
+ cairo_surface_t *t1d_pp_surface, *t2d_pp_surface;
  GtkWidget *t1d_window, *t2d_window;
  GtkWidget *t1d_control_frame, *t2d_control_frame;
  GtkWidget *t1d_mbar, *t2d_mbar;
@@ -315,7 +315,7 @@ typedef struct
   void (*pmode_set)(ProjectionMode, displayd *, ggobid *);
   /* */
 
-  gboolean (*varcircle_draw)(displayd *, gint jvar, GdkPixmap *da_pix, ggobid *gg);
+  gboolean (*varcircle_draw)(displayd *, gint jvar, cairo_t *cr, ggobid *gg);
   void (*select_X)(GtkWidget *, displayd *, gint, ggobid *);
 
   void (*tour1d_realloc)(displayd *, gint, GGobiData *);

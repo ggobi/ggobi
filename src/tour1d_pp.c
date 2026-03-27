@@ -52,6 +52,26 @@ The authors can be contacted at the following email addresses:
 #define EXPMINUS1 0.3678794411714423
 #define ONEMINUSEXPMINUS1 0.63212056
 
+static void
+pp_widget_flush (GtkWidget *widget)
+{
+  if (widget == NULL)
+    return;
+
+  gtk_widget_queue_draw (widget);
+  while (g_main_context_pending (NULL))
+    g_main_context_iteration (NULL, FALSE);
+}
+
+static cairo_t *
+pp_surface_begin (displayd *dsp)
+{
+  if (dsp->t1d_pp_surface == NULL)
+    return NULL;
+
+  return cairo_create (dsp->t1d_pp_surface);
+}
+
 /* void print()
 { FILE *f = fopen ("dump", "a");
   if (f)
@@ -548,26 +568,24 @@ void t1d_clear_pppixmap(displayd *dsp, ggobid *gg)
 {
   colorschemed *scheme = gg->activeColorScheme;
   gint margin=10;
-  GdkDrawable *drawable = GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda));
   gint wid = gtk_widget_get_allocated_width (dsp->t1d_ppda);
   gint hgt = gtk_widget_get_allocated_height (dsp->t1d_ppda);
+  cairo_t *cr = pp_surface_begin (dsp);
+
+  if (cr == NULL)
+    return;
 
   /* clear the pixmap */
   ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_bg);
-  gdk_draw_rectangle (dsp->t1d_pp_pixmap, GGOBI_PLOT_STYLE (gg),
-                      true, 0, 0, wid, hgt);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
+  ggobi_cairo_draw_rectangle (cr, true, 0, 0, wid, hgt);
 
   ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
-  gdk_draw_line (dsp->t1d_pp_pixmap, GGOBI_PLOT_STYLE (gg),
-    margin, hgt - margin,
-    wid - margin, hgt - margin);
-  gdk_draw_line (dsp->t1d_pp_pixmap, GGOBI_PLOT_STYLE (gg),
-    margin, hgt - margin, margin, margin);
-
-  gdk_draw_pixmap (drawable, GGOBI_PLOT_STYLE (gg), dsp->t1d_pp_pixmap,
-                   0, 0, 0, 0,
-                   wid, hgt);
-  gtk_widget_queue_draw (dsp->t1d_ppda);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
+  ggobi_cairo_draw_line (cr, margin, hgt - margin, wid - margin, hgt - margin);
+  ggobi_cairo_draw_line (cr, margin, hgt - margin, margin, margin);
+  cairo_destroy (cr);
+  pp_widget_flush (dsp->t1d_ppda);
 }
 
 void t1d_clear_ppda(displayd *dsp, ggobid *gg)
@@ -591,8 +609,12 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
   /*gint xpos, ypos, xstrt, ystrt;*/
   GdkPoint pptrace[100];
   gint i;
+  cairo_t *cr;
 
   t1d_clear_pppixmap(dsp, gg);
+  cr = pp_surface_begin (dsp);
+  if (cr == NULL)
+    return;
 
   for (i=0; i<dsp->t1d_ppindx_count; i++) 
   {
@@ -601,13 +623,10 @@ void t1d_ppdraw_all(gint wid, gint hgt, gint margin, displayd *dsp, ggobid *gg)
       dsp->t1d_indx_min)/(gfloat) (dsp->t1d_indx_max-dsp->t1d_indx_min)) * 
       (gfloat) (hgt - 2*margin));
   }
-  gdk_draw_lines (dsp->t1d_pp_pixmap, GGOBI_PLOT_STYLE (gg),
-    pptrace, dsp->t1d_ppindx_count);
-
-  gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda)),
-    GGOBI_PLOT_STYLE (gg), dsp->t1d_pp_pixmap,
-    0, 0, 0, 0, wid, hgt);
-  gtk_widget_queue_draw (dsp->t1d_ppda);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
+  ggobi_cairo_draw_lines (cr, pptrace, dsp->t1d_ppindx_count);
+  cairo_destroy (cr);
+  pp_widget_flush (dsp->t1d_ppda);
 
 }
 
@@ -617,24 +636,20 @@ void t1d_ppdraw_think(displayd *dsp, ggobid *gg)
 {
   splotd *sp = (splotd *) g_list_nth_data (dsp->splots, 0);
   colorschemed *scheme = gg->activeColorScheme;
-  gint wid = gtk_widget_get_allocated_width (dsp->t1d_ppda);
-  gint hgt = gtk_widget_get_allocated_height (dsp->t1d_ppda);
   PangoLayout *layout = gtk_widget_create_pango_layout(sp->da, "Thinking...");
+  cairo_t *cr = pp_surface_begin (dsp);
+
+  if (cr == NULL) {
+    g_object_unref(G_OBJECT(layout));
+    return;
+  }
   
   ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_accent);
-  gdk_draw_layout(dsp->t1d_pp_pixmap, GGOBI_PLOT_STYLE (gg), 10, 10, layout);
+  ggobi_draw_style_apply (cr, GGOBI_PLOT_STYLE (gg));
+  ggobi_cairo_draw_layout (cr, layout, 10, 10);
   g_object_unref(G_OBJECT(layout));
-  /*gdk_text_extents (
-    gtk_style_get_font (style),
-    varlab, strlen (varlab),
-    &lbearing, &rbearing, &width, &ascent, &descent);
-    gdk_draw_string (dsp->t1d_pp_pixmap,
-    gtk_style_get_font (style),
-      GGOBI_PLOT_STYLE (gg), 10, 10, varlab);*/
-  gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (dsp->t1d_ppda)),
-    GGOBI_PLOT_STYLE (gg), dsp->t1d_pp_pixmap,
-    0, 0, 0, 0, wid, hgt);
-  gtk_widget_queue_draw (dsp->t1d_ppda);
+  cairo_destroy (cr);
+  pp_widget_flush (dsp->t1d_ppda);
 }
 
 /* This is the pp index plot drawing routine */ 

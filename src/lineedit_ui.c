@@ -48,14 +48,11 @@ static void
 add_record_dialog_cancel (GtkWidget * w, ggobid * gg)
 {
   GtkWidget *dialog = gtk_widget_get_toplevel (w);
-  gboolean rval = false;
 
   gg->edgeedit.a = -1;
   gtk_widget_destroy (dialog);
   edgeedit_event_handlers_toggle (gg->current_splot, true);
-
-  g_signal_emit_by_name (G_OBJECT (gg->current_splot->da),
-                         "expose_event", (gpointer) gg, (gpointer) & rval);
+  gtk_widget_queue_draw (gg->current_splot->da);
 }
 
 static void

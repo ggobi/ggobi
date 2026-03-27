@@ -24,7 +24,6 @@
 
 static GtkWidget *varcircle_create (gint, GGobiData *, ggobid * gg);
 static void varcircle_draw (gint, GGobiData *, ggobid * gg);
-static gboolean da_expose_cb (GtkWidget *, GdkEventExpose *, gpointer cbd);
 static gboolean da_draw_cb (GtkWidget *, cairo_t *, gpointer cbd);
 
 GtkWidget *varcircles_get_nth (gint which, gint jvar, GGobiData * d);
@@ -190,15 +189,17 @@ void
 varcircles_delete_nth (gint jvar, GGobiData * d)
 {
   GtkWidget *w;
-  GdkPixmap *pix;
+  cairo_surface_t *surface;
 
   w = varcircles_get_nth (LBL, jvar, d);
   d->vcirc_ui.label = g_slist_remove (d->vcirc_ui.label, (gpointer) w);
   w = varcircles_get_nth (DA, jvar, d);
   d->vcirc_ui.da = g_slist_remove (d->vcirc_ui.da, (gpointer) w);
 
-  pix = (GdkPixmap *) g_slist_nth_data (d->vcirc_ui.da_pix, jvar);
-  d->vcirc_ui.da_pix = g_slist_remove (d->vcirc_ui.da_pix, (gpointer) w);
+  surface = (cairo_surface_t *) g_slist_nth_data (d->vcirc_ui.da_surface, jvar);
+  d->vcirc_ui.da_surface = g_slist_remove (d->vcirc_ui.da_surface, surface);
+  if (surface != NULL)
+    cairo_surface_destroy (surface);
 
 
   w = (GtkWidget *) g_slist_nth_data (d->vcirc_ui.vb, jvar);
@@ -397,7 +398,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   d->vcirc_ui.vb = NULL;
   d->vcirc_ui.da = NULL;
   d->vcirc_ui.label = NULL;
-  d->vcirc_ui.da_pix = NULL;
+  d->vcirc_ui.da_surface = NULL;
 
   for (j = 0; j < d->ncols; j++) {
     vb = varcircle_create (j, d, gg);
@@ -460,7 +461,7 @@ varcircles_delete (gint nc, gint jvar, GGobiData * d, ggobid * gg)
 {
   gint j;
   GtkWidget *w;
-  GdkPixmap *pix;
+  cairo_surface_t *surface;
 
   if (nc > 0 && nc < d->ncols) {  /*-- forbid deleting every circle --*/
     for (j = jvar; j < jvar + nc; j++) {
@@ -475,9 +476,10 @@ varcircles_delete (gint nc, gint jvar, GGobiData * d, ggobid * gg)
       /*-- without a ref, this will be destroyed --*/
       gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
 
-      pix = (GdkPixmap *) g_slist_nth_data (d->vcirc_ui.da, jvar);
-      d->vcirc_ui.da_pix = g_slist_remove (d->vcirc_ui.da_pix, pix);
-      gdk_pixmap_unref (pix);
+      surface = (cairo_surface_t *) g_slist_nth_data (d->vcirc_ui.da_surface, jvar);
+      d->vcirc_ui.da_surface = g_slist_remove (d->vcirc_ui.da_surface, surface);
+      if (surface != NULL)
+        cairo_surface_destroy (surface);
     }
   }
 }
@@ -490,7 +492,7 @@ varcircles_clear (ggobid * gg)
   gint j;
   GSList *l;
   GGobiData *d;
-  GdkPixmap *pix;
+  cairo_surface_t *surface;
 
   for (l = gg->d; l; l = l->next) {
     d = (GGobiData *) l->data;
@@ -506,9 +508,10 @@ varcircles_clear (ggobid * gg)
       d->vcirc_ui.vb = g_slist_remove (d->vcirc_ui.vb, w);
       gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), w);
 
-      pix = (GdkPixmap *) g_slist_nth_data (d->vcirc_ui.da, j);
-      d->vcirc_ui.da_pix = g_slist_remove (d->vcirc_ui.da_pix, pix);
-      gdk_pixmap_unref (pix);
+      surface = (cairo_surface_t *) g_slist_nth_data (d->vcirc_ui.da_surface, j);
+      d->vcirc_ui.da_surface = g_slist_remove (d->vcirc_ui.da_surface, surface);
+      if (surface != NULL)
+        cairo_surface_destroy (surface);
     }
   }
 }
@@ -629,7 +632,7 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
   cpaneld *cpanel;
   gint k, len;
   GtkWidget *da = varcircles_get_nth (DA, jvar, d);
-  GdkPixmap *da_pix;
+  cairo_surface_t *da_surface;
   cairo_t *c;
   double radius = VAR_CIRCLE_DIAM / 2.0;
 
@@ -643,21 +646,20 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
 
   cpanel = &display->cpanel;
 
-  if ((len = g_slist_length (d->vcirc_ui.da_pix)) < d->ncols) {
+  if ((len = g_slist_length (d->vcirc_ui.da_surface)) < d->ncols) {
     for (k = len; k < d->ncols; k++) {
-      d->vcirc_ui.da_pix = g_slist_append (d->vcirc_ui.da_pix,
-                                           gdk_pixmap_new (gtk_widget_get_window (da),
-                                                           VAR_CIRCLE_DIAM +
-                                                           1,
-                                                           VAR_CIRCLE_DIAM +
-                                                           1, -1));
+      d->vcirc_ui.da_surface = g_slist_append (
+        d->vcirc_ui.da_surface,
+        cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
+                                    VAR_CIRCLE_DIAM + 1,
+                                    VAR_CIRCLE_DIAM + 1));
       /*
-       * clear and initialize each pixmap here, because they may be
+       * clear and initialize each surface here, because they may be
        * exposed out of sequence, and then noise is drawn to the
        * variable circle on the screen.
        */
-      da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, k);
-      c = gdk_cairo_create (da_pix);
+      da_surface = g_slist_nth_data (d->vcirc_ui.da_surface, k);
+      c = cairo_create (da_surface);
       cairo_set_operator (c, CAIRO_OPERATOR_CLEAR);
       cairo_paint (c);
       cairo_set_operator (c, CAIRO_OPERATOR_OVER);
@@ -670,10 +672,12 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
     }
   }
 
-  da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, jvar);
+  da_surface = g_slist_nth_data (d->vcirc_ui.da_surface, jvar);
+  if (da_surface == NULL)
+    return;
 
-  /*-- clear the pixmap --*/
-  c = gdk_cairo_create (da_pix);
+  /*-- clear the backing surface --*/
+  c = cairo_create (da_surface);
   cairo_set_operator (c, CAIRO_OPERATOR_CLEAR);
   cairo_paint (c);
   cairo_set_operator (c, CAIRO_OPERATOR_OVER);
@@ -687,7 +691,7 @@ varcircle_draw (gint jvar, GGobiData * d, ggobid * gg)
     GGobiExtendedDisplayClass *klass;
     klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
     if (klass->varcircle_draw)
-      chosen = klass->varcircle_draw (display, jvar, da_pix, gg);
+      chosen = klass->varcircle_draw (display, jvar, c, gg);
   }
 
   /*
@@ -720,37 +724,13 @@ tour_draw_circles (GGobiData * d, ggobid * gg)
   }
 }
 
-gboolean
-da_expose_cb (GtkWidget * w, GdkEventExpose * event, gpointer cbd)
-{
-  ggobid *gg = GGobiFromWidget (w, true);
-  gint j = GPOINTER_TO_INT (cbd);
-  GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (w), "datad");
-  GtkWidget *da = varcircles_get_nth (DA, j, d);
-  GdkPixmap *da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, j);
-
-  if (j >= d->ncols)
-    return false;
-
-  if (da_pix == NULL) {
-    varcircle_draw (j, d, gg);
-  }
-  else {
-    gdk_draw_pixmap (GGOBI_GDK_WINDOW_TO_DRAWABLE (gtk_widget_get_window (da)), NULL,
-                     da_pix, 0, 0, 0, 0,
-                     VAR_CIRCLE_DIAM + 1, VAR_CIRCLE_DIAM + 1);
-  }
-
-  return true;
-}
-
 static gboolean
 da_draw_cb (GtkWidget *w, cairo_t *cr, gpointer cbd)
 {
   gint j = GPOINTER_TO_INT (cbd);
   GGobiData *d = (GGobiData *) g_object_get_data (G_OBJECT (w), "datad");
   ggobid *gg = GGobiFromWidget (w, true);
-  GdkPixmap *da_pix;
+  cairo_surface_t *da_surface;
   GtkStyleContext *context;
 
   if (d == NULL || j >= d->ncols)
@@ -765,14 +745,14 @@ da_draw_cb (GtkWidget *w, cairo_t *cr, gpointer cbd)
   varcircle_draw (j, d, gg);
   g_object_set_data (G_OBJECT (w), "ggobi-varcircle-in-draw", NULL);
 
-  da_pix = g_slist_nth_data (d->vcirc_ui.da_pix, j);
-  if (da_pix != NULL && da_pix->surface != NULL) {
-    cairo_set_source_surface (cr, da_pix->surface, 0, 0);
+  da_surface = g_slist_nth_data (d->vcirc_ui.da_surface, j);
+  if (da_surface != NULL) {
+    cairo_set_source_surface (cr, da_surface, 0, 0);
     cairo_paint (cr);
     return FALSE;
   }
 
-  return da_expose_cb (w, NULL, cbd);
+  return FALSE;
 }
 
 /*-- used in cloning and appending variables; see vartable.c --*/

@@ -54,7 +54,7 @@ typedef struct _Varpanel_circd {
 
  /*-- components and properties of the table --*/
   GSList *vb, *da, *label;
-  GSList *da_pix;         /*-- backing pixmaps --*/
+  GSList *da_surface;     /*-- backing Cairo surfaces --*/
   gint nvars;
 } Varpanel_circd;
 
