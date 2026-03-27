@@ -721,7 +721,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
 
         dsp->t2d.oppval = -1.0;
         t2d_ppdraw_think(dsp, gg);
-/*XX*/  gdk_flush ();
+/*XX*/  ggobi_flush_display ();
         revert_random = t2d_switch_index(cpanel->t2d, 
           dsp->t2d.target_selection_method, dsp, gg);
 
@@ -803,7 +803,7 @@ tour2d_idle_func (displayd *dsp)
   gboolean doit = !cpanel->t2d.paused;
   if (doit) {
     tour2d_run (dsp, gg);
-    gdk_flush (); 
+    ggobi_flush_display ();
   }
 
   return (doit);

@@ -30,14 +30,12 @@ void
 colorscheme_init (colorschemed * scheme)
 {
   gint i;
-  gboolean writeable = false, best_match = true, *success;
+  gboolean *success;
 
   if (!scheme || scheme->n <= 0) {
     g_printerr ("unable to init colorscheme: ncolors=%d\n", scheme->n);
     return;
   }
-
-  success = (gboolean *) g_malloc (scheme->n * sizeof (gboolean));
 
   scheme->rgb = (GdkColor *) g_realloc (scheme->rgb,
                                         scheme->n * sizeof (GdkColor));
@@ -49,9 +47,9 @@ colorscheme_init (colorschemed * scheme)
     scheme->rgb[i].blue = (guint16) (scheme->data[i][2] * 65535.0);
   }
 
-  gdk_colormap_alloc_colors (gdk_colormap_get_system (),
-                             scheme->rgb, scheme->n, writeable, best_match,
-                             success);
+  success = (gboolean *) g_malloc (scheme->n * sizeof (gboolean));
+  for (i = 0; i < scheme->n; i++)
+    success[i] = TRUE;
 
   /*
    * Success[i] should always be true, since I'm allowing best_match,
@@ -62,12 +60,8 @@ colorscheme_init (colorschemed * scheme)
       scheme->rgb[i].red = (guint16) 65535;
       scheme->rgb[i].green = (guint16) 65535;
       scheme->rgb[i].blue = (guint16) 65535;
-      if (gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                    &scheme->rgb[i], writeable,
-                                    best_match) == false) {
-        g_printerr ("Unable to allocate colors, not even white!\n");
-        exit (0);
-      }
+      g_printerr ("Unable to allocate colors, not even white!\n");
+      exit (0);
     }
   }
 
@@ -77,10 +71,6 @@ colorscheme_init (colorschemed * scheme)
   scheme->rgb_bg.red = (guint16) (scheme->bg[0] * 65535.0);
   scheme->rgb_bg.green = (guint16) (scheme->bg[1] * 65535.0);
   scheme->rgb_bg.blue = (guint16) (scheme->bg[2] * 65535.0);
-  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                 &scheme->rgb_bg, writeable, best_match))
-    g_printerr ("failure allocating background color\n");
-
 /*
  * color for showing hidden points and edges to preserve context
  * in a few situations:  when doing "un-hide" brushing and when showing
@@ -101,10 +91,6 @@ colorscheme_init (colorschemed * scheme)
     scheme->rgb_hidden.red = (guint16) (red * 65535.0);
     scheme->rgb_hidden.green = (guint16) (green * 65535.0);
     scheme->rgb_hidden.blue = (guint16) (blue * 65535.0);
-    if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                   &scheme->rgb_hidden, writeable,
-                                   best_match))
-      g_printerr ("failure allocating hidden color\n");
   }
 
 /*
@@ -114,10 +100,6 @@ colorscheme_init (colorschemed * scheme)
   scheme->rgb_accent.red = (guint16) (scheme->accent[0] * 65535.0);
   scheme->rgb_accent.green = (guint16) (scheme->accent[1] * 65535.0);
   scheme->rgb_accent.blue = (guint16) (scheme->accent[2] * 65535.0);
-  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                 &scheme->rgb_accent, writeable, best_match))
-    g_printerr ("failure allocating background color\n");
-
   g_free (success);
 }
 
@@ -234,39 +216,22 @@ getColorTable (ggobid * gg)
 void
 special_colors_init (ggobid * gg)
 {
-  GdkColormap *cmap = gdk_colormap_get_system ();
-  gboolean writeable = false, best_match = true;
-
 /*
  * colors that show up in the variable circle panel
 */
   gg->vcirc_manip_color.red = (guint16) 65535;
   gg->vcirc_manip_color.green = (guint16) 0;
   gg->vcirc_manip_color.blue = (guint16) 65535;
-  if (!gdk_colormap_alloc_color (cmap, &gg->vcirc_manip_color, writeable,
-                                 best_match))
-    g_printerr ("trouble allocating vcirc_manip_color\n");
-
   gg->vcirc_freeze_color.red = (guint16) 0;
   gg->vcirc_freeze_color.green = (guint16) 64435;
   gg->vcirc_freeze_color.blue = (guint16) 0;
-  if (!gdk_colormap_alloc_color (cmap, &gg->vcirc_freeze_color, writeable,
-                                 best_match))
-    g_printerr ("trouble allocating vcirc_freeze_color\n");
 
   gg->darkgray.red = gg->darkgray.blue = gg->darkgray.green =
     (guint16) (.3 * 65535.0);
-  if (!gdk_colormap_alloc_color (cmap, &gg->darkgray, writeable, best_match))
-    g_printerr ("trouble allocating dark gray\n");
   gg->mediumgray.red = gg->mediumgray.blue = gg->mediumgray.green =
     (guint16) (.5 * 65535.0);
-  if (!gdk_colormap_alloc_color
-      (cmap, &gg->mediumgray, writeable, best_match))
-    g_printerr ("trouble allocating medium gray\n");
   gg->lightgray.red = gg->lightgray.blue = gg->lightgray.green =
     (guint16) (.7 * 65535.0);
-  if (!gdk_colormap_alloc_color (cmap, &gg->lightgray, writeable, best_match))
-    g_printerr ("trouble allocating light gray\n");
 }
 
 void

@@ -156,8 +156,8 @@ getDefaultPrintOptions (PrintOptions * opts)
   //opts->file->fileName = g_strdup("foo.svg");
 
 
-  gdk_color_white (gdk_colormap_get_system (), &white);
-  gdk_color_black (gdk_colormap_get_system (), &black);
+  white.red = white.green = white.blue = 65535;
+  black.red = black.green = black.blue = 0;
   opts->background = white;
   opts->foreground = black;
   return (opts);

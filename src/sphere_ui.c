@@ -604,7 +604,7 @@ sphere_panel_open (ggobid * gg)
     gtk_widget_show_all (vbox);
   }
 
-  gdk_flush ();
+  ggobi_flush_display ();
   gtk_widget_show_all (gg->sphere_ui.window);
 
 /*-- play around with making this notebook larger --*/

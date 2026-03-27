@@ -1156,7 +1156,7 @@ addVariableInternal (gdouble * vals, gint num, gchar * name,
                           numLevels, levels, values, counts, d);
 
   if (update)
-    gdk_flush ();
+    ggobi_flush_display ();
 
   return (d->ncols - 1);
 }
@@ -1356,7 +1356,7 @@ GGOBI (raiseWindow) (int which, gboolean raiseOrIcon, gboolean up,
   ok = true;
 
 
-  gdk_flush ();
+  ggobi_flush_display ();
   return (ok);
 }
 

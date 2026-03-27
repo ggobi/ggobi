@@ -23,8 +23,6 @@
 #include "externs.h"
 #include "colorscheme.h"
 
-#undef WIN32
-
 static void splot_draw_border (splotd *, cairo_t *, ggobid *);
 static cairo_t *splot_begin_surface (GGobiSurfaceBuffer *surface);
 static void splot_copy_surface_region (GGobiSurfaceBuffer *dest,
@@ -220,9 +218,6 @@ splot_draw_to_surface0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
     if (draw_hidden) {
       ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
 
-#ifdef WIN32
-      win32_draw_to_pixmap_unbinned (-1, sp, draw_hidden, gg);
-#else
       for (i=0; i<d->nrows_in_plot; i++) {
         m = d->rows_in_plot.els[i];
         if (d->hidden_now.els[m] && splot_plot_case (m, d, sp, display, gg)) {
@@ -245,7 +240,6 @@ splot_draw_to_surface0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
           }
         }
       }
-#endif
     } else {  /*-- un-hidden points --*/
 
       maxcolorid = datad_colors_used_get (&ncolors_used, colors_used, d, gg);
@@ -257,9 +251,6 @@ splot_draw_to_surface0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
       for (k=0; k<ncolors_used; k++) {
         current_color = colors_used[k];
         ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[current_color]);
-#ifdef WIN32
-        win32_draw_to_pixmap_unbinned (current_color, sp, draw_hidden, gg);
-#else
         for (i=0; i<d->nrows_in_plot; i++) {
           m = d->rows_in_plot.els[i];
           if (d->color_now.els[m] == current_color &&
@@ -287,7 +278,6 @@ splot_draw_to_surface0_unbinned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
           }
         }
-#endif
       }
     }
   }
@@ -353,10 +343,8 @@ splot_clear_surface0_binned (splotd *sp, ggobid *gg)
 void
 splot_draw_to_surface0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 {
-#ifndef WIN32
   gint ih, iv;
   gint i, m;
-#endif
   gint k;
   displayd *display = (displayd *) sp->displayptr;
   cpaneld *cpanel = &display->cpanel;
@@ -393,9 +381,6 @@ splot_draw_to_surface0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
 
       ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb_hidden);
 
-#ifdef WIN32
-      win32_draw_to_pixmap_binned (bin0, bin1, -1, sp, draw_hidden, gg);
-#else
       for (ih=bin0->x; ih<=bin1->x; ih++) {
         for (iv=bin0->y; iv<=bin1->y; iv++) {
           for (m=0; m<d->brush.binarray[ih][iv].nels ; m++) {
@@ -419,7 +404,6 @@ splot_draw_to_surface0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
           }
         }
       }
-#endif
 
     } else {  /* if !draw_hidden */
 
@@ -434,10 +418,6 @@ splot_draw_to_surface0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
         current_color = colors_used[k];
         ggobi_draw_style_set_foreground (GGOBI_PLOT_STYLE (gg), &scheme->rgb[current_color]);
 
-#ifdef WIN32
-        win32_draw_to_pixmap_binned (bin0, bin1, current_color,
-          sp, draw_hidden, gg);
-#else
 
         for (ih=bin0->x; ih<=bin1->x; ih++) {
           for (iv=bin0->y; iv<=bin1->y; iv++) {
@@ -462,7 +442,6 @@ splot_draw_to_surface0_binned (splotd *sp, gboolean draw_hidden, ggobid *gg)
             }
           }
         }
-#endif
       }
     }
   }
@@ -871,9 +850,11 @@ splot_surface_to_window (splotd *sp, GGobiSurfaceBuffer *surface, ggobid *gg) {
   if (window == NULL || surface == NULL || surface->surface == NULL)
     return;
 
-  cr = gdk_cairo_create (window);
+  cr = ggobi_draw_target_cairo_create (window);
   cairo_set_source_surface (cr, surface->surface, 0, 0);
   cairo_paint (cr);
+  if (sp == gg->current_splot)
+    splot_draw_border (sp, cr, gg);
   cairo_destroy (cr);
 }
 
@@ -942,14 +923,6 @@ splot_redraw (splotd *sp, RedrawStyle style, ggobid *gg) {
    * I ought to be able to fix that more nicely some day, but in the
    * meantime, what's an extra rectangle?
   */
-  if (sp == gg->current_splot && style != NONE) 
-  {
-    cairo_t *cr =
-      gdk_cairo_create (gtk_widget_get_window (sp->da));
-    splot_draw_border (sp, cr, gg);
-    cairo_destroy (cr);
-  }
-
   sp->redraw_style = EXPOSE;
 
   gtk_widget_queue_draw (sp->da);

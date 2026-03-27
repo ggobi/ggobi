@@ -51,7 +51,7 @@ tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
 
   for (l = display->splots; l; l = l->next) {
     w = ((splotd *) l->data)->da;
-    gtk_widget_ref (w);
+    g_object_ref (w);
     gtk_container_remove (GTK_CONTAINER (gg->tsplot.arrangement_box), w);
   }
 
@@ -70,7 +70,7 @@ tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
     sp = (splotd *) l->data;
     gtk_box_pack_start (GTK_BOX (gg->tsplot.arrangement_box),
                         sp->da, true, true, 0);
-    gtk_widget_unref (sp->da);
+    g_object_unref (sp->da);
   }
 
  /*-- position the display toward the lower left of the main window --*/

@@ -286,7 +286,6 @@ populate_tree_view (GtkWidget * tree_view, gchar ** lbl, gint nitems,
 void
 scale_set_default_values (GtkScale * scale)
 {
-  gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_draw_value (scale, false);
 }
 
@@ -865,5 +864,4 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
 
   return d;
 }
-
 

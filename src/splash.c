@@ -44,8 +44,7 @@ splash_show (ggobid * gg)
   GtkWidget *hbox = gtk_vbox_new (false, 0);
 
   splash_pix = ggobi_surface_buffer_from_xpm_data (NULL,
-                                                   gtk_widget_get_colormap
-                                                   (gg->main_window), NULL,
+                                                   NULL,
                                                    NULL,
                                                    (gchar **) splash);
   splashw = ggobi_gtk_image_new_from_surface_buffer (splash_pix, NULL);

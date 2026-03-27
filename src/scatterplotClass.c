@@ -348,20 +348,6 @@ varcircleDraw (displayd * display, gint jvar, cairo_t *c, ggobid * gg)
     }
     break;
 
-
-
-
-
-
-    /*      } 
-       else {
-
-       x = 0;
-       y = (gint) (display->tcorr2.F.vals[0][jvar]*(gfloat)r);
-       gdk_draw_line (da_pix, NULL, r, r, r+x, r-y);
-
-       } */
-
   default:
     break;
   }

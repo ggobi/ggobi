@@ -178,7 +178,6 @@ jitter_window_open (ggobid * gg)
       gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
                             "Set the degree of jitter", NULL);
       gtk_scale_set_draw_value (GTK_SCALE (sbar), false);
-      gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
       gtk_scale_set_digits (GTK_SCALE (sbar), 2);
       gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
       gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 0);

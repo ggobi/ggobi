@@ -1219,7 +1219,7 @@ tourcorr_idle_func (displayd *dsp)
 
   if (doit) {
     tourcorr_run(dsp, gg);
-    gdk_flush ();
+    ggobi_flush_display ();
   }
 
   return (doit);

@@ -376,7 +376,7 @@ viewmode_set (ProjectionMode pmode, InteractionMode imode, ggobid * gg)
   if (gg->current_control_panel) {
     GtkWidget *modeBox = gg->current_control_panel;
     if (modeBox) {
-      gtk_widget_ref (modeBox);
+      g_object_ref (modeBox);
       gtk_container_remove (GTK_CONTAINER (gg->imode_frame), modeBox);
       gg->current_control_panel = NULL;
     }
@@ -1047,7 +1047,7 @@ ggobi_actions_create (ggobid * gg)
     {"ShowTooltips", NULL, "Show _Tooltips", NULL,
      "Toggle display of helpful tips like this one",
      G_CALLBACK (action_toggle_tooltips_cb),
-     GTK_TOOLTIPS (gg->tips)->enabled},
+     gg->tips},
     {"ShowControlPanel", NULL, "Show _Control Panel", NULL,
      "Toggle display of control panel",
      G_CALLBACK (action_toggle_cpanel_cb), true},
@@ -1099,7 +1099,6 @@ make_ui (ggobid * gg)
 
   gg->main_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), "GGobi");
-  gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
   gtk_window_set_default_size (GTK_WINDOW (window), 400, 500);
 
   GGobi_widget_set (window, gg, true);

@@ -115,7 +115,6 @@ SRC=\
   vartable_nbook.c \
   vartable_ui.c \
   vector.c \
-  win32_draw.c \
   writedata_ui.c \
   write_csv.c \
   write_state.c \

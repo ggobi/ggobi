@@ -53,7 +53,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
 
   for (l=display->splots; l; l=l->next) {
     w = ((splotd *) l->data)->da;
-    gtk_widget_ref (w);
+    g_object_ref (w);
     gtk_container_remove (GTK_CONTAINER (gg->parcoords.arrangement_box), w);
   }
 
@@ -83,7 +83,7 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
     sp = (splotd *) l->data;
     gtk_box_pack_start (GTK_BOX (gg->parcoords.arrangement_box),
                         sp->da, true, true, 0);
-    gtk_widget_unref (sp->da);  /*-- keep the ref_count appropriate --*/
+    g_object_unref (sp->da);  /*-- keep the ref_count appropriate --*/
   }
 
   /*-- position the display toward the lower left of the main window --*/
@@ -354,7 +354,7 @@ parcoords_add_delete_splot(cpaneld *cpanel, splotd *sp, gint jvar, gint *jvar_pr
         sp_event_handlers_toggle (s, on, cpanel->pmode, cpanel->imode);
       }
       // Try to get all the event handlers toggled before the plot is freed.
-      gdk_flush();
+      ggobi_flush_display();
       splot_free (sp_jvar, display, gg);
       g_list_free(ltofree);  // Free the list element that pointed to sp_jvar.
     }

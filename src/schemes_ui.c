@@ -15,8 +15,8 @@
 */
 
 /*
- * It is my understanding that I'm supposed to use gdk_colormap_free_colors
- * to free anything I've allocated with gdk_colormap_alloc_color(s), but
+ * It is my understanding that I'm supposed to release anything I've
+ * explicitly allocated through the old color-allocation path, but
  * it just isn't working to free all the svis.color_map colors.   
  *    dfs, 10/30/2001
 */

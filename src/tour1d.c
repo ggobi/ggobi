@@ -719,7 +719,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
 
         dsp->t1d.oppval = -1.0;
         t1d_ppdraw_think(dsp, gg);
-        gdk_flush ();
+        ggobi_flush_display ();
         revert_random = t1d_switch_index(cpanel->t1d.pp_indx, 
           dsp->t1d.target_selection_method, dsp, gg);
 
@@ -811,7 +811,7 @@ tour1d_idle_func (displayd *dsp)
 
   if (doit) {
     tour1d_run (dsp, gg);
-    gdk_flush ();
+    ggobi_flush_display ();
   }
 
   return (doit);

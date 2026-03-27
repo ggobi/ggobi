@@ -250,6 +250,7 @@ void       set_display_options(displayd *display, ggobid *gg);
 void	   set_display_option(gboolean active, guint action, displayd *display);
 gint       do_ash1d (gfloat *, gint, gint, gint, gfloat *, gfloat *, gfloat *, gfloat *);
 void       do_last_increment (vector_f, vector_f, gfloat, gint);
+void       ggobi_flush_display (void);
 void       draw_3drectangle (GtkWidget *w, cairo_t *cr, gint x, gint y, gint width, gint height, ggobid *gg);
 void       draw_glyph (cairo_t *cr, glyphd *, icoords *, gint, ggobid *);
 gint       dsvd (gdouble **a, gint m, gint n, gfloat *w, gdouble **v);
@@ -738,12 +739,6 @@ void      cpanel_barchart_set (displayd *, cpaneld *, GtkWidget *panel, ggobid *
 void      barchart_scale_event_handlers_toggle(splotd *sp, gboolean state);
 
 displayd *barchart_new_with_vars(gboolean use_window, gboolean missing_p, gint nvars, gint *vars, GGobiData * d, ggobid * gg);
-
-#ifdef WIN32
-void      win32_draw_to_pixmap_binned (icoords *, icoords *, gint, splotd *, gboolean draw_hidden, ggobid *gg);
-void      win32_draw_to_pixmap_unbinned (gint, splotd *, gboolean draw_hidden, ggobid *gg);
-void      win32_drawing_arrays_free (splotd *sp);
-#endif
 
 #ifdef __cplusplus
 }

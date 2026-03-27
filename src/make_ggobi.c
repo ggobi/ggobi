@@ -55,6 +55,7 @@ globals_init (ggobid * gg)
 
   gg->d = NULL;
 
+  gg->tips = TRUE;
   gg->statusbar_p = true;
 }
 

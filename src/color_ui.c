@@ -187,7 +187,7 @@ redraw_symbol_display (GtkWidget * w, ggobid * gg)
   if (window == NULL)
     return;
 
-  cr = gdk_cairo_create (window);
+  cr = ggobi_draw_target_cairo_create (window);
 
   gg->color_ui.spacing = width / NGLYPHTYPES;
 
@@ -328,7 +328,7 @@ redraw_line_display (GtkWidget * w, ggobid * gg)
   if (window == NULL)
     return;
 
-  cr = gdk_cairo_create (window);
+  cr = ggobi_draw_target_cairo_create (window);
   margin = gg->color_ui.margin;
   spacing = gg->color_ui.spacing;
 
@@ -470,7 +470,7 @@ redraw_fg (GtkWidget * w, gint k, ggobid * gg)
   if (window == NULL)
     return;
 
-  cr = gdk_cairo_create (window);
+  cr = ggobi_draw_target_cairo_create (window);
   ggobi_cairo_set_source_gdk_color (cr, &gg->activeColorScheme->rgb[k]);
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
@@ -514,7 +514,7 @@ redraw_bg (GtkWidget * w, ggobid * gg)
   if (window == NULL)
     return;
 
-  cr = gdk_cairo_create (window);
+  cr = ggobi_draw_target_cairo_create (window);
   ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb_bg);
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
@@ -541,7 +541,7 @@ redraw_accent (GtkWidget * w, ggobid * gg)
   if (window == NULL)
     return;
 
-  cr = gdk_cairo_create (window);
+  cr = ggobi_draw_target_cairo_create (window);
   ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb_accent);
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
@@ -568,7 +568,7 @@ redraw_hidden (GtkWidget * w, ggobid * gg)
   if (window == NULL)
     return;
 
-  cr = gdk_cairo_create (window);
+  cr = ggobi_draw_target_cairo_create (window);
   ggobi_cairo_set_source_gdk_color (cr, &scheme->rgb_hidden);
   cairo_rectangle (cr, 0, 0, width, height);
   cairo_fill (cr);
@@ -608,10 +608,6 @@ reverse_video_cb (GtkWidget * ok_button, ggobid * gg)
   scheme->rgb_hidden.red = 65535 - scheme->rgb_hidden.red;
   scheme->rgb_hidden.green = 65535 - scheme->rgb_hidden.green;
   scheme->rgb_hidden.blue = 65535 - scheme->rgb_hidden.blue;
-  if (!gdk_colormap_alloc_color (gdk_colormap_get_system (),
-                                 &scheme->rgb_hidden, writeable, best_match))
-    g_printerr ("failure allocating hidden color\n");
-
   queue_color_widget_redraw (gg->color_ui.symbol_display);
   queue_color_widget_redraw (gg->color_ui.line_display);
   queue_color_widget_redraw (gg->color_ui.bg_da);
@@ -629,7 +625,6 @@ void
 color_changed_cb (GtkWidget * colorsel, ggobid * gg)
 {
   GdkColor gdk_color;
-  GdkColormap *cmap = gdk_colormap_get_system ();
   splotd *sp = gg->current_splot;
 
   colorschemed *scheme = gg->activeColorScheme;
@@ -638,54 +633,51 @@ color_changed_cb (GtkWidget * colorsel, ggobid * gg)
   gtk_color_selection_get_current_color (GTK_COLOR_SELECTION (colorsel),
                                          &gdk_color);
 
-  /* Allocate color */
-  if (gdk_color_alloc (cmap, &gdk_color)) {
-    if (gg->color_ui.current_da == gg->color_ui.bg_da) {
+  if (gg->color_ui.current_da == gg->color_ui.bg_da) {
 
-      scheme->rgb_bg.pixel = gdk_color.pixel;
-      scheme->rgb_bg.red = gdk_color.red;
-      scheme->rgb_bg.green = gdk_color.green;
-      scheme->rgb_bg.blue = gdk_color.blue;
+    scheme->rgb_bg.pixel = gdk_color.pixel;
+    scheme->rgb_bg.red = gdk_color.red;
+    scheme->rgb_bg.green = gdk_color.green;
+    scheme->rgb_bg.blue = gdk_color.blue;
 
-      queue_color_widget_redraw (gg->color_ui.bg_da);
-    }
-    else if (gg->color_ui.current_da == gg->color_ui.accent_da) {
-
-      scheme->rgb_accent.pixel = gdk_color.pixel;
-      scheme->rgb_accent.red = gdk_color.red;
-      scheme->rgb_accent.green = gdk_color.green;
-      scheme->rgb_accent.blue = gdk_color.blue;
-
-      queue_color_widget_redraw (gg->color_ui.accent_da);
-    }
-    else if (gg->color_ui.current_da == gg->color_ui.hidden_da) {
-
-      scheme->rgb_hidden.pixel = gdk_color.pixel;
-      scheme->rgb_hidden.red = gdk_color.red;
-      scheme->rgb_hidden.green = gdk_color.green;
-      scheme->rgb_hidden.blue = gdk_color.blue;
-
-      queue_color_widget_redraw (gg->color_ui.hidden_da);
-    }
-    else {
-
-      gg->activeColorScheme->rgb[gg->color_id].pixel = gdk_color.pixel;
-      gg->activeColorScheme->rgb[gg->color_id].red = gdk_color.red;
-      gg->activeColorScheme->rgb[gg->color_id].green = gdk_color.green;
-      gg->activeColorScheme->rgb[gg->color_id].blue = gdk_color.blue;
-
-      queue_color_widget_redraw (gg->color_ui.fg_da[gg->color_id]);
-    }
-
-    queue_color_widget_redraw (gg->color_ui.symbol_display);
-    queue_color_widget_redraw (gg->color_ui.line_display);
-
-    if (sp->da != NULL) {
-      gtk_widget_queue_draw (sp->da);
-    }
-
-    displays_plot ((splotd *) NULL, FULL, gg);
+    queue_color_widget_redraw (gg->color_ui.bg_da);
   }
+  else if (gg->color_ui.current_da == gg->color_ui.accent_da) {
+
+    scheme->rgb_accent.pixel = gdk_color.pixel;
+    scheme->rgb_accent.red = gdk_color.red;
+    scheme->rgb_accent.green = gdk_color.green;
+    scheme->rgb_accent.blue = gdk_color.blue;
+
+    queue_color_widget_redraw (gg->color_ui.accent_da);
+  }
+  else if (gg->color_ui.current_da == gg->color_ui.hidden_da) {
+
+    scheme->rgb_hidden.pixel = gdk_color.pixel;
+    scheme->rgb_hidden.red = gdk_color.red;
+    scheme->rgb_hidden.green = gdk_color.green;
+    scheme->rgb_hidden.blue = gdk_color.blue;
+
+    queue_color_widget_redraw (gg->color_ui.hidden_da);
+  }
+  else {
+
+    gg->activeColorScheme->rgb[gg->color_id].pixel = gdk_color.pixel;
+    gg->activeColorScheme->rgb[gg->color_id].red = gdk_color.red;
+    gg->activeColorScheme->rgb[gg->color_id].green = gdk_color.green;
+    gg->activeColorScheme->rgb[gg->color_id].blue = gdk_color.blue;
+
+    queue_color_widget_redraw (gg->color_ui.fg_da[gg->color_id]);
+  }
+
+  queue_color_widget_redraw (gg->color_ui.symbol_display);
+  queue_color_widget_redraw (gg->color_ui.line_display);
+
+  if (sp->da != NULL) {
+    gtk_widget_queue_draw (sp->da);
+  }
+
+  displays_plot ((splotd *) NULL, FULL, gg);
 }
 
 static void

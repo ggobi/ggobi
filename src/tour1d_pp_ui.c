@@ -341,7 +341,6 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_widget_set_name (sbar, "TOUR1D:PP_TEMPST");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust starting temp of pp", NULL);
-    gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
@@ -366,7 +365,6 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_widget_set_name (sbar, "TOUR1D:PP_COOLING");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust cooling", NULL);
-    gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
@@ -440,8 +438,6 @@ tour1dpp_window_open (ggobid *gg) {
     param_scale = gtk_hscale_new (GTK_ADJUSTMENT (param_adj));
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), param_scale,
       "Set number of terms in the expansion for some indices; bandwidth for others", NULL);
-    gtk_range_set_update_policy (GTK_RANGE (param_scale),
-                                 GTK_UPDATE_CONTINUOUS);
     gtk_scale_set_digits (GTK_SCALE (param_scale), 0);
     gtk_scale_set_value_pos (GTK_SCALE (param_scale), GTK_POS_BOTTOM);
 

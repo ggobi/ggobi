@@ -293,7 +293,6 @@ cpanel_tour1d_make (ggobid *gg) {
   gtk_widget_set_name (sbar, "TOUR1D:ASH_smooth");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
     "Adjust ASH smoothness", NULL);
-  gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
@@ -537,9 +536,9 @@ static void tour1dadv_window_open (ggobid *gg)
 
     entry = gtk_entry_new ();
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry);
-    gtk_widget_set_usize (entry,
-                          gdk_string_width (entry->style->font, "XXXX"),
-                          -1);
+    gtk_widget_set_size_request (entry,
+                                 gdk_string_width (entry->style->font, "XXXX"),
+                                 -1);
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
     /*-- Number of bases stored; a label and a text entry --*/
@@ -552,14 +551,14 @@ static void tour1dadv_window_open (ggobid *gg)
 
     entry = gtk_entry_new ();
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), entry);
-    gtk_widget_set_usize (entry,
-                          gdk_string_width (entry->style->font, "XXXX"),
-                          -1);
+    gtk_widget_set_size_request (entry,
+                                 gdk_string_width (entry->style->font, "XXXX"),
+                                 -1);
     gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 0);
     entry = gtk_entry_new ();
-    gtk_widget_set_usize (entry,
-                          gdk_string_width (entry->style->font, "XXXX"),
-                          -1);
+    gtk_widget_set_size_request (entry,
+                                 gdk_string_width (entry->style->font, "XXXX"),
+                                 -1);
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
     /*-- Return to basis x --*/
@@ -570,9 +569,9 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (hb), tgl, false, false, 0);
 
     entry = gtk_entry_new ();
-    gtk_widget_set_usize (entry,
-                          gdk_string_width (entry->style->font, "XXXX"),
-                          -1);
+    gtk_widget_set_size_request (entry,
+                                 gdk_string_width (entry->style->font, "XXXX"),
+                                 -1);
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
     /*-- Display basis as bitmap --*/
@@ -587,9 +586,9 @@ static void tour1dadv_window_open (ggobid *gg)
     entry = gtk_entry_new ();
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
       "Enter bitmap number", NULL);
-    gtk_widget_set_usize (entry,
-                          gdk_string_width (entry->style->font, "XXXX"),
-                          -1);
+    gtk_widget_set_size_request (entry,
+                                 gdk_string_width (entry->style->font, "XXXX"),
+                                 -1);
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
 /*-- section tour widgets: vbox to be placed in the notebook page --*/
@@ -623,7 +622,6 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
       "Set the width of the cross-section",
       NULL);
-    gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 0);

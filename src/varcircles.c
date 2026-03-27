@@ -67,7 +67,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
           gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
           gtk_widget_show_all (box);
           if (G_OBJECT (box)->ref_count > 1)
-            gtk_widget_unref (box);
+            g_object_unref (box);
         }
         n++;
 
@@ -75,7 +75,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
       }
       else {
         if (g_list_index (children, box) >= 0) {
-          gtk_widget_ref (box);
+          g_object_ref (box);
           gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), box);
         }
       }
@@ -92,14 +92,14 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
           gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
           gtk_widget_show_all (box);
           if (G_OBJECT (box)->ref_count > 1)
-            gtk_widget_unref (box);
+            g_object_unref (box);
         }
         n++;
 
       }
       else {                    /* not in the subset */
         if (g_list_index (children, box) >= 0) {  /* but among children */
-          gtk_widget_ref (box);
+          g_object_ref (box);
           gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), box);
         }
       }
@@ -117,7 +117,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
           gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
           gtk_widget_show_all (box);
           if (G_OBJECT (box)->ref_count > 1)
-            gtk_widget_unref (box);
+            g_object_unref (box);
         }
         n++;
 
@@ -125,7 +125,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
       }
       else {
         if (g_list_index (children, box) >= 0) {
-          gtk_widget_ref (box);
+          g_object_ref (box);
           gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), box);
         }
       }
@@ -144,7 +144,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
           gtk_box_reorder_child (GTK_BOX (d->vcirc_ui.table), box, n);
           gtk_widget_show_all (box);
           if (G_OBJECT (box)->ref_count > 1)
-            gtk_widget_unref (box);
+            g_object_unref (box);
         }
         n++;
 
@@ -152,7 +152,7 @@ varcircles_visibility_set (displayd * display, ggobid * gg)
       }
       else {
         if (g_list_index (children, box) >= 0) {  /* among children */
-          gtk_widget_ref (box);
+          g_object_ref (box);
           gtk_container_remove (GTK_CONTAINER (d->vcirc_ui.table), box);
         }
       }
@@ -262,7 +262,7 @@ static gint
 da_manip_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-  cairo_t *c = gdk_cairo_create (gtk_widget_get_window (w));
+  cairo_t *c = ggobi_draw_target_cairo_create (gtk_widget_get_window (w));
   ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_manip_color);
   cairo_rectangle (c, 0, 0, gtk_widget_get_allocated_width (w),
     gtk_widget_get_allocated_height (w));
@@ -283,7 +283,7 @@ static gint
 da_freeze_expose_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   ggobid *gg = GGobiFromWidget (w, true);
-  cairo_t *c = gdk_cairo_create (gtk_widget_get_window (w));
+  cairo_t *c = ggobi_draw_target_cairo_create (gtk_widget_get_window (w));
   ggobi_cairo_set_source_gdk_color (c, &gg->vcirc_freeze_color);
   cairo_rectangle (c, 0, 0, gtk_widget_get_allocated_width (w),
     gtk_widget_get_allocated_height (w));
@@ -318,7 +318,7 @@ varcircles_show (gboolean show, GGobiData * d, displayd * display,
 
     /* reparent the variable circles */
     if (parent == basement) {
-      gtk_widget_ref (d->vcirc_ui.ebox);
+      g_object_ref (d->vcirc_ui.ebox);
       gtk_container_remove (GTK_CONTAINER (basement), d->vcirc_ui.ebox);
       gtk_paned_pack2 (GTK_PANED (d->varpanel_ui.hpane),
                        d->vcirc_ui.ebox, true, true);
@@ -334,7 +334,7 @@ varcircles_show (gboolean show, GGobiData * d, displayd * display,
 
     if (parent == d->varpanel_ui.hpane) {
       gtk_widget_hide (d->vcirc_ui.ebox);
-      gtk_widget_ref (d->vcirc_ui.ebox);
+      g_object_ref (d->vcirc_ui.ebox);
       gtk_container_remove (GTK_CONTAINER (d->varpanel_ui.hpane),
                             d->vcirc_ui.ebox);
       gtk_box_pack_start (GTK_BOX (basement), d->vcirc_ui.ebox, false, false,

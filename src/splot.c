@@ -438,10 +438,6 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
   g_free ((gpointer) sp->screen);
   vectorf_free (&sp->p1d.spread_data);
 
-#ifdef WIN32
-  win32_drawing_arrays_free (sp);
-#endif
-
   if(GGOBI_IS_EXTENDED_SPLOT(sp))
      gtk_object_destroy(GTK_OBJECT(sp));
   else
@@ -533,10 +529,6 @@ sp->pmid.x = sp->pmid.y = sp->max.x = sp->max.y = 0;
   sp->tour2d.initmax = true;
   sp->tourcorr.initmax = true;
 
-#ifdef WIN32
-  sp->win32.npoints = 0;
-#endif
-  
 /*
   g_signal_connect (G_OBJECT (GGOBI_WINDOW_DISPLAY(display)->window),
 		      "key_press_event",

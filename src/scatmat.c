@@ -318,7 +318,7 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
          * destroyed in splot_free, and we don't want it destroyed
          * as a result of gtk_container_remove.
          */
-        gtk_widget_ref (da);
+        g_object_ref (da);
         gtk_container_remove (GTK_CONTAINER (display->table), da);
 
         if (s == gg->current_splot)

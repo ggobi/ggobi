@@ -270,7 +270,7 @@ varpanel_switch_page_cb (GtkNotebook * notebook, GtkWidget * page,
                          guint page_num, ggobid * gg)
 {
   varpanel_reinit (gg);
-  gdk_flush ();
+  ggobi_flush_display ();
 
   /*-- describe the datad being selected in the console statusbar --*/
   if (gg->status_message_func) {
@@ -648,7 +648,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
 
 
   gtk_widget_show_all (d->varpanel_ui.hpane);
-  gdk_flush ();
+  ggobi_flush_display ();
 
   d->vcbox_ui.box = NULL;
   for (j = 0; j < d->ncols; j++)

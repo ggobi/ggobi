@@ -28,29 +28,9 @@ void
 scale_update_set (gboolean update, displayd * dsp, ggobid * gg)
 {
   cpaneld *cpanel = &dsp->cpanel;
-  GtkWidget *panel =
-    mode_panel_get_by_name (GGOBI (getIModeName) (SCALE), gg);
-  GtkWidget *w;
-  GtkUpdateType policy;
+  (void) gg;
 
   cpanel->scale.updateAlways_p = update;
-
-  if (cpanel->scale.updateAlways_p)
-    policy = GTK_UPDATE_CONTINUOUS;
-  else
-    policy = GTK_UPDATE_DISCONTINUOUS;
-
-  /* When the update policy changes, change the update policy of
-     the range widgets as well */
-  w = widget_find_by_name (panel, "SCALE:x_zoom");
-  gtk_range_set_update_policy (GTK_RANGE (w), policy);
-  w = widget_find_by_name (panel, "SCALE:y_zoom");
-  gtk_range_set_update_policy (GTK_RANGE (w), policy);
-  w = widget_find_by_name (panel, "SCALE:x_pan");
-  gtk_range_set_update_policy (GTK_RANGE (w), policy);
-  w = widget_find_by_name (panel, "SCALE:y_pan");
-  gtk_range_set_update_policy (GTK_RANGE (w), policy);
-
 }
 
 /* Use the hscale widget name to find the corresponding adjustment */

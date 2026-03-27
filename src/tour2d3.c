@@ -558,7 +558,7 @@ tour2d3_idle_func (displayd *dsp)
 
   if (doit) {
     tour2d3_run (dsp, gg);
-    gdk_flush ();
+    ggobi_flush_display ();
   }
 
   return (doit);

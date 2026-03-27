@@ -220,7 +220,6 @@ cpanel_p1dplot_make (ggobid * gg)
   gtk_widget_set_name (sbar, "P1PLOT:ASH_smooth");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
                         "Adjust ASH smoothness", NULL);
-  gtk_range_set_update_policy (GTK_RANGE (sbar), GTK_UPDATE_CONTINUOUS);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
