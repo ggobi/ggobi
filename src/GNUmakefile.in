@@ -126,11 +126,6 @@ SRC=\
   xyplot.c \
   xyplot_ui.c
 
-%.c: ggobi-data.c
-
-ggobi-data.c ggobi-data.h ggobi-data-private.h: data.gob
-	gob2 $<
-
 ifdef USE_DBMS
  SRC+= dbms.c dbms_ui.c
 endif
@@ -175,7 +170,7 @@ libs:
 	@echo "$(LIBS)"
 
 clean:
-	for f in $(OBJ) ggobiMain.o marshal.c marshal.h ggobi-data*; do \
+	for f in $(OBJ) ggobiMain.o marshal.c marshal.h; do \
 	  if test -f $$f ; then rm $$f ; fi \
 	done
 

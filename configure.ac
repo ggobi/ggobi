@@ -168,9 +168,6 @@ if test -n "${enable_debug}" && ! test "${enable_debug}" = "no" ;  then
 fi
 AC_SUBST(SRC_DEBUG)
 
-# Find GOB2 (don't fail if not found, not necessary for distributed builds)
-AC_PATH_PROG(GOB2, gob2,,$PATH)
-
 PKG_PROG_PKG_CONFIG(0.20)
 
 # FIND GTK3
