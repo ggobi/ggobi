@@ -377,14 +377,14 @@ cpanel_scale_make (ggobid * gg)
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
   panel->name = g_strdup (GGOBI (getIModeName) (SCALE));
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   /*-- frame and vbox for zoom controls --*/
   f = gtk_frame_new ("Zoom");
   gtk_box_pack_start (GTK_BOX (panel->w), f, false, false, 0);
 
-  vb = gtk_vbox_new (true, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_container_add (GTK_CONTAINER (f), vb);
 
   /* value, lower, upper, step_increment, page_increment, page_size */
@@ -424,7 +424,7 @@ cpanel_scale_make (ggobid * gg)
   f = gtk_frame_new ("Pan");
   gtk_box_pack_start (GTK_BOX (panel->w), f, false, false, 0);
 
-  vb = gtk_vbox_new (true, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_container_add (GTK_CONTAINER (f), vb);
 
   /* value, lower, upper, step_increment, page_increment, page_size */

@@ -139,7 +139,7 @@ scatmat_new (displayd * display, gboolean use_window,
 /*
  * Add the main menu bar
 */
-  vbox = gtk_vbox_new (FALSE, 1);
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
   display->menu_manager = display_menu_manager_create (display);
   if (wdpy && wdpy->useWindow) {

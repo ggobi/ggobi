@@ -323,7 +323,7 @@ tour2dpp_window_open (ggobid *gg) {
 /*
  * Add the main menu bar
 */
-      vbox = gtk_vbox_new (FALSE, 1);
+      vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
       gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
       gtk_container_add (GTK_CONTAINER (dsp->t2d_window), vbox);
 
@@ -344,7 +344,7 @@ tour2dpp_window_open (ggobid *gg) {
 /*
  * Divide the window:  controls on the left, plot on the right
 */
-      hbox = gtk_hbox_new (false, 1);
+      hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
       gtk_container_set_border_width (GTK_CONTAINER (hbox), 1);
       gtk_box_pack_start (GTK_BOX (vbox),
                         hbox, true, true, 1);
@@ -357,7 +357,7 @@ tour2dpp_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (hbox),
                         dsp->t2d_control_frame, false, false, 1);
 
-      vbc = gtk_vbox_new (false, 5);
+      vbc = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
       gtk_container_set_border_width (GTK_CONTAINER (vbc), 5);
       gtk_container_add (GTK_CONTAINER (dsp->t2d_control_frame), vbc);
 
@@ -376,9 +376,9 @@ tour2dpp_window_open (ggobid *gg) {
 /*
  * Box to hold temp start and cooling controls
 */
-    hb = gtk_hbox_new (true, 2);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
-    vb = gtk_vbox_new (false, 0);
+    vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
     lbl = gtk_label_new_with_mnemonic ("_Temp start:");
     gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
@@ -402,7 +402,7 @@ tour2dpp_window_open (ggobid *gg) {
       false, false, 0);
 
   /*-- value, lower, upper, step --*/
-    vb = gtk_vbox_new (false, 0);
+    vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
     lbl = gtk_label_new_with_mnemonic ("_Cooling:");
     gtk_box_pack_start (GTK_BOX (vb), lbl,
@@ -430,7 +430,7 @@ tour2dpp_window_open (ggobid *gg) {
 /*
  * Index value with label
 */
-      hb = gtk_hbox_new (false, 3);
+      hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 3);
       gtk_box_pack_start (GTK_BOX (vbc), hb, false, false, 2);
   
       dsp->t2d_pplabel = gtk_label_new ("PP index: 0.0000");
@@ -460,8 +460,8 @@ tour2dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vbc), frame, false, false, 0);
     */
 
-    /*    vb = gtk_vbox_new (false, 3);*/
-      vb = gtk_vbox_new (true, 2);
+    /*    vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 3);*/
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       gtk_box_pack_start (GTK_BOX (vbc), vb, false, false, 2);
     /*    gtk_container_add (GTK_CONTAINER (frame), vb);*/
 
@@ -485,7 +485,7 @@ tour2dpp_window_open (ggobid *gg) {
       populate_combo_box (opt, t2d_pp_func_lbl, G_N_ELEMENTS(t2d_pp_func_lbl),
         G_CALLBACK(t2d_pp_func_cb), (gpointer) dsp);
 
-    /*    param_vb = gtk_vbox_new (false, 3);
+    /*    param_vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 3);
     gtk_container_set_border_width (GTK_CONTAINER (param_vb), 4);
     gtk_box_pack_start (GTK_BOX (vb), param_vb, false, false, 2);
 

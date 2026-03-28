@@ -118,7 +118,7 @@ writeall_window_open (ggobid *gg) {
   
   gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
-  vbox = gtk_vbox_new (false, VBOX_SPACING);
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
   table = gtk_table_new (7, 2, false);

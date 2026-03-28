@@ -168,7 +168,7 @@ cpanel_tour1d_make (ggobid *gg) {
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
   panel->name = g_strdup(GGOBI(getPModeName)(TOUR1D));
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
@@ -196,7 +196,7 @@ cpanel_tour1d_make (ggobid *gg) {
 /*
  * Box to hold 'pause' toggle and 'reinit' button
 */
-  box = gtk_hbox_new (true, 1);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
 
   btn = gtk_check_button_new_with_mnemonic ("_Pause");
   gtk_widget_set_name (btn, "TOUR1D:pause_button");
@@ -211,7 +211,7 @@ cpanel_tour1d_make (ggobid *gg) {
 /*
  * Box to hold 'Reinit' toggle and 'Scramble' button
 */
-  box = gtk_hbox_new (true, 2);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   btn = gtk_button_new_with_mnemonic("_Reinit");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -232,7 +232,7 @@ cpanel_tour1d_make (ggobid *gg) {
 /*
  * snapshot and video stream controls
  */
-  /*box = gtk_hbox_new (true, 2);
+  /*box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Snap");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -257,7 +257,7 @@ cpanel_tour1d_make (ggobid *gg) {
   gtk_box_pack_start (GTK_BOX (panel->w), frame,
     false, false, 3);
 
-  framevb = gtk_vbox_new (false, VBOX_SPACING);
+  framevb = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (framevb), 4);
   gtk_container_add (GTK_CONTAINER (frame), framevb);
 
@@ -275,7 +275,7 @@ cpanel_tour1d_make (ggobid *gg) {
     false, false, 0);
 
   /*-- ASH smoothness --*/
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (framevb), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("ASH s_moothness:");
@@ -303,7 +303,7 @@ cpanel_tour1d_make (ggobid *gg) {
  * Box to hold 'vertical' button
 */
 #ifdef TOUR_ADV_IMPLEMENTED
-  box = gtk_hbox_new (true, 1);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
 
   btn = gtk_check_button_new_with_mnemonic ("V_ertical");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -446,7 +446,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_container_add (GTK_CONTAINER (window), notebook);
 
     /*-- vbox to be placed in the notebook page --*/
-    vbox = gtk_vbox_new (false, 2);
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 4);
 
     /*-- local scan toggle --*/
@@ -459,7 +459,7 @@ static void tour1dadv_window_open (ggobid *gg)
                         tgl, false, false, 1);
 
     /*-- Box to hold 'step' toggle and 'go' button --*/
-    box = gtk_hbox_new (true, 2);
+    box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
     tgl = gtk_check_button_new_with_mnemonic ("_Step");
     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
@@ -483,7 +483,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, lbl);
 
     /*-- path length option menu inside frame --*/
-    hb = gtk_hbox_new (false, 0);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
     lbl = gtk_label_new_with_mnemonic ("Path _length:");
@@ -498,7 +498,7 @@ static void tour1dadv_window_open (ggobid *gg)
                           G_CALLBACK(pathlen_cb), gg);
 
     /*-- interpolation option menu inside hbox --*/
-    hb = gtk_hbox_new (false, 0);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
     lbl = gtk_label_new_with_mnemonic ("_Interpolation: ");
@@ -513,7 +513,7 @@ static void tour1dadv_window_open (ggobid *gg)
                           G_CALLBACK(interp_cb), gg);
 
 /*-- tour history functions: vbox to be placed in the notebook page --*/
-    vb = gtk_vbox_new (true, 0);
+    vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
     lbl = gtk_label_new_with_mnemonic ("_History");
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vb, lbl);
@@ -527,7 +527,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), tgl, false, false, 0);
 
     /*-- Number of bases stored; a label and a text entry --*/
-    hb = gtk_hbox_new (false, 0);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
     lbl = gtk_label_new_with_mnemonic ("_Number of bases stored:");
@@ -542,7 +542,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
     /*-- Number of bases stored; a label and a text entry --*/
-    hb = gtk_hbox_new (false, 0);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
     lbl = gtk_label_new_with_mnemonic ("_Current base pair: ");
@@ -562,7 +562,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
     /*-- Return to basis x --*/
-    hb = gtk_hbox_new (false, 0);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
     tgl = gtk_check_button_new_with_mnemonic ("_Return to basis");
@@ -575,7 +575,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
     /*-- Display basis as bitmap --*/
-    hb = gtk_hbox_new (false, 0);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
     tgl = gtk_check_button_new_with_mnemonic ("_Display basis");
@@ -592,7 +592,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_end (GTK_BOX (hb), entry, false, false, 0);
 
 /*-- section tour widgets: vbox to be placed in the notebook page --*/
-    box = gtk_vbox_new (false, 0);
+    box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_set_border_width (GTK_CONTAINER (box), 4);
     lbl = gtk_label_new_with_mnemonic ("_Section");
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook), box, lbl);
@@ -606,7 +606,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (box), tgl, false, false, 1);
 
     /*-- vbox for label and rangewidget --*/
-    vb = gtk_vbox_new (true, 0);
+    vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_pack_start (GTK_BOX (box), vb, false, false, 1);
 
     lbl = gtk_label_new_with_mnemonic ("_Epsilon:");

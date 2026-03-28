@@ -35,7 +35,7 @@ cpanel_scatmat_make (ggobid * gg)
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
   panel->name = g_strdup ("SCATMAT");
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   gtk_widget_show_all (panel->w);

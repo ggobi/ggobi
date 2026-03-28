@@ -191,11 +191,11 @@ cpanel_movepts_make (ggobid * gg)
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
   panel->name = g_strdup (GGOBI (getIModeName) (MOVEPTS));
 
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   /*-- option menu: direction of motion --*/
-  hb = gtk_vbox_new (false, 0);
+  hb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), hb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Direction of _motion:");
@@ -220,7 +220,7 @@ cpanel_movepts_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
 
   /*-- Box to hold reset buttons --*/
-  box = gtk_hbox_new (true, 2);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Reset all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,

@@ -359,13 +359,13 @@ svis_window_open (ggobid * gg)
     /* 
      * Right half of window
      */
-    vbox = gtk_vbox_new (false, 0);
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
     gtk_box_set_spacing (GTK_BOX (vbox), 5);
     gtk_container_add (GTK_CONTAINER (hpane), vbox);
 
     /* Name currently in use */
-    hb = gtk_hbox_new (true, 0);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hb, true, true, 5);
     label = gtk_label_new ("Color scheme in use");
     gtk_misc_set_alignment (GTK_MISC (label), 0, .5);
@@ -378,7 +378,7 @@ svis_window_open (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (hb), gg->svis.entry_applied, true, true, 0);
      /**/
       /* preview scheme */
-      hb = gtk_hbox_new (true, 0);
+      hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hb, true, true, 5);
     label = gtk_label_new ("Color scheme  in preview");
     gtk_misc_set_alignment (GTK_MISC (label), 0, .5);
@@ -413,7 +413,7 @@ svis_window_open (ggobid * gg)
     /*-- add a close button --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new (),
                         false, true, 2);
-    hb = gtk_hbox_new (false, 2);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
     /* Apply button */

@@ -520,11 +520,11 @@ cpanel_edgeedit_make (ggobid * gg)
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
   panel->name = g_strdup (GGOBI (getIModeName) (EDGEED));
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
  /*-- Radio group in a box: add edges or points buttons --*/
-  vb = gtk_vbox_new (false, 1);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 

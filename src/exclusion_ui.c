@@ -673,7 +673,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   gtk_widget_set_size_request (GTK_WIDGET (scrolled_window), -1, 150);
 
   /*-- horizontal box to hold a few buttons --*/
-  hbox = gtk_hbox_new (false, 2);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
   gtk_box_pack_start (GTK_BOX (content_area), hbox, false, false, 0);
 
   /*-- Exclude button --*/

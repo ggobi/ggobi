@@ -638,7 +638,7 @@ wvis_window_open (ggobid *gg)
     g_signal_connect (G_OBJECT (gg->wvis.window),
       "delete_event", G_CALLBACK (close_wmgr_cb), gg);
 
-    vbox = gtk_vbox_new (false, 0);
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
     gtk_box_set_spacing (GTK_BOX(vbox), 5);
     gtk_container_add (GTK_CONTAINER (gg->wvis.window), vbox);    
@@ -678,7 +678,7 @@ wvis_window_open (ggobid *gg)
                | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
 
     /*-- hbox to hold the options --*/
-    hb = gtk_hbox_new (false, 2);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
     /*-- option menu for choosing the method of binning --*/
@@ -704,7 +704,7 @@ wvis_window_open (ggobid *gg)
     /*-- hbox for buttons --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
       false, true, 2);
-    hb = gtk_hbox_new (false, 2);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
     /* Apply button */

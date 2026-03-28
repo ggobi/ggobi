@@ -1125,7 +1125,7 @@ make_ui (ggobid * gg)
 /*
  * Add the main menu bar
 */
-  vbox = gtk_vbox_new (false, 1);
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
@@ -1145,7 +1145,7 @@ make_ui (ggobid * gg)
 
   gtk_accel_group_lock (gg->main_accel_group);
 
-  hbox = gtk_hbox_new (false, 0);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 0);
 
 /*
@@ -1188,7 +1188,7 @@ make_ui (ggobid * gg)
   gtk_widget_show_all (hbox);
 
   /* -- do not map or show this widget -- */
-  basement = gtk_vbox_new (false, 0);
+  basement = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_widget_set_name (basement, "BASEMENT");
   gtk_box_pack_start (GTK_BOX (hbox), basement, false, false, 0);
   /* -- do not map or show this widget -- */

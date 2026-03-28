@@ -403,7 +403,7 @@ sphere_panel_open (ggobid * gg)
     gtk_container_set_border_width (GTK_CONTAINER (gg->sphere_ui.window), 10);
 
     /*-- partition the screen vertically: scree plot, choose nPCs, apply --*/
-    vbox = gtk_vbox_new (false, 2);
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     gtk_container_add (GTK_CONTAINER (gg->sphere_ui.window), vbox);
 
     /* Create a notebook, set the position of the tabs */
@@ -440,7 +440,7 @@ sphere_panel_open (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 2);
 
     /*-- stick a box in here so we can control the border width --*/
-    vb = gtk_vbox_new (false, 2);
+    vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
@@ -537,7 +537,7 @@ sphere_panel_open (ggobid * gg)
     gtk_container_set_border_width (GTK_CONTAINER (frame), 2);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 2);
 
-    vb = gtk_vbox_new (false, 2);
+    vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
@@ -589,7 +589,7 @@ sphere_panel_open (ggobid * gg)
     /*-- close button --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new (),
                         false, true, 2);
-    hb = gtk_hbox_new (false, 2);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);

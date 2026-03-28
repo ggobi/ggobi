@@ -115,7 +115,7 @@ cpanel_tour2d3_make (ggobid *gg) {
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
   panel->name = g_strdup(GGOBI(getPModeName)(TOUR2D3));
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
@@ -144,7 +144,7 @@ cpanel_tour2d3_make (ggobid *gg) {
 /*
  * Box to hold 'pause' toggle button
 */
-  box = gtk_hbox_new (true, 1);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
 
   btn = gtk_check_button_new_with_mnemonic ("_Pause");
   gtk_widget_set_name (btn, "TOUR2D3:pause_button");
@@ -160,7 +160,7 @@ cpanel_tour2d3_make (ggobid *gg) {
 /*
  * Box to hold 'Reinit' toggle and 'Scramble' button
 */
-  box = gtk_hbox_new (true, 2);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Reinit");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -183,7 +183,7 @@ cpanel_tour2d3_make (ggobid *gg) {
  * manipulation option menu and label inside vbox
 */
 
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb,
     false, false, 0);
 

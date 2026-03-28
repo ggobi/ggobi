@@ -59,9 +59,9 @@ tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
   gtk_widget_destroy (gg->tsplot.arrangement_box);
 
 /*    if (arrangement == ARRANGE_ROW) */
-/*      gg->tsplot.arrangement_box = gtk_hbox_new (true, 0); */
+/*      gg->tsplot.arrangement_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0); */
 /*    else */
-  gg->tsplot.arrangement_box = gtk_vbox_new (true, 0);
+  gg->tsplot.arrangement_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_container_add (GTK_CONTAINER (frame), gg->tsplot.arrangement_box);
 
   display->p1d_orientation = (arrangement == ARRANGE_ROW) ? VERTICAL :
@@ -231,7 +231,7 @@ tsplot_new (displayd * display, gboolean use_window, gboolean missing_p,
  * this is the box that would have to change from horizontal to vertical
  * when the plot arrangement changes
 */
-  gg->tsplot.arrangement_box = gtk_vbox_new (true, 0);
+  gg->tsplot.arrangement_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_container_add (GTK_CONTAINER (frame), gg->tsplot.arrangement_box);
 
   display->splots = NULL;

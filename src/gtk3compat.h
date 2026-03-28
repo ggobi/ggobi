@@ -34,11 +34,6 @@ void ggobi_gtk_tooltips_set_tip (GtkTooltips tips, GtkWidget *widget,
   ((void) (tip_private),                                              \
    ggobi_gtk_tooltips_set_tip ((tips), GTK_WIDGET (widget), (tip_text)))
 
-#define gtk_vbox_new(homogeneous, spacing) \
-  gtk_box_new (GTK_ORIENTATION_VERTICAL, spacing)
-#define gtk_hbox_new(homogeneous, spacing) \
-  gtk_box_new (GTK_ORIENTATION_HORIZONTAL, spacing)
-
 #define gtk_combo_box_new_text() gtk_combo_box_text_new ()
 #define gtk_combo_box_append_text(combo_box, text) \
   gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo_box), text)

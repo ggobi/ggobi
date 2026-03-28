@@ -55,13 +55,13 @@ cpanel_barchart_make (ggobid * gg)
   GtkWidget *vb, *lbl, *opt;
   GtkWidget *panel;
 
-  panel = gtk_vbox_new (false, VBOX_SPACING);
+  panel = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel), 5);
 
 /*
  * option menu: selection mode
 */
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Display _mode:");

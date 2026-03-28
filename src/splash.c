@@ -41,7 +41,7 @@ splash_show (ggobid * gg)
   GtkWidget *splashw, *label;
   GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   GtkWidget *ebox = gtk_event_box_new ();
-  GtkWidget *hbox = gtk_vbox_new (false, 0);
+  GtkWidget *hbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
   splash_pix = ggobi_surface_buffer_from_xpm_data (NULL,
                                                    NULL,

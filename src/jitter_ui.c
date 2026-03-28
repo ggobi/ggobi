@@ -144,7 +144,7 @@ jitter_window_open (ggobid * gg)
       gtk_container_set_border_width (GTK_CONTAINER (gg->jitter_ui.window),
                                       10);
 
-      vbox = gtk_vbox_new (false, 2);
+      vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       gtk_container_add (GTK_CONTAINER (gg->jitter_ui.window), vbox);
 
       /* Create a notebook, set the position of the tabs */
@@ -163,7 +163,7 @@ jitter_window_open (ggobid * gg)
                           G_CALLBACK (type_cb), gg);
 
       /*-- vbox for label and rangewidget --*/
-      vb = gtk_vbox_new (true, 2);
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
 
       lbl = gtk_label_new_with_mnemonic ("_Degree of jitter:");
@@ -195,7 +195,7 @@ jitter_window_open (ggobid * gg)
       /*-- Close button --*/
       gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new (), false, true,
                           2);
-      hb = gtk_hbox_new (false, 2);
+      hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
       gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
       btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);

@@ -871,11 +871,11 @@ make_symbol_window (ggobid * gg)
                       "delete_event",
                       G_CALLBACK (close_symbol_window_cb), (gpointer) gg);
 
-    vbox = gtk_vbox_new (false, 2);
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     gtk_container_add (GTK_CONTAINER (gg->color_ui.symbol_window), vbox);
 
     /*-- to contain the two display areas --*/
-    hbox = gtk_hbox_new (false, 2);
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 0);
 
 /*
@@ -992,7 +992,7 @@ make_symbol_window (ggobid * gg)
     }
 
     /*-- hbox to contain bg, accent and hidden color frames --*/
-    hbox = gtk_hbox_new (false, 2);
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 0);
 
     /*-- Background color --*/

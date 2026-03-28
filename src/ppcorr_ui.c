@@ -78,7 +78,7 @@ ctourpp_window_open (ggobid * gg)
 /*
  * Add the main menu bar
 */
-    vbox = gtk_vbox_new (FALSE, 1);
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
     gtk_container_add (GTK_CONTAINER (window), vbox);
 /*
@@ -97,7 +97,7 @@ ctourpp_window_open (ggobid * gg)
 /*
  * Divide the window:  controls on the left, plot on the right
 */
-    hbox = gtk_hbox_new (false, 1);
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
     gtk_container_set_border_width (GTK_CONTAINER (hbox), 1);
     gtk_box_pack_start (GTK_BOX (vbox), hbox, true, true, 1);
 
@@ -109,7 +109,7 @@ ctourpp_window_open (ggobid * gg)
     gtk_container_set_border_width (GTK_CONTAINER (control_frame), 5);
     gtk_box_pack_start (GTK_BOX (hbox), control_frame, false, false, 1);
 
-    vbc = gtk_vbox_new (false, 5);
+    vbc = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_set_border_width (GTK_CONTAINER (vbc), 5);
     gtk_container_add (GTK_CONTAINER (control_frame), vbc);
 
@@ -127,7 +127,7 @@ ctourpp_window_open (ggobid * gg)
 /*
  * Index value with label
 */
-    hb = gtk_hbox_new (false, 3);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 3);
     gtk_box_pack_start (GTK_BOX (vbc), hb, false, false, 2);
 
     label = gtk_label_new ("PP index:");

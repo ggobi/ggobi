@@ -168,7 +168,7 @@ cpanel_ctour_make (ggobid *gg) {
   panel = (modepaneld *) g_malloc(sizeof(modepaneld));
   gg->control_panels = g_list_append(gg->control_panels, (gpointer) panel);
   panel->name = g_strdup(GGOBI(getPModeName)(COTOUR));
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
@@ -196,7 +196,7 @@ cpanel_ctour_make (ggobid *gg) {
 /*
  * Box to hold 'pause' toggle button
 */
-  box = gtk_hbox_new (true, 1);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
 
   btn = gtk_check_button_new_with_mnemonic ("_Pause");
   gtk_widget_set_name (btn, "COTOUR:pause_button");
@@ -211,7 +211,7 @@ cpanel_ctour_make (ggobid *gg) {
 /*
  * Box to hold 'Reinit' toggle and 'Scramble' button
 */
-  box = gtk_hbox_new (true, 2);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   btn = gtk_button_new_with_mnemonic("_Reinit");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -232,7 +232,7 @@ cpanel_ctour_make (ggobid *gg) {
 
 /*
  * snapshot and video stream controls
-  box = gtk_hbox_new (true, 2);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
    btn = gtk_button_new_with_mnemonic ("_Snap");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -254,7 +254,7 @@ cpanel_ctour_make (ggobid *gg) {
 /*
  * manipulation option menu with label
 */
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("_Manual manipulation:");
@@ -274,7 +274,7 @@ cpanel_ctour_make (ggobid *gg) {
 /*
  * path length option menu 
 */
-  /*  vb = gtk_vbox_new (false, 0);
+  /*  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new ("Path length:");
@@ -349,7 +349,7 @@ ctouradv_window_open (void) {
     
     gtk_container_set_border_width (GTK_CONTAINER (window), 10);
 
-    vbox = gtk_vbox_new (false, 2);
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     gtk_container_add (GTK_CONTAINER (window), vbox);
     
     frame = gtk_frame_new ("History");

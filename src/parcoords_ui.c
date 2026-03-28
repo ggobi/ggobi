@@ -87,13 +87,13 @@ cpanel_parcoords_make (ggobid * gg)
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
   panel->name = g_strdup ("PCPLOT");
 
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
 /*
  * arrangement of plots, row or column
 */
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Plot _arrangement:");
@@ -114,7 +114,7 @@ cpanel_parcoords_make (ggobid * gg)
 /*
  * option menu
 */
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Sp_reading method:");
@@ -134,7 +134,7 @@ cpanel_parcoords_make (ggobid * gg)
 /*
  * ASH smoothness
 */
-  vbox = gtk_vbox_new (false, 0);
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vbox, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("ASH s_moothness:"),
@@ -158,7 +158,7 @@ cpanel_parcoords_make (ggobid * gg)
  * show cases: label and option menu
 */
 /*
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
   lbl = gtk_label_new ("Show cases:");
@@ -179,7 +179,7 @@ cpanel_parcoords_make (ggobid * gg)
  * Variable scales
 */
 /*
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
   lbl = gtk_label_new ("Scales:");

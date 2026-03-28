@@ -292,7 +292,7 @@ createScatterplot (displayd * display, gboolean use_window, gboolean missing_p,
   projection = (d->ncols >= 2) ? XYPLOT : P1PLOT;
   scatterplot_cpanel_init (&display->cpanel, projection, DEFAULT_IMODE, gg);
 
-  vbox = GTK_WIDGET (display);  /* gtk_vbox_new (false, 1); */
+  vbox = GTK_WIDGET (display);  /* gtk_box_new (GTK_ORIENTATION_VERTICAL, 1); */
   display->menu_manager = display_menu_manager_create (display);
   
   if (GGOBI_IS_WINDOW_DISPLAY (display)

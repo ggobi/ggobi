@@ -71,9 +71,9 @@ parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   gtk_widget_destroy (gg->parcoords.arrangement_box);
 
   if (arrangement == ARRANGE_ROW)
-    gg->parcoords.arrangement_box = gtk_hbox_new (true, 0);
+    gg->parcoords.arrangement_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   else
-    gg->parcoords.arrangement_box = gtk_vbox_new (true, 0);
+    gg->parcoords.arrangement_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_container_add (GTK_CONTAINER (frame), gg->parcoords.arrangement_box);
 
   display->p1d_orientation = (arrangement == ARRANGE_ROW) ? VERTICAL :
@@ -231,7 +231,7 @@ parcoords_new (displayd *display, gboolean use_window, gboolean missing_p,
  * this is the box that would have to change from horizontal to vertical
  * when the plot arrangement changes
 */
-  gg->parcoords.arrangement_box = gtk_hbox_new (true, 0);
+  gg->parcoords.arrangement_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_container_add (GTK_CONTAINER (frame), gg->parcoords.arrangement_box);
 
   display->splots = NULL;

@@ -468,7 +468,7 @@ cpanel_brush_make (ggobid * gg)
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
   panel->name = g_strdup (GGOBI (getIModeName) (BRUSH));
 
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
  /*-- button: open symbol panel --*/
@@ -481,7 +481,7 @@ cpanel_brush_make (ggobid * gg)
 
 
   /* hbox to hold the Persistent checkbox and the Undo button */
-  hb = gtk_hbox_new (false, 0);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), hb, false, false, 0);
 
 /*-- check button: persistent/transient --*/
@@ -506,7 +506,7 @@ cpanel_brush_make (ggobid * gg)
 
 
 /*-- option menu: brush with color/glyph/both --*/
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Poi_nt brushing:");
@@ -529,7 +529,7 @@ cpanel_brush_make (ggobid * gg)
                     G_CALLBACK (brush_point_targets_cb), gg);
 
 /*-- new, for edges --*/
-  vb = gtk_vbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("_Edge brushing:");

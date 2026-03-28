@@ -361,7 +361,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   d->vcirc_ui.ebox = gtk_event_box_new ();
   gtk_widget_show (d->vcirc_ui.ebox);
 
-  d->vcirc_ui.vbox = gtk_vbox_new (false, 0);
+  d->vcirc_ui.vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_container_add (GTK_CONTAINER (d->vcirc_ui.ebox), d->vcirc_ui.vbox);
   gtk_widget_show (d->vcirc_ui.vbox);
 
@@ -376,7 +376,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
                       true, true, 0);
   gtk_widget_show (d->vcirc_ui.swin);
 
-  d->vcirc_ui.table = gtk_vbox_new (false, 0);
+  d->vcirc_ui.table = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
   gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW
                                          (d->vcirc_ui.swin),
@@ -406,7 +406,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   }
 
   /*-- the second child of the vbox: an hbox with buttons --*/
-  d->vcirc_ui.hbox = gtk_hbox_new (false, 0);
+  d->vcirc_ui.hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.vbox), d->vcirc_ui.hbox,
                       false, false, 2);
   gtk_widget_show (d->vcirc_ui.hbox);
@@ -560,7 +560,7 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
 {
   GtkWidget *vb, *lbl, *da;
 
-  vb = gtk_hbox_new (false, 0);
+  vb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   d->vcirc_ui.vb = g_slist_append (d->vcirc_ui.vb, vb);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 1);
 

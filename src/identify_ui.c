@@ -365,7 +365,7 @@ cpanel_identify_make (ggobid * gg)
   panel = (modepaneld *) g_malloc (sizeof (modepaneld));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
   panel->name = g_strdup (GGOBI (getIModeName) (IDENT));
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   /*-- option menu --*/
@@ -415,7 +415,7 @@ cpanel_identify_make (ggobid * gg)
   //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w), frame, false, false, 3);
 
-  framevb = gtk_vbox_new (false, VBOX_SPACING);
+  framevb = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (framevb), 4);
   gtk_container_add (GTK_CONTAINER (frame), framevb);
 

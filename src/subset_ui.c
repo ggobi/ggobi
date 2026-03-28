@@ -283,7 +283,7 @@ subset_window_open (ggobid *gg) {
   
       gtk_container_set_border_width (GTK_CONTAINER (gg->subset_ui.window), 5);
 
-      vbox = gtk_vbox_new (false, 2);
+      vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       gtk_container_add (GTK_CONTAINER (gg->subset_ui.window), vbox);
 
 
@@ -328,7 +328,7 @@ subset_window_open (ggobid *gg) {
       frame = gtk_frame_new ("Random sample without replacement");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-      hb = gtk_hbox_new (false, 2);
+      hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
       gtk_container_add (GTK_CONTAINER (frame), hb);
 
 	    label = gtk_label_new_with_mnemonic ("Sample si_ze");
@@ -372,7 +372,7 @@ subset_window_open (ggobid *gg) {
       gtk_container_add (GTK_CONTAINER (frame), t);
 
       /*-- Block subsetting: First case (bstart) --*/
-      vb = gtk_vbox_new (false, 3);
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 3);
       label = gtk_label_new_with_mnemonic ("_First case:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
@@ -387,7 +387,7 @@ subset_window_open (ggobid *gg) {
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
 
       /*-- Block subsetting: blocksize (bsize) --*/
-      vb = gtk_vbox_new (false, 2);
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       label = gtk_label_new_with_mnemonic ("Blocksi_ze:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
@@ -412,7 +412,7 @@ subset_window_open (ggobid *gg) {
       frame = gtk_frame_new ("Variable limits");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-      vb = gtk_vbox_new (false, 2);
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       gtk_container_add (GTK_CONTAINER (frame), vb);
 
       gtk_box_pack_start (GTK_BOX (vb),
@@ -435,7 +435,7 @@ subset_window_open (ggobid *gg) {
       gtk_container_add (GTK_CONTAINER (frame), t);
 
       /*-- everyn subsetting: start --*/
-      vb = gtk_vbox_new (false, 3);
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 3);
       label = gtk_label_new_with_mnemonic ("_First case:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
@@ -450,7 +450,7 @@ subset_window_open (ggobid *gg) {
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
 
       /*-- everyn subsetting: stepsize --*/
-      vb = gtk_vbox_new (false, 2);
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       label = gtk_label_new_with_mnemonic ("_N:");
       gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
@@ -475,7 +475,7 @@ subset_window_open (ggobid *gg) {
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
       //gtk_widget_set_usize (frame, 100, 75);
 
-      vb = gtk_vbox_new (false, 2);
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       gtk_container_add (GTK_CONTAINER (frame), vb);
 
       gtk_box_pack_start (GTK_BOX (vb),
@@ -492,10 +492,10 @@ subset_window_open (ggobid *gg) {
       frame = gtk_frame_new ("Cases with specified row label");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-      vb = gtk_vbox_new (false, 5);
+      vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
       gtk_container_add (GTK_CONTAINER (frame), vb);
 
-      hb = gtk_hbox_new (false, 5);
+      hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
       gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 5);
 
       label = gtk_label_new_with_mnemonic ("S_ubstring:");
@@ -510,7 +510,7 @@ subset_window_open (ggobid *gg) {
         NULL);
       gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
 
-      hb = gtk_hbox_new (false, 5);
+      hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
       gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 5);
 
       opt = gtk_combo_box_new_text ();
@@ -534,7 +534,7 @@ subset_window_open (ggobid *gg) {
         frame, label);
 
       /*-- hbox to hold a few buttons --*/
-      button_hbox = gtk_hbox_new (true, 2);
+      button_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
       gtk_box_pack_start (GTK_BOX (vbox), button_hbox, false, false, 2);
 
@@ -567,7 +567,7 @@ subset_window_open (ggobid *gg) {
         false, true, 2);
 
       /*-- Close button --*/
-      close_hbox = gtk_hbox_new (false, 2);
+      close_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
       gtk_box_pack_start (GTK_BOX (vbox), close_hbox, false, false, 1);
 
       btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);

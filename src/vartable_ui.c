@@ -214,7 +214,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_container_add (GTK_CONTAINER (content), frame);
 
-  vb = gtk_vbox_new (true, 5);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
@@ -241,12 +241,12 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_container_add (GTK_CONTAINER (content), frame);
 
-  vb = gtk_vbox_new (true, 5);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
   /*-- make an hbox to hold a label and a text entry widget --*/
-  hb = gtk_hbox_new (true, 5);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
   lbl = gtk_label_new_with_mnemonic ("M_inimum: ");
   gtk_box_pack_start (GTK_BOX (hb), lbl, true, true, 0);
 
@@ -262,7 +262,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   gtk_container_add (GTK_CONTAINER (vb), hb);
 
   /*-- make another hbox --*/
-  hb = gtk_hbox_new (true, 5);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
   lbl = gtk_label_new_with_mnemonic ("M_aximum: ");
   gtk_box_pack_start (GTK_BOX (hb), lbl,
     true, true, 2);
@@ -283,7 +283,7 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   frame = gtk_frame_new ("Restore default limits");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
   gtk_container_add (GTK_CONTAINER (content), frame);
-  vb = gtk_vbox_new (true, 5);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
@@ -410,7 +410,7 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
     false, false, 2);
 
   /*-- make a vb to hold the radio buttons --*/
-  vb = gtk_vbox_new (false, 2);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 
   radio1 = gtk_radio_button_new_with_mnemonic (NULL, "1:_n");
@@ -429,7 +429,7 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
   gtk_box_pack_start (GTK_BOX (vb), radio2, false, false, 2);
 
   /*-- label and entry --*/
-  hb = gtk_hbox_new (false, 2);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
   lbl = gtk_label_new_with_mnemonic ("Variable _name: ");
   gtk_box_pack_start (GTK_BOX (hb), lbl,
     true, true, 2);
@@ -514,7 +514,7 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
  
   /*-- label and entry --*/
-  hb = gtk_hbox_new (false, 2);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
   lbl = gtk_label_new ("Variable _name: ");
   gtk_box_pack_start (GTK_BOX (hb), lbl,
     true, true, 2);
@@ -557,10 +557,10 @@ vartable_buttonbox_build (ggobid *gg) {
   GtkWidget *hbox, *hb, *btn;
 
   /*-- hbox for the buttons along the bottom --*/
-  hbox = gtk_hbox_new (false, 12);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 12);
 
   /*-- Make and clear selections --*/
-  hb = gtk_hbox_new (false, 2);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Select all");
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
@@ -580,7 +580,7 @@ vartable_buttonbox_build (ggobid *gg) {
   /*-- --*/
 
   /*-- Set and apply limits --*/
-  hb = gtk_hbox_new (false, 2);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   /*-- set and clear variable ranges --*/
   btn = gtk_button_new_with_mnemonic ("_Limits ... ");
@@ -602,7 +602,7 @@ vartable_buttonbox_build (ggobid *gg) {
   /*--  --*/
 
   /*-- Clone, new, delete ... --*/
-  hb = gtk_hbox_new (false, 2);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
   /*-- Clone or delete selected variables --*/
 
   btn = gtk_button_new_with_mnemonic ("Cl_one");

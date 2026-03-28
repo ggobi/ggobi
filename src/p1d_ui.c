@@ -169,7 +169,7 @@ cpanel_p1dplot_make (ggobid * gg)
   panel->name = g_strdup (GGOBI (getPModeName) (P1PLOT));
   gg->control_panels = g_list_append (gg->control_panels, (gpointer) panel);
 
-  panel->w = gtk_vbox_new (false, VBOX_SPACING);
+  panel->w = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
  /*-- option menu --*/
@@ -187,7 +187,7 @@ cpanel_p1dplot_make (ggobid * gg)
   //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w), frame, false, false, 3);
 
-  framevb = gtk_vbox_new (false, VBOX_SPACING);
+  framevb = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (framevb), 4);
   gtk_container_add (GTK_CONTAINER (frame), framevb);
 
@@ -204,7 +204,7 @@ cpanel_p1dplot_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (framevb), btn, false, false, 0);
 
   /*-- ASH smoothness --*/
-  vbox = gtk_vbox_new (false, 0);
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start (GTK_BOX (framevb), vbox, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("ASH _smoothness:");
@@ -235,7 +235,7 @@ cpanel_p1dplot_make (ggobid * gg)
   //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
   gtk_box_pack_start (GTK_BOX (panel->w), frame, false, false, 3);
 
-  vb = gtk_vbox_new (false, VBOX_SPACING);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 4);
   gtk_container_add (GTK_CONTAINER (frame), vb);
 

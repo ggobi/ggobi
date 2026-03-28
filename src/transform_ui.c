@@ -261,7 +261,7 @@ transform_window_open (ggobid *gg)
 /*
  * Transformations
 */
-    vbox = gtk_vbox_new (false, 2);
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
     gtk_container_add (GTK_CONTAINER (gg->tform_ui.window), vbox);
 
     /* Create a notebook, set the position of the tabs */
@@ -293,7 +293,7 @@ transform_window_open (ggobid *gg)
     //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 1);
 
-    vb = gtk_vbox_new (false, 5);
+    vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_set_border_width (GTK_CONTAINER (vb), 5);
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
@@ -307,7 +307,7 @@ transform_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), stage1_option_menu, true, false, 1);
 
     /*-- label and spin button for Box-Cox parameter --*/
-    hb = gtk_hbox_new (false, 2);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 2);
     
     lbl = gtk_label_new_with_mnemonic ("Box-Cox _param:");
@@ -333,7 +333,7 @@ transform_window_open (ggobid *gg)
       "999999999", strlen ("999999999"),
       &lbearing, &rbearing, &width, &ascent, &descent);*/
 
-    hb = gtk_hbox_new (false, 2);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 2);
 
     lbl = gtk_label_new_with_mnemonic ("_a:");
@@ -391,7 +391,7 @@ transform_window_open (ggobid *gg)
 
     /*-- add a close button --*/
     gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(), false, true, 2);
-    hb = gtk_hbox_new (false, 2);
+    hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);

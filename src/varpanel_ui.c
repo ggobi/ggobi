@@ -406,7 +406,7 @@ varpanel_add_row (gint j, GGobiData * d, ggobid * gg)
     if (GGOBI_DISPLAY (displays->data)->d == d)
       sens = true;
 
-  box = gtk_hbox_new (false, 2);
+  box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
   gtk_box_pack_start (GTK_BOX (d->vcbox_ui.vbox), box, false, false, 1);
 
   xw = ggobi_noop_toggle_button_new_with_label (" X ");
@@ -624,7 +624,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
   gtk_container_add (GTK_CONTAINER (d->vcbox_ui.ebox), d->vcbox_ui.swin);
 
   /*-- add a vbox to the swin --*/
-  d->vcbox_ui.vbox = gtk_vbox_new (false, 1);
+  d->vcbox_ui.vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (d->vcbox_ui.vbox), 2);
   g_signal_connect (G_OBJECT (gg), "display_new",
                     G_CALLBACK (varpanel_set_sensitive_cb), NULL);

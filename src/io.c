@@ -199,7 +199,7 @@ createInputFileSelectionDialog (gchar * title, ggobid * gg)
                                  GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                  GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 
-  hbox = gtk_hbox_new (false, 5);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
 
   lbl = gtk_label_new_with_mnemonic ("Input _Type:");
   gtk_box_pack_start (GTK_BOX (hbox), lbl, false, false, 0);
