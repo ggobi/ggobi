@@ -165,7 +165,7 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Show all visible cases, or show only labelled cases", NULL);
@@ -186,7 +186,7 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Scale variables (and variable groups) on a common scale, or independently",

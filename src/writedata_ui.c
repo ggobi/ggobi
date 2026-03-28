@@ -201,14 +201,13 @@ writeall_window_open (ggobid *gg) {
   /*-- Jitter? --*/
 /*
   j++;
-  opt = gtk_option_menu_new ();
+  opt = gtk_combo_box_new_text ();
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
     "Include any added jitter?",
     NULL);
   populate_option_menu (opt, jitter_lbl,
     sizeof (jitter_lbl) / sizeof (gchar *), jitterp_set_cb, "GGobi", gg);
-  gtk_option_menu_set_history (GTK_OPTION_MENU (opt),
-    true);
+  gtk_combo_box_set_active (GTK_COMBO_BOX (opt), true);
 
   gtk_table_attach (GTK_TABLE (table),
     gtk_label_new ("Jitter?:"),
@@ -308,4 +307,3 @@ writeall_window_open (ggobid *gg) {
 
   gtk_widget_show_all (window);
 }
-

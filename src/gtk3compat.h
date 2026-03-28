@@ -38,11 +38,6 @@ void ggobi_gtk_tooltips_set_tip (GtkTooltips tips, GtkWidget *widget,
 #define gtk_combo_box_append_text(combo_box, text) \
   gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo_box), text)
 
-#define gtk_option_menu_new() gtk_combo_box_text_new ()
-#define GTK_OPTION_MENU(widget) GTK_COMBO_BOX (widget)
-#define gtk_option_menu_set_history(widget, index) \
-  gtk_combo_box_set_active (GTK_COMBO_BOX (widget), index)
-
 #define gtk_widget_set_double_buffered(widget, setting) ((void) 0)
 #define GTK_WIDGET_VISIBLE(widget) gtk_widget_get_visible (GTK_WIDGET (widget))
 #define GTK_WIDGET_REALIZED(widget) gtk_widget_get_realized (GTK_WIDGET (widget))

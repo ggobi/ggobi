@@ -281,7 +281,7 @@ cpanel_ctour_make (ggobid *gg) {
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  pathlen_opt = gtk_option_menu_new ();
+  pathlen_opt = gtk_combo_box_new_text ();
   gtk_container_set_border_width (GTK_CONTAINER (pathlen_opt), 4);
   gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pathlen_opt,
     "Set the path length", NULL);

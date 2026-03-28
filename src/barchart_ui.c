@@ -68,7 +68,7 @@ cpanel_barchart_make (ggobid * gg)
   gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  //opt = gtk_option_menu_new();
+  //opt = gtk_combo_box_new_text ();
   opt = gtk_combo_box_new_text ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
   gtk_widget_set_name (opt, "BARCHART:display_mode_option_menu");
