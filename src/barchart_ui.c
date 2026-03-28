@@ -65,16 +65,15 @@ cpanel_barchart_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (panel), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Display _mode:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+  gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  //opt = gtk_combo_box_new_text ();
-  opt = gtk_combo_box_new_text ();
+  //opt = gtk_combo_box_text_new ();
+  opt = gtk_combo_box_text_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
   gtk_widget_set_name (opt, "BARCHART:display_mode_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "switch between height (bars) and width (spines) to represent count",
-                        NULL);
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("switch between height (bars) and width (spines) to represent count") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, display_mode_lbl, G_N_ELEMENTS (display_mode_lbl),
                       G_CALLBACK (display_mode_cb), gg);
@@ -433,7 +432,7 @@ barchart_event_handlers_toggle (displayd * display, splotd * sp,
     return;
 
   if (state == on) {
-    GtkObject *winobj = GTK_OBJECT (GGOBI_WINDOW_DISPLAY (display)->window);
+    GtkWidget *winobj = GGOBI_WINDOW_DISPLAY (display)->window;
     /* Mode selection */
     sp->key_press_id =
       g_signal_connect (winobj, "key_press_event",

@@ -24,7 +24,7 @@ GtkWidget *CreateMenuItemWithCheck (GtkWidget * menu,
                                     gchar * szName, gchar * szAccel,
                                     gchar * szTip, GtkWidget * win_main,
                                     GtkAccelGroup * accel_group,
-                                    GtkSignalFunc func, gpointer data,
+                                    GCallback func, gpointer data,
                                     ggobid * gg, GSList * radiogroup,
                                     gboolean check);
 
@@ -51,7 +51,7 @@ GtkWidget *
 CreateMenuItem (GtkWidget * menu,
                 gchar * szName, gchar * szAccel, gchar * szTip,
                 GtkWidget * win_main, GtkAccelGroup * accel_group,
-                GtkSignalFunc func, gpointer data, ggobid * gg)
+                GCallback func, gpointer data, ggobid * gg)
 {
   return (CreateMenuItemWithCheck (menu, szName, szAccel, szTip,
                                    win_main, accel_group, func, data, gg,
@@ -62,7 +62,7 @@ GtkWidget *
 CreateMenuItemWithCheck (GtkWidget * menu,
                          gchar * szName, gchar * szAccel, gchar * szTip,
                          GtkWidget * win_main, GtkAccelGroup * accel_group,
-                         GtkSignalFunc func, gpointer data, ggobid * gg,
+                         GCallback func, gpointer data, ggobid * gg,
                          GSList * RadioGroup, gboolean check)
 {
   GtkWidget *menuitem;
@@ -121,7 +121,7 @@ CreateMenuItemWithCheck (GtkWidget * menu,
 
   /* --- If there was a tool tip --- */
   if (szTip && strlen (szTip))
-    gtk_tooltips_set_tip (gg->tips, menuitem, szTip, NULL);
+    gtk_widget_set_tooltip_text ((menuitem), gg->tips ? (szTip) : NULL);
 
   return (menuitem);
 }
@@ -147,7 +147,7 @@ CreateMenuItemWithCheck (GtkWidget * menu,
 GtkWidget *
 CreateMenuCheck (GtkWidget * menu,
                  gchar * szName,
-                 GtkSignalFunc func,
+                 GCallback func,
                  gpointer data, gboolean state, ggobid * gg)
 {
   GtkWidget *menuitem;
@@ -235,7 +235,7 @@ populate_combo_box (GtkWidget * combo_box, gchar ** lbl, gint nitems,
 {
   gint i;
   for (i = 0; i < nitems; i++) {
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combo_box), lbl[i]);
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo_box), lbl[i]);
   }
   //gtk_combo_box_set_add_tearoffs(GTK_COMBO_BOX(combo_box), true);
   gtk_combo_box_set_active (GTK_COMBO_BOX (combo_box), 0);
@@ -403,15 +403,15 @@ variable_notebook_handlers_disconnect (GtkWidget * notebook, ggobid * gg)
   g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
                                         G_CALLBACK
                                         (variable_notebook_varchange_cb),
-                                        GTK_OBJECT (notebook));
+                                        notebook);
   g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
                                         G_CALLBACK
                                         (variable_notebook_varchange_cb),
-                                        GTK_OBJECT (notebook));
+                                        notebook);
   g_signal_handlers_disconnect_by_func (G_OBJECT (gg),
                                         G_CALLBACK
                                         (variable_notebook_adddata_cb),
-                                        GTK_OBJECT (notebook));
+                                        notebook);
 }
 
 GtkWidget *
@@ -579,7 +579,7 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
      GtkWidget *create_variable_notebook (GtkWidget * box,
                                           GtkSelectionMode mode,
                                           vartyped vtype, datatyped dtype,
-                                          GtkSignalFunc func,
+                                          GCallback func,
                                           gpointer func_data, ggobid * gg)
 {
   GtkWidget *notebook;
@@ -617,17 +617,17 @@ CHECK_EVENT_SIGNATURE (variable_notebook_adddata_cb, datad_added_f)
   g_signal_connect (G_OBJECT (gg),
                     "variable_added",
                     G_CALLBACK (variable_notebook_varchange_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
   g_signal_connect (G_OBJECT (gg),
                     "variable_list_changed",
                     G_CALLBACK (variable_notebook_list_changed_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
 
   /*-- listen for datad_added events on main_window --*/
   g_signal_connect (G_OBJECT (gg),
                     "datad_added",
                     G_CALLBACK (variable_notebook_adddata_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
 
   return notebook;
 }
@@ -728,7 +728,7 @@ prefixed_variable_notebook_current_page_set (displayd *display,
 GtkWidget *
 create_prefixed_variable_notebook (GtkWidget * box,
                                    GtkSelectionMode mode, vartyped vtype,
-                                   datatyped dtype, GtkSignalFunc func,
+                                   datatyped dtype, GCallback func,
                                    gpointer func_data, ggobid * gg,
                                    GGobiVariableNotebookPrefixFunc
                                    prefix_func)
@@ -743,15 +743,15 @@ create_prefixed_variable_notebook (GtkWidget * box,
   g_signal_connect (G_OBJECT (gg),
                     "variable_added",
                     G_CALLBACK (prefixed_variable_notebook_varchange_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
   g_signal_connect (G_OBJECT (gg),
                     "variable_list_changed",
                     G_CALLBACK (prefixed_variable_notebook_list_changed_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
   g_signal_connect (G_OBJECT (gg),
                     "datad_added",
                     G_CALLBACK (prefixed_variable_notebook_adddata_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
 
   return (notebook);
 }
@@ -864,4 +864,3 @@ datad_get_from_notebook (GtkWidget *notebook, ggobid *gg) {
 
   return d;
 }
-

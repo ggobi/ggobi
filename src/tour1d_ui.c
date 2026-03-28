@@ -184,10 +184,9 @@ cpanel_tour1d_make (ggobid *gg) {
   g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (speed1d_set_cb), (gpointer) gg);
 
-  sbar = gtk_hscale_new (adj);
+  sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, adj);
   gtk_widget_set_name (sbar, "TOUR1D:speed_bar");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-    "Adjust speed of tour motion", NULL);
+  gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Adjust speed of tour motion") : NULL);
   scale_set_default_values (GTK_SCALE (sbar));
 
   gtk_box_pack_start (GTK_BOX (panel->w), sbar,
@@ -200,8 +199,7 @@ cpanel_tour1d_make (ggobid *gg) {
 
   btn = gtk_check_button_new_with_mnemonic ("_Pause");
   gtk_widget_set_name (btn, "TOUR1D:pause_button");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Stop tour motion temporarily (keyboard shortcut: w)", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Stop tour motion temporarily (keyboard shortcut: w)") : NULL);
   g_signal_connect (G_OBJECT (btn), "toggled",
                      G_CALLBACK (tour1d_pause_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
@@ -214,15 +212,13 @@ cpanel_tour1d_make (ggobid *gg) {
   box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   btn = gtk_button_new_with_mnemonic("_Reinit");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Reset projection", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Reset projection") : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
                      G_CALLBACK (reinit_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   btn = gtk_button_new_with_mnemonic ("Scr_amble");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Reset projection to random value", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Reset projection to random value") : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
                      G_CALLBACK (scramble_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
@@ -235,15 +231,13 @@ cpanel_tour1d_make (ggobid *gg) {
   /*box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
   btn = gtk_button_new_with_mnemonic ("_Snap");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Take a snapshot of this frame to re-generate plot outside ggobi", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Take a snapshot of this frame to re-generate plot outside ggobi") : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
                      G_CALLBACK (t1d_snap_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
   btn = gtk_check_button_new_with_mnemonic ("Vid_eo");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Save sequence of projection frames out to file", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Save sequence of projection frames out to file") : NULL);
   g_signal_connect (G_OBJECT (btn), "toggled",
                      G_CALLBACK (t1d_video_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
@@ -264,9 +258,7 @@ cpanel_tour1d_make (ggobid *gg) {
   /*-- ASH line segments --*/
   btn = gtk_check_button_new_with_mnemonic ("ASH: add _lines");
   gtk_widget_set_name (btn, "TOUR1D:ASH_add_lines");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "When displaying ASHes, add lines connecting each point to the baseline.",
-    NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("When displaying ASHes") : NULL);
   /*-- cpanel may not be available, so initialize this to false --*/
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
   g_signal_connect (G_OBJECT (btn), "toggled",
@@ -287,12 +279,11 @@ cpanel_tour1d_make (ggobid *gg) {
   g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (t1d_ash_sm_cb), gg);
 
-/*  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->ash.smoothness_adj));*/
-  sbar = gtk_hscale_new (adj);
+/*  sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (gg->ash.smoothness_adj));*/
+  sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, adj);
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
   gtk_widget_set_name (sbar, "TOUR1D:ASH_smooth");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-    "Adjust ASH smoothness", NULL);
+  gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Adjust ASH smoothness") : NULL);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
@@ -306,8 +297,7 @@ cpanel_tour1d_make (ggobid *gg) {
   box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
 
   btn = gtk_check_button_new_with_mnemonic ("V_ertical");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Change orientation of plot", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Change orientation of plot") : NULL);
   g_signal_connect (G_OBJECT (btn), "toggled",
                      G_CALLBACK (tour1d_vert_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
@@ -319,8 +309,7 @@ cpanel_tour1d_make (ggobid *gg) {
  * projection pursuit button
 */
   btn = gtk_button_new_with_mnemonic ("Pro_jection pursuit ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open panel for tour projection pursuit", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Open panel for tour projection pursuit") : NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   g_signal_connect (G_OBJECT (btn), "clicked",
@@ -331,8 +320,7 @@ cpanel_tour1d_make (ggobid *gg) {
 */
 #ifdef TOUR_ADV_IMPLEMENTED
   btn = gtk_button_new_with_mnemonic ("Advanced _features ...");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-    "Open panel for additional grand tour features", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Open panel for additional grand tour features") : NULL);
   gtk_box_pack_start (GTK_BOX (panel->w),
                       btn, false, false, 1);
   g_signal_connect (G_OBJECT (btn), "clicked",
@@ -431,7 +419,7 @@ static void tour1dadv_window_open (ggobid *gg)
 {
   GtkWidget *vbox, *box, *btn, *opt, *tgl, *entry;
   GtkWidget *pathlen_opt, *vb, *hb, *lbl, *sbar, *notebook;
-  GtkObject *adj;
+  GtkAdjustment *adj;
 
   if (window == NULL) {
     
@@ -451,8 +439,7 @@ static void tour1dadv_window_open (ggobid *gg)
 
     /*-- local scan toggle --*/
     tgl = gtk_check_button_new_with_label ("Local scan");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Perform the tour within a small local region", NULL);
+    gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Perform the tour within a small local region") : NULL);
     g_signal_connect (G_OBJECT (tgl), "toggled",
                         G_CALLBACK (localscan_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vbox),
@@ -462,14 +449,12 @@ static void tour1dadv_window_open (ggobid *gg)
     box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
 
     tgl = gtk_check_button_new_with_mnemonic ("_Step");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Prepare to run the grand tour one step at a time", NULL);
+    gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Prepare to run the grand tour one step at a time") : NULL);
     gtk_box_pack_start (GTK_BOX (box), tgl, true, true, 1);
 
     btn = gtk_button_new_with_mnemonic ("_Go");
     gtk_widget_set_sensitive (btn, false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Take one step of the grand tour", NULL);
+    gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Take one step of the grand tour") : NULL);
     gtk_box_pack_start (GTK_BOX (box), btn, true, true, 1);
 
     g_signal_connect (G_OBJECT (btn), "clicked",
@@ -489,10 +474,9 @@ static void tour1dadv_window_open (ggobid *gg)
     lbl = gtk_label_new_with_mnemonic ("Path _length:");
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
-    pathlen_opt = gtk_combo_box_new_text ();
+    pathlen_opt = gtk_combo_box_text_new ();
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), pathlen_opt);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), pathlen_opt,
-      "Set the path length", NULL);
+    gtk_widget_set_tooltip_text ((pathlen_opt), gg->tips ? ("Set the path length") : NULL);
     gtk_box_pack_end (GTK_BOX (hb), pathlen_opt, false, false, 0);
     populate_combo_box (pathlen_opt, pathlen_lbl, G_N_ELEMENTS(pathlen_lbl),
                           G_CALLBACK(pathlen_cb), gg);
@@ -504,10 +488,9 @@ static void tour1dadv_window_open (ggobid *gg)
     lbl = gtk_label_new_with_mnemonic ("_Interpolation: ");
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
-    opt = gtk_combo_box_new_text ();
+    opt = gtk_combo_box_text_new ();
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Set the interpolation method", NULL);
+    gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Set the interpolation method") : NULL);
     gtk_box_pack_end (GTK_BOX (hb), opt, false, false, 0);
     populate_combo_box (opt, interp_lbl, G_N_ELEMENTS(interp_lbl),
                           G_CALLBACK(interp_cb), gg);
@@ -520,8 +503,7 @@ static void tour1dadv_window_open (ggobid *gg)
 
     /*-- Store bases toggle --*/
     tgl = gtk_check_button_new_with_mnemonic ("_Store bases");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Store basis vectors", NULL);
+    gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Store basis vectors") : NULL);
     g_signal_connect (G_OBJECT (tgl), "toggled",
                         G_CALLBACK (storebases_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vb), tgl, false, false, 0);
@@ -531,7 +513,8 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
     lbl = gtk_label_new_with_mnemonic ("_Number of bases stored:");
-    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+    gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
     entry = gtk_entry_new ();
@@ -546,7 +529,8 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
     lbl = gtk_label_new_with_mnemonic ("_Current base pair: ");
-    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+    gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
     gtk_box_pack_start (GTK_BOX (hb), lbl, false, false, 0);
 
     entry = gtk_entry_new ();
@@ -579,13 +563,11 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 0);
 
     tgl = gtk_check_button_new_with_mnemonic ("_Display basis");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Display basis as bitmap", NULL);
+    gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Display basis as bitmap") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), tgl, false, false, 0);
 
     entry = gtk_entry_new ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-      "Enter bitmap number", NULL);
+    gtk_widget_set_tooltip_text ((entry), gg->tips ? ("Enter bitmap number") : NULL);
     gtk_widget_set_size_request (entry,
                                  gdk_string_width (entry->style->font, "XXXX"),
                                  -1);
@@ -598,9 +580,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_notebook_append_page (GTK_NOTEBOOK (notebook), box, lbl);
 
     tgl = gtk_check_button_new_with_mnemonic ("S_ection");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Downlight points that are not within epsilon of the center plane",
-      NULL);
+    gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Downlight points that are not within epsilon of the center plane") : NULL);
     g_signal_connect (G_OBJECT (tgl), "toggled",
                         G_CALLBACK (section_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (box), tgl, false, false, 1);
@@ -610,18 +590,17 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (box), vb, false, false, 1);
 
     lbl = gtk_label_new_with_mnemonic ("_Epsilon:");
-    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+    gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
     gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
     adj = gtk_adjustment_new (1.0, 0.0, 1.0, 0.01, .01, 0.0);
     g_signal_connect (G_OBJECT (adj), "value_changed",
                         G_CALLBACK (epsilon_cb), NULL);
 
-    sbar = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+    sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (adj));
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-      "Set the width of the cross-section",
-      NULL);
+    gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Set the width of the cross-section") : NULL);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 0);
@@ -629,7 +608,7 @@ static void tour1dadv_window_open (ggobid *gg)
     /*-- Close button --*/
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
     g_signal_connect_swapped (G_OBJECT (btn), "clicked",
-      G_CALLBACK(G_CALLBACK) (hide_cb), (GtkObject*) window);
+      G_CALLBACK (hide_cb), window);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);
   }
 

@@ -313,9 +313,7 @@ tour1dpp_window_open (ggobid *gg) {
  * Optimize toggle
 */
     tgl = gtk_check_button_new_with_mnemonic ("_Optimize");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-      "Guide the tour using projection pursuit optimization or tour passively",
-      NULL);
+    gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Guide the tour using projection pursuit optimization or tour passively") : NULL);
     g_signal_connect (G_OBJECT (tgl), "toggled",
                         G_CALLBACK (t1d_optimz_cb), (gpointer) dsp);
     gtk_box_pack_start (GTK_BOX (vbc),
@@ -336,11 +334,10 @@ tour1dpp_window_open (ggobid *gg) {
     g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (t1d_pptemp_set_cb), dsp);
 
-    sbar = gtk_hscale_new (adj);
+    sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, adj);
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_widget_set_name (sbar, "TOUR1D:PP_TEMPST");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-    "Adjust starting temp of pp", NULL);
+    gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Adjust starting temp of pp") : NULL);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
@@ -360,11 +357,10 @@ tour1dpp_window_open (ggobid *gg) {
     g_signal_connect (G_OBJECT (adj), "value_changed",
                       G_CALLBACK (t1d_ppcool_set_cb), dsp);
 
-    sbar = gtk_hscale_new (adj);
+    sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, adj);
 	gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), sbar);
     gtk_widget_set_name (sbar, "TOUR1D:PP_COOLING");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-    "Adjust cooling", NULL);
+    gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Adjust cooling") : NULL);
     gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
     gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
@@ -382,19 +378,16 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vbc), hb, false, false, 2);
 
     dsp->t1d_pplabel = gtk_label_new ("PP index: (0.00) 0.0000 (0.00)");
-    gtk_misc_set_alignment (GTK_MISC (dsp->t1d_pplabel), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (dsp->t1d_pplabel), 0);
+    gtk_label_set_yalign (GTK_LABEL (dsp->t1d_pplabel), 0.5);
     gtk_box_pack_start (GTK_BOX (hb), dsp->t1d_pplabel, false, false, 0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), dsp->t1d_pplabel,
-      "The value of the projection pursuit index for the current projection",
-      NULL);
+    gtk_widget_set_tooltip_text ((dsp->t1d_pplabel), gg->tips ? ("The value of the projection pursuit index for the current projection") : NULL);
 
     /*    entry = gtk_entry_new_with_max_length (32);
     gtk_entry_set_editable (GTK_ENTRY (entry), false);
     gtk_entry_set_text (GTK_ENTRY (entry), "0");
     gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-      "The value of the projection pursuit index for the current projection",
-      NULL);
+    gtk_widget_set_tooltip_text ((entry), gg->tips ? ("The value of the projection pursuit index for the current projection") : NULL);
     g_signal_connect (G_OBJECT (entry), "value_changed",
     G_CALLBACK (t1d_writeindx_cb), gg);*/
     /*    g_signal_connect (G_OBJECT (dsp->t1d.ppval), "value_changed",
@@ -412,13 +405,10 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vbc), vb, false, false, 2);
     /*    gtk_container_add (GTK_CONTAINER (frame), vb);*/
 
-    opt = gtk_combo_box_new_text ();
+    opt = gtk_combo_box_text_new ();
     //gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-/*
-    gtk_misc_set_alignment (opt, 0, 0.5);
-*/
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Set the projection pursuit index", NULL);
+
+    gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Set the projection pursuit index") : NULL);
     gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
     /*  gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);*/
     populate_combo_box (opt, t1d_pp_func_lbl, G_N_ELEMENTS(t1d_pp_func_lbl),
@@ -429,15 +419,15 @@ tour1dpp_window_open (ggobid *gg) {
     gtk_box_pack_start (GTK_BOX (vb), param_vb, false, false, 2);
 
     param_lbl = gtk_label_new ("Terms in expansion:");
-    gtk_misc_set_alignment (GTK_MISC (param_lbl), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (param_lbl), 0);
+    gtk_label_set_yalign (GTK_LABEL (param_lbl), 0.5);
     gtk_box_pack_start (GTK_BOX (param_vb), param_lbl, false, false, 0);
 
     param_adj = (GtkAdjustment *) gtk_adjustment_new (1.0,
                                                       1.0, 30.0,
                                                       1.0, 1.0, 0.0);
-    param_scale = gtk_hscale_new (GTK_ADJUSTMENT (param_adj));
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), param_scale,
-      "Set number of terms in the expansion for some indices; bandwidth for others", NULL);
+    param_scale = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (param_adj));
+    gtk_widget_set_tooltip_text ((param_scale), gg->tips ? ("Set number of terms in the expansion for some indices; bandwidth for others") : NULL);
     gtk_scale_set_digits (GTK_SCALE (param_scale), 0);
     gtk_scale_set_value_pos (GTK_SCALE (param_scale), GTK_POS_BOTTOM);
 
@@ -454,7 +444,6 @@ tour1dpp_window_open (ggobid *gg) {
                         frame, true, true, 1);
 
     dsp->t1d_ppda = gtk_drawing_area_new ();
-    gtk_widget_set_double_buffered(dsp->t1d_ppda, false);
     gtk_widget_set_size_request (GTK_WIDGET (dsp->t1d_ppda), WIDTH, HEIGHT);
     g_signal_connect (G_OBJECT (dsp->t1d_ppda),
                         "configure_event",

@@ -203,7 +203,7 @@ void tour1d_write_video(ggobid *gg)
   vartabled *vt;
   gfloat ppval;
 
-  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window))
+  if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window))
     ppval = dsp->t1d.ppval;
   else
     ppval = 0.;
@@ -315,7 +315,7 @@ tour1d_all_vars (displayd *dsp)
     varcircles_visibility_set (dsp, gg);
     varpanel_refresh (dsp, gg);
 
-    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+    if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window)) {
       free_optimize0_p(&dsp->t1d_pp_op);
       alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
         1);
@@ -475,7 +475,7 @@ tour1d_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
     dsp->t1d.active_vars_p.els[jvar] = true;
   }
 
-  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+  if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window)) {
     free_optimize0_p(&dsp->t1d_pp_op);
     alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
       1);
@@ -523,7 +523,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d, g
         tour1d_active_var_set (jvar, d, dsp, gg);
         gg->tour1d.fade_vars = fade;
 
-        if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+        if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window)) {
           free_optimize0_p(&dsp->t1d_pp_op);
           alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot,
             dsp->t1d.nactive, 1);
@@ -543,7 +543,7 @@ tour1d_varsel (GtkWidget *w, gint jvar, gint toggle, gint mouse, GGobiData *d, g
     } else { /* This part sets active/not active var */
       tour1d_active_var_set (jvar, d, dsp, gg);
 
-      if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+      if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window)) {
         free_optimize0_p(&dsp->t1d_pp_op);
         alloc_optimize0_p(&dsp->t1d_pp_op, d->nrows_in_plot, dsp->t1d.nactive, 
           1);
@@ -665,7 +665,7 @@ tour1d_run(displayd *dsp, ggobid *gg)
       dsp->t1d.F, dsp->t1d.Va, d->ncols, (gint) 1);
 
     /* plot pp indx */
-    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+    if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window)) {
       /*    if (dsp->t1d_ppda != NULL) {*/
 
       dsp->t1d.oppval = dsp->t1d.ppval;
@@ -864,7 +864,7 @@ void tour1d_reinit(ggobid *gg)
 
   varcircles_refresh (d, gg);
 
-  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) 
+  if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window)) 
     t1d_pp_reinit(dsp, gg);
 }
 
@@ -892,7 +892,7 @@ void tour1d_scramble(ggobid *gg)
 
   varcircles_refresh (d, gg);
 
-  if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) 
+  if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window)) 
     t1d_pp_reinit(dsp, gg);
 }
 
@@ -1028,7 +1028,7 @@ tour1d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
  
     /* plot pp index */
     /*    if (dsp->t1d_ppda != NULL) {*/
-    if (dsp->t1d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t1d_window)) {
+    if (dsp->t1d_window != NULL && gtk_widget_get_visible (dsp->t1d_window)) {
       dsp->t1d.oppval = dsp->t1d.ppval;
       pp_problem = t1d_switch_index(cpanel->t1d.pp_indx, 
         0, dsp, gg);

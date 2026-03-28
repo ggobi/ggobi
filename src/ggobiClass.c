@@ -187,7 +187,7 @@ testDisplayDestroy (GGobiObject * obj)
 {
   GGobiObjectClass *klass;
   g_print ("In testDisplayDestroy\n");
-  klass = GTK_OBJECT_CLASS (G_TYPE_VBOX);
+  klass = g_type_class_peek (GTK_TYPE_BOX);
   if (klass->destroy)
     klass->destroy (obj);
 

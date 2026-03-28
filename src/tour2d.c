@@ -272,7 +272,7 @@ tour2d_all_vars (displayd *dsp)
     varcircles_visibility_set (dsp, gg);
     varpanel_refresh (dsp, gg);
 
-    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+    if (dsp->t2d_window != NULL && gtk_widget_get_visible (dsp->t2d_window)) {
       free_optimize0_p(&dsp->t2d_pp_op);
       alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 
         2);
@@ -451,7 +451,7 @@ tour2d_active_var_set (gint jvar, GGobiData *d, displayd *dsp, ggobid *gg)
 
   /* Check if pp indices are being calculated, if so re-allocate
      and re-initialize as necessary */
-  if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+  if (dsp->t2d_window != NULL && gtk_widget_get_visible (dsp->t2d_window)) {
     free_optimize0_p(&dsp->t2d_pp_op);
     alloc_optimize0_p(&dsp->t2d_pp_op, d->nrows_in_plot, dsp->t2d.nactive, 2);
     free_pp(&dsp->t2d_pp_param);
@@ -646,7 +646,7 @@ tour2d_run(displayd *dsp, ggobid *gg)
       dsp->t2d.F, dsp->t2d.Va, d->ncols, (gint) 2);
 
     /* plot pp indx */
-    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+    if (dsp->t2d_window != NULL && gtk_widget_get_visible (dsp->t2d_window)) {
       /*    if (dsp->t2d_ppda != NULL) {*/
 
       dsp->t2d.oppval = dsp->t2d.ppval;
@@ -878,7 +878,7 @@ void tour2d_reinit(ggobid *gg)
 
   varcircles_refresh (d, gg);
 
-  if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) 
+  if (dsp->t2d_window != NULL && gtk_widget_get_visible (dsp->t2d_window)) 
     t2d_pp_reinit(dsp, gg);
 }
 
@@ -1343,7 +1343,7 @@ tour2d_manip(gint p1, gint p2, splotd *sp, ggobid *gg)
     }
 
     /* plot pp indx */
-    if (dsp->t2d_window != NULL && GTK_WIDGET_VISIBLE (dsp->t2d_window)) {
+    if (dsp->t2d_window != NULL && gtk_widget_get_visible (dsp->t2d_window)) {
       /*    if (dsp->t2d_ppda != NULL) {*/
 
       dsp->t2d.oppval = dsp->t2d.ppval;

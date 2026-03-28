@@ -85,15 +85,14 @@ cpanel_tsplot_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("_Layout:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+  gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_combo_box_new_text ();
+  opt = gtk_combo_box_text_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), lbl);
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "Arrange the time series as single plot or several plots",
-                        NULL);
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Arrange the time series as single plot or several plots") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS (arrangement_lbl),
                       arrangement_cb, gg);
@@ -108,14 +107,13 @@ cpanel_tsplot_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (cpanel), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Sc_ales:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+  gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_combo_box_new_text ();
+  opt = gtk_combo_box_text_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "Scale variables (and variable groups) on a common scale, or independently",
-                        NULL);
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Scale variables (and variable groups) on a common scale") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, varscale_lbl, G_N_ELEMENTS (varscale_lbl),
                       varscale_cb, gg);

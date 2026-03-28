@@ -80,7 +80,7 @@ typedef struct {
 
 
 extern void barchart_display_menus_make(displayd * display,
-                                        GtkAccelGroup *, GtkSignalFunc,
+                                        GtkAccelGroup *, GCallback,
                                         ggobid *);
 extern splotd *ggobi_barchart_splot_new(displayd * dpy, ggobid * gg);
 

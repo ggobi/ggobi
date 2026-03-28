@@ -543,7 +543,7 @@ CHECK_EVENT_SIGNATURE (linkby_notebook_adddata_cb, datad_added_f)
 
      static void
        linkby_notebook_adddata_cb (ggobid * gg, GGobiData * d, void *notebook,
-                                   GtkSignalFunc func)
+                                   GCallback func)
 {
   if (g_slist_length (d->vartable)) {
     linkby_notebook_subwindow_add (d, notebook, gg);
@@ -640,17 +640,17 @@ create_linkby_notebook (GtkWidget * box, ggobid * gg)
   g_signal_connect (G_OBJECT (gg),
                     "variable_added",
                     G_CALLBACK (linkby_notebook_varadded_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
   g_signal_connect (G_OBJECT (gg),
                     "variable_list_changed",
                     G_CALLBACK (linkby_notebook_varchanged_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
 
   /*-- listen for datad_added events on main_window --*/
   g_signal_connect (G_OBJECT (gg),
                     "datad_added",
                     G_CALLBACK (linkby_notebook_adddata_cb),
-                    GTK_OBJECT (notebook));
+                    notebook);
 
   return notebook;
 }

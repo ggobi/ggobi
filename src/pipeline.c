@@ -384,7 +384,7 @@ world_to_raw (gint pt, splotd *sp, GGobiData *d, ggobid *gg)
 
   if(GGOBI_IS_EXTENDED_DISPLAY(display)) {
      GGobiExtendedDisplayClass *klass;
-     klass = GGOBI_EXTENDED_DISPLAY_CLASS(GTK_OBJECT(display)->klass);
+     klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
      if(klass->world_to_raw)
          klass->world_to_raw(display, sp, pt, d, gg);
   } 

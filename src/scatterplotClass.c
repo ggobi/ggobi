@@ -1049,64 +1049,33 @@ varpanelTooltipsReset (displayd * display, ggobid * gg, GtkWidget * wx,
 
   switch (projection) {
   case P1PLOT:
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                          "Select to plot", NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                          "Click left to plot horizontally, right or middle to plot vertically",
-                          NULL);
+    gtk_widget_set_tooltip_text ((wx), gg->tips ? ("Select to plot") : NULL);
+    gtk_widget_set_tooltip_text ((label), gg->tips ? ("Click left to plot horizontally") : NULL);
     break;
   case XYPLOT:
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                          "Press to select the horizontally plotted variable",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-                          "Press to select the vertically plotted variable",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                          "Click left to select the horizontal variable, middle for vertical",
-                          NULL);
+    gtk_widget_set_tooltip_text ((wx), gg->tips ? ("Press to select the horizontally plotted variable") : NULL);
+    gtk_widget_set_tooltip_text ((wy), gg->tips ? ("Press to select the vertically plotted variable") : NULL);
+    gtk_widget_set_tooltip_text ((label), gg->tips ? ("Click left to select the horizontal variable") : NULL);
 
     break;
   case TOUR1D:
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                          "Click to select a variable to be available for touring",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                          "Click to select a variable to be available for touring",
-                          NULL);
+    gtk_widget_set_tooltip_text ((wx), gg->tips ? ("Click to select a variable to be available for touring") : NULL);
+    gtk_widget_set_tooltip_text ((label), gg->tips ? ("Click to select a variable to be available for touring") : NULL);
     break;
   case TOUR2D3:
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                          "Click to select a variable to be available for rotation",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-                          "Click to select a variable to be available for rotation",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wz,
-                          "Click to select a variable to be available for rotation",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                          "Click to select a variable to be available for rotation",
-                          NULL);
+    gtk_widget_set_tooltip_text ((wx), gg->tips ? ("Click to select a variable to be available for rotation") : NULL);
+    gtk_widget_set_tooltip_text ((wy), gg->tips ? ("Click to select a variable to be available for rotation") : NULL);
+    gtk_widget_set_tooltip_text ((wz), gg->tips ? ("Click to select a variable to be available for rotation") : NULL);
+    gtk_widget_set_tooltip_text ((label), gg->tips ? ("Click to select a variable to be available for rotation") : NULL);
     break;
   case TOUR2D:
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                          "Click to select a variable to be available for touring",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                          "Click to select a variable to be available for touring",
-                          NULL);
+    gtk_widget_set_tooltip_text ((wx), gg->tips ? ("Click to select a variable to be available for touring") : NULL);
+    gtk_widget_set_tooltip_text ((label), gg->tips ? ("Click to select a variable to be available for touring") : NULL);
     break;
   case COTOUR:
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                          "Click to select a variable to be toured horizontally",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wy,
-                          "Click to select a variable to be toured vertically",
-                          NULL);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                          "Click to select a variable to be available for touring",
-                          NULL);
+    gtk_widget_set_tooltip_text ((wx), gg->tips ? ("Click to select a variable to be toured horizontally") : NULL);
+    gtk_widget_set_tooltip_text ((wy), gg->tips ? ("Click to select a variable to be toured vertically") : NULL);
+    gtk_widget_set_tooltip_text ((label), gg->tips ? ("Click to select a variable to be available for touring") : NULL);
     break;
     /*-- to pacify compiler if we change these to an enum --*/
   default:

@@ -340,8 +340,7 @@ subset_window_open (ggobid *gg) {
 	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
       g_object_set_data(G_OBJECT(gg->subset_ui.window),
         "SS:RANDOM_ENTRY", entry);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-        "Type in the desired sample size", NULL);
+      gtk_widget_set_tooltip_text ((entry), gg->tips ? ("Type in the desired sample size") : NULL);
       gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
 
 	    label = gtk_label_new_with_mnemonic ("_out of");
@@ -374,29 +373,29 @@ subset_window_open (ggobid *gg) {
       /*-- Block subsetting: First case (bstart) --*/
       vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 3);
       label = gtk_label_new_with_mnemonic ("_First case:");
-      gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+      gtk_label_set_xalign (GTK_LABEL (label), 0);
+      gtk_label_set_yalign (GTK_LABEL (label), 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
       spinbtn = gtk_spin_button_new (d->subset.bstart_adj, 0, 0);
   	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
       g_object_set_data(G_OBJECT(d->subset.bstart_adj), "WIDGET", spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-        spinbtn, "Specify the first row of the block", NULL);
+      gtk_widget_set_tooltip_text ((spinbtn), gg->tips ? ("Specify the first row of the block") : NULL);
       gtk_box_pack_start (GTK_BOX (vb), spinbtn, false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
 
       /*-- Block subsetting: blocksize (bsize) --*/
       vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       label = gtk_label_new_with_mnemonic ("Blocksi_ze:");
-      gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+      gtk_label_set_xalign (GTK_LABEL (label), 0);
+      gtk_label_set_yalign (GTK_LABEL (label), 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
       spinbtn = gtk_spin_button_new (d->subset.bsize_adj, 0, 0);
 	    gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-        spinbtn, "Specify the size of the block", NULL);
+      gtk_widget_set_tooltip_text ((spinbtn), gg->tips ? ("Specify the size of the block") : NULL);
       gtk_box_pack_start (GTK_BOX (vb),
         spinbtn, false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
@@ -437,30 +436,30 @@ subset_window_open (ggobid *gg) {
       /*-- everyn subsetting: start --*/
       vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 3);
       label = gtk_label_new_with_mnemonic ("_First case:");
-      gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+      gtk_label_set_xalign (GTK_LABEL (label), 0);
+      gtk_label_set_yalign (GTK_LABEL (label), 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
       spinbtn = gtk_spin_button_new (d->subset.estart_adj, 0, 0);
 	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
       g_object_set_data(G_OBJECT(d->subset.estart_adj), "WIDGET", spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinbtn,
-        "Specify the first row of the block", NULL);
+      gtk_widget_set_tooltip_text ((spinbtn), gg->tips ? ("Specify the first row of the block") : NULL);
       gtk_box_pack_start (GTK_BOX (vb), spinbtn, false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
 
       /*-- everyn subsetting: stepsize --*/
       vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
       label = gtk_label_new_with_mnemonic ("_N:");
-      gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+      gtk_label_set_xalign (GTK_LABEL (label), 0);
+      gtk_label_set_yalign (GTK_LABEL (label), 0.5);
       gtk_box_pack_start (GTK_BOX (vb), label, false, false, 0);
 
       spinbtn = gtk_spin_button_new (d->subset.estep_adj, 0, 0);
 	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), spinbtn);
       g_object_set_data(G_OBJECT(d->subset.estep_adj), "WIDGET", spinbtn);
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinbtn,
-        "Specify the size of the block", NULL);
+      gtk_widget_set_tooltip_text ((spinbtn), gg->tips ? ("Specify the size of the block") : NULL);
       gtk_box_pack_start (GTK_BOX (vb), spinbtn, false, false, 0);
       gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
 
@@ -505,20 +504,16 @@ subset_window_open (ggobid *gg) {
 	  gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
       g_object_set_data(G_OBJECT(gg->subset_ui.window),
         "SS:ROWLAB", entry);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-        "Type in a string to specify the cases you want in the subset",
-        NULL);
+      gtk_widget_set_tooltip_text ((entry), gg->tips ? ("Type in a string to specify the cases you want in the subset") : NULL);
       gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
 
       hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
       gtk_box_pack_start (GTK_BOX (vb), hb, false, false, 5);
 
-      opt = gtk_combo_box_new_text ();
+      opt = gtk_combo_box_text_new ();
       g_object_set_data(G_OBJECT(gg->subset_ui.window),
         "SS:ROWLAB_POS", opt);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-        "Specify the position in the row labels to check for the substring",
-        NULL);
+      gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Specify the position in the row labels to check for the substring") : NULL);
       gtk_box_pack_start (GTK_BOX (hb), opt, false, false, 0);
       populate_combo_box (opt, (gchar**) substr_lbl, G_N_ELEMENTS(substr_lbl),
         G_CALLBACK(subset_string_pos_cb), gg);
@@ -539,31 +534,28 @@ subset_window_open (ggobid *gg) {
       gtk_box_pack_start (GTK_BOX (vbox), button_hbox, false, false, 2);
 
       button = gtk_button_new_with_mnemonic ("_Subset");
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
-        "Draw a new subset and update all plots", NULL);
+      gtk_widget_set_tooltip_text ((button), gg->tips ? ("Draw a new subset and update all plots") : NULL);
       g_object_set_data(G_OBJECT (button), "datad_tree_view", tree_view);
       g_signal_connect (G_OBJECT (button), "clicked",
                           G_CALLBACK (subset_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
 
       button = gtk_button_new_with_mnemonic ("_Rescale");
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
-        "Rescale the data after choosing a new subset", NULL);
+      gtk_widget_set_tooltip_text ((button), gg->tips ? ("Rescale the data after choosing a new subset") : NULL);
       g_object_set_data(G_OBJECT (button), "datad_tree_view", tree_view);
       g_signal_connect (G_OBJECT (button), "clicked",
                           G_CALLBACK (rescale_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
     
       button = gtk_button_new_with_mnemonic ("Include _all");
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), button,
-        "Stop subsetting: include all cases and update all plots", NULL);
+      gtk_widget_set_tooltip_text ((button), gg->tips ? ("Stop subsetting: include all cases and update all plots") : NULL);
       g_object_set_data(G_OBJECT (button), "datad_tree_view", tree_view);
       g_signal_connect (G_OBJECT (button), "clicked",
                           G_CALLBACK (include_all_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (button_hbox), button, true, true, 2);
 
       /*-- Separator --*/
-      gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
+      gtk_box_pack_start (GTK_BOX (vbox), gtk_separator_new (GTK_ORIENTATION_HORIZONTAL),
         false, true, 2);
 
       /*-- Close button --*/

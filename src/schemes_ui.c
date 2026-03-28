@@ -368,33 +368,30 @@ svis_window_open (ggobid * gg)
     hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hb, true, true, 5);
     label = gtk_label_new ("Color scheme in use");
-    gtk_misc_set_alignment (GTK_MISC (label), 0, .5);
+    gtk_label_set_xalign (GTK_LABEL (label), 0);
+    gtk_label_set_yalign (GTK_LABEL (label), .5);
     gtk_box_pack_start (GTK_BOX (hb), label, true, true, 0);
     gg->svis.entry_applied = gtk_entry_new ();
     gtk_editable_set_editable (GTK_EDITABLE (gg->svis.entry_applied), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->svis.entry_applied,
-                          "The name of the currently active color scheme.",
-                          NULL);
+    gtk_widget_set_tooltip_text ((gg->svis.entry_applied), gg->tips ? ("The name of the currently active color scheme.") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), gg->svis.entry_applied, true, true, 0);
      /**/
       /* preview scheme */
       hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hb, true, true, 5);
     label = gtk_label_new ("Color scheme  in preview");
-    gtk_misc_set_alignment (GTK_MISC (label), 0, .5);
+    gtk_label_set_xalign (GTK_LABEL (label), 0);
+    gtk_label_set_yalign (GTK_LABEL (label), .5);
     gtk_box_pack_start (GTK_BOX (hb), label, true, true, 0);
 
     gg->svis.entry_preview = gtk_entry_new ();
     gtk_editable_set_editable (GTK_EDITABLE (gg->svis.entry_preview), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->svis.entry_preview,
-                          "The name of the color scheme whose colors are displayed below.",
-                          NULL);
+    gtk_widget_set_tooltip_text ((gg->svis.entry_preview), gg->tips ? ("The name of the color scheme whose colors are displayed below.") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), gg->svis.entry_preview, true, true, 0);
 
 
     /* Drawing area */
     gg->svis.da = gtk_drawing_area_new ();
-    gtk_widget_set_double_buffered (gg->svis.da, false);
     gtk_widget_set_size_request (GTK_WIDGET (gg->svis.da), 300, 150);
     gtk_box_pack_start (GTK_BOX (vbox), gg->svis.da, false, false, 0);
 
@@ -411,23 +408,20 @@ svis_window_open (ggobid * gg)
     entry_set_scheme_name (gg);
 
     /*-- add a close button --*/
-    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new (),
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_separator_new (GTK_ORIENTATION_HORIZONTAL),
                         false, true, 2);
     hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
     /* Apply button */
     btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Make this the current color scheme for brushing in ggobi, preserving current color groups.  If the number of colors in the new scheme is less than the number of colors currently in use, this won't work.",
-                          NULL);
+    gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Make this the current color scheme for brushing in ggobi") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (scale_set_cb), gg);
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Close the window", NULL);
+    gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Close the window") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (close_btn_cb), gg);

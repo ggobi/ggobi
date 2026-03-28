@@ -97,16 +97,15 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Plot _arrangement:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+  gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_combo_box_new_text ();
+  opt = gtk_combo_box_text_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), opt);
   gtk_widget_set_name (opt, "PCPLOT:sel_mode_option_menu");
   //gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "When opening a new parallel coordinates display, arrange the 1d plots in a row or a column",
-                        NULL);
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("When opening a new parallel coordinates display") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, arrangement_lbl, G_N_ELEMENTS (arrangement_lbl),
                       G_CALLBACK (arrangement_cb), gg);
@@ -118,13 +117,12 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (panel->w), vb, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("Sp_reading method:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+  gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_combo_box_new_text ();
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "Display either textured dot plots or average shifted histograms",
-                        NULL);
+  opt = gtk_combo_box_text_new ();
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Display either textured dot plots or average shifted histograms") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_combo_box (opt, type_lbl, G_N_ELEMENTS (type_lbl),
                       G_CALLBACK (type_cb), gg);
@@ -138,17 +136,17 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (panel->w), vbox, false, false, 0);
 
   lbl = gtk_label_new_with_mnemonic ("ASH s_moothness:"),
-    gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+    gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
   gtk_box_pack_start (GTK_BOX (vbox), lbl, false, false, 0);
 
   adj = GTK_ADJUSTMENT (gtk_adjustment_new (0.19, 0.02, 0.5, 0.01, .01, 0.0));
   g_signal_connect (G_OBJECT (adj), "value_changed",
                     G_CALLBACK (ash_smoothness_cb), gg);
 
-  sbar = gtk_hscale_new (adj);
+  sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, adj);
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), sbar);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-                        "Adjust ASH smoothness", NULL);
+  gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Adjust ASH smoothness") : NULL);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
@@ -162,13 +160,13 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
   lbl = gtk_label_new ("Show cases:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+  gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_combo_box_new_text ();
+  opt = gtk_combo_box_text_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Show all visible cases, or show only labelled cases", NULL);
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Show all visible cases") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, showcases_lbl,
     sizeof (showcases_lbl) / sizeof (gchar *),
@@ -183,14 +181,13 @@ cpanel_parcoords_make (ggobid * gg)
   gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 0);
 
   lbl = gtk_label_new ("Scales:");
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+  gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
   gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
-  opt = gtk_combo_box_new_text ();
+  opt = gtk_combo_box_text_new ();
   gtk_container_set_border_width (GTK_CONTAINER (opt), 4);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-    "Scale variables (and variable groups) on a common scale, or independently",
-     NULL);
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Scale variables (and variable groups) on a common scale") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), opt, false, false, 0);
   populate_option_menu (opt, varscale_lbl,
     sizeof (varscale_lbl) / sizeof (gchar *),

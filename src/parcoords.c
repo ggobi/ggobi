@@ -204,9 +204,7 @@ parcoords_new (displayd *display, gboolean use_window, gboolean missing_p,
     /*-- add a tooltip to the file menu --*/
     /* - tooltips are generally not done for toplevel menus
 	w = gtk_item_factory_get_widget (factory, "<main>/File");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-			  gtk_menu_get_attach_widget (GTK_MENU(w)),
-			  "File menu for this display", NULL);
+    gtk_widget_set_tooltip_text ((gtk_menu_get_attach_widget (GTK_MENU(w))), gg->tips ? ("File menu for this display") : NULL);
 	*/
     /*
      * After creating the menubar, and populating the file menu,

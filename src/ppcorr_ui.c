@@ -117,9 +117,7 @@ ctourpp_window_open (ggobid * gg)
  * Optimize toggle
 */
     tgl = gtk_check_button_new_with_mnemonic ("_Optimize");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-                          "Guide the tour using projection pursuit optimization or tour passively",
-                          NULL);
+    gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Guide the tour using projection pursuit optimization or tour passively") : NULL);
     g_signal_connect (G_OBJECT (tgl), "toggled",
                       G_CALLBACK (optimize_cb), (gpointer) NULL);
     gtk_box_pack_start (GTK_BOX (vbc), tgl, false, false, 1);
@@ -131,15 +129,14 @@ ctourpp_window_open (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (vbc), hb, false, false, 2);
 
     label = gtk_label_new ("PP index:");
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (label), 0);
+    gtk_label_set_yalign (GTK_LABEL (label), 0.5);
     gtk_box_pack_start (GTK_BOX (hb), label, false, false, 0);
 
     entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (entry), 32);
     gtk_editable_set_editable (GTK_EDITABLE (entry), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), entry,
-                          "The value of the projection pursuit index for the current projection",
-                          NULL);
+    gtk_widget_set_tooltip_text ((entry), gg->tips ? ("The value of the projection pursuit index for the current projection") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), entry, false, false, 2);
 
 /*
@@ -151,7 +148,6 @@ ctourpp_window_open (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (hbox), frame, true, true, 1);
 
     da = gtk_drawing_area_new ();
-    gtk_widget_set_double_buffered (da, false);
     gtk_widget_set_size_request (GTK_WIDGET (da), WIDTH, HEIGHT);
     gtk_container_add (GTK_CONTAINER (frame), da);
   }

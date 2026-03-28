@@ -73,7 +73,8 @@ ggobi_noop_toggle_button_new_with_label (const gchar * label)
 
   noop_toggle_button = ggobi_noop_toggle_button_new ();
   label_widget = gtk_label_new (label);
-  gtk_misc_set_alignment (GTK_MISC (label_widget), 0, 0.5);
+  gtk_label_set_xalign (GTK_LABEL (label_widget), 0);
+  gtk_label_set_yalign (GTK_LABEL (label_widget), 0.5);
 
   gtk_container_add (GTK_CONTAINER (noop_toggle_button), label_widget);
   gtk_widget_show (label_widget);

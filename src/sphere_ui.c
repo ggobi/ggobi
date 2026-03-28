@@ -131,7 +131,7 @@ vars_stdized_send_event (GGobiData * d, ggobid * gg)
 {
   if (gg->sphere_ui.stdized_entry != NULL &&
       GTK_IS_WIDGET (gg->sphere_ui.stdized_entry) &&
-      GTK_WIDGET_VISIBLE (gg->sphere_ui.stdized_entry)) {
+      gtk_widget_get_visible (gg->sphere_ui.stdized_entry)) {
     gtk_widget_queue_draw (gg->sphere_ui.scree_da);
   }
 }
@@ -415,9 +415,7 @@ sphere_panel_open (ggobid * gg)
     /*-- use correlation matrix? --*/
     btn = gtk_check_button_new_with_mnemonic ("Use _correlation matrix");
     gtk_widget_set_name (btn, "SPHERE:std_button");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "When this button is checked the correlation matrix is used to generate the PCs, otherwise the variance-covariance matrix is used",
-                          NULL);
+    gtk_widget_set_tooltip_text ((btn), gg->tips ? ("When this button is checked the correlation matrix is used to generate the PCs") : NULL);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), TRUE);
     g_signal_connect (G_OBJECT (btn), "toggled",
                       G_CALLBACK (vars_stdized_cb), (gpointer) gg);
@@ -427,9 +425,7 @@ sphere_panel_open (ggobid * gg)
     btn = gtk_button_new_with_mnemonic ("_Update scree plot");
     GGobi_widget_set (btn, gg, true);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Update scree plot when a new set of variables is selected, or when variables are transformed",
-                          NULL);
+    gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Update scree plot when a new set of variables is selected") : NULL);
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (scree_update_cb), gg);
 
@@ -445,7 +441,6 @@ sphere_panel_open (ggobid * gg)
     gtk_container_add (GTK_CONTAINER (frame), vb);
 
     gg->sphere_ui.scree_da = gtk_drawing_area_new ();
-    gtk_widget_set_double_buffered (gg->sphere_ui.scree_da, false);
     gtk_widget_set_size_request (GTK_WIDGET (gg->sphere_ui.scree_da),
                                  SCREE_WIDTH, SCREE_HEIGHT);
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.scree_da, true, true, 1);
@@ -469,7 +464,8 @@ sphere_panel_open (ggobid * gg)
 
     /*-- current variance --*/
     label = gtk_label_new_with_mnemonic ("Set number of _PCs");
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (label), 0);
+    gtk_label_set_yalign (GTK_LABEL (label), 0.5);
     gtk_table_attach (GTK_TABLE (table), label,
                       0, 1, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
 
@@ -487,14 +483,14 @@ sphere_panel_open (ggobid * gg)
     spinner = gtk_spin_button_new (gg->sphere_ui.npcs_adj, 0, 0);
     gtk_label_set_mnemonic_widget (GTK_LABEL (label), spinner);
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), spinner,
-                          "Specify the number of principal components", NULL);
+    gtk_widget_set_tooltip_text ((spinner), gg->tips ? ("Specify the number of principal components") : NULL);
     gtk_table_attach (GTK_TABLE (table), spinner,
                       1, 2, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
 
     /*-- total variance --*/
     label = gtk_label_new_with_mnemonic ("_Variance");
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (label), 0);
+    gtk_label_set_yalign (GTK_LABEL (label), 0.5);
     gtk_table_attach (GTK_TABLE (table), label,
                       0, 1, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 
@@ -503,10 +499,7 @@ sphere_panel_open (ggobid * gg)
                                    gg->sphere_ui.variance_entry);
     gtk_editable_set_editable (GTK_EDITABLE (gg->sphere_ui.variance_entry),
                                false);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-                          gg->sphere_ui.variance_entry,
-                          "The percentage of variance accounted for by the first n principal components",
-                          NULL);
+    gtk_widget_set_tooltip_text ((gg->sphere_ui.variance_entry), gg->tips ? ("The percentage of variance accounted for by the first n principal components") : NULL);
     gtk_widget_show (gg->sphere_ui.variance_entry);
     gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.variance_entry), "-");
 
@@ -515,7 +508,8 @@ sphere_panel_open (ggobid * gg)
 
     /*-- condition number --*/
     label = gtk_label_new_with_mnemonic ("Condition _number");
-    gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+    gtk_label_set_xalign (GTK_LABEL (label), 0);
+    gtk_label_set_yalign (GTK_LABEL (label), 0.5);
     gtk_table_attach (GTK_TABLE (table), label,
                       0, 1, 2, 3, GTK_FILL, GTK_FILL, 0, 0);
 
@@ -525,10 +519,7 @@ sphere_panel_open (ggobid * gg)
     gtk_editable_set_editable (GTK_EDITABLE (gg->sphere_ui.condnum_entry),
                                false);
     gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.condnum_entry), "-");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-                          gg->sphere_ui.condnum_entry,
-                          "The condition number for the specified number of principal components",
-                          NULL);
+    gtk_widget_set_tooltip_text ((gg->sphere_ui.condnum_entry), gg->tips ? ("The condition number for the specified number of principal components") : NULL);
     gtk_table_attach (GTK_TABLE (table), gg->sphere_ui.condnum_entry, 1, 2, 2,
                       3, GTK_FILL, GTK_FILL, 0, 0);
 
@@ -546,9 +537,7 @@ sphere_panel_open (ggobid * gg)
       gtk_button_new_with_mnemonic ("_Apply sphering, add PCs to data");
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.apply_btn, false, false,
                         0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.apply_btn,
-                          "Apply principal components transformation to the selected variables, adding 'number of PCs' variables to the data set",
-                          NULL);
+    gtk_widget_set_tooltip_text ((gg->sphere_ui.apply_btn), gg->tips ? ("Apply principal components transformation to the selected variables") : NULL);
     g_signal_connect (G_OBJECT (gg->sphere_ui.apply_btn), "clicked",
                       G_CALLBACK (sphere_apply_cb), gg);
 
@@ -577,9 +566,7 @@ sphere_panel_open (ggobid * gg)
  * Di and I decided there's no good reason to have this button.
     gg->sphere_ui.restore_btn = gtk_button_new_with_label ("Restore scree plot");
     GGobi_widget_set (gg->sphere_ui.restore_btn, gg, true);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), gg->sphere_ui.restore_btn,
-      "Restore the scree plot to reflect the current principal components",
-      NULL);
+    gtk_widget_set_tooltip_text ((gg->sphere_ui.restore_btn), gg->tips ? ("Restore the scree plot to reflect the current principal components") : NULL);
     g_signal_connect (G_OBJECT (gg->sphere_ui.restore_btn), "clicked",
                         G_CALLBACK (scree_restore_cb), gg);
     gtk_box_pack_start (GTK_BOX (vb), gg->sphere_ui.restore_btn,
@@ -587,15 +574,14 @@ sphere_panel_open (ggobid * gg)
 */
 
     /*-- close button --*/
-    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new (),
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_separator_new (GTK_ORIENTATION_HORIZONTAL),
                         false, true, 2);
     hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                          "Close the sphering window", NULL);
+    gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Close the sphering window") : NULL);
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (close_btn_cb), gg);
 

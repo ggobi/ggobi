@@ -41,7 +41,7 @@ scale_adjustment_find_by_name (gchar * name, ggobid * gg)
 
   panel = mode_panel_get_by_name ("Scale", gg);
   w = widget_find_by_name (panel, name);
-  if (GTK_IS_HSCALE (w))
+  if (GTK_IS_RANGE (w))
     return (gtk_range_get_adjustment (GTK_RANGE (w)));
   else return NULL;
 }
@@ -393,11 +393,10 @@ cpanel_scale_make (ggobid * gg)
   g_object_set_data (G_OBJECT (adjx), "name", "SCALE:x_zoom_adj");
   g_signal_connect (G_OBJECT (adjx), "value_changed",
                     G_CALLBACK (zoom_cb), gg);
-  sbarx = gtk_hscale_new (GTK_ADJUSTMENT (adjx));
+  sbarx = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (adjx));
   gtk_widget_set_name (sbarx, "SCALE:x_zoom");
   scale_set_default_values (GTK_SCALE (sbarx));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbarx,
-                        "Zoom horizontally", NULL);
+  gtk_widget_set_tooltip_text ((sbarx), gg->tips ? ("Zoom horizontally") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), sbarx, true, true, 0);
 
   adjy = (GtkAdjustment *)
@@ -405,17 +404,15 @@ cpanel_scale_make (ggobid * gg)
   g_object_set_data (G_OBJECT (adjy), "name", "SCALE:y_zoom_adj");
   g_signal_connect (G_OBJECT (adjy), "value_changed",
                     G_CALLBACK (zoom_cb), gg);
-  sbary = gtk_hscale_new (GTK_ADJUSTMENT (adjy));
+  sbary = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (adjy));
   gtk_widget_set_name (sbary, "SCALE:y_zoom");
   scale_set_default_values (GTK_SCALE (sbary));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbary,
-                        "Zoom vertically", NULL);
+  gtk_widget_set_tooltip_text ((sbary), gg->tips ? ("Zoom vertically") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), sbary, true, true, 0);
 
   tgl = gtk_check_button_new_with_mnemonic ("Fixed _aspect");
   gtk_widget_set_name (tgl, "SCALE:aspect_ratio_tgl");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-                        "Fix the aspect ratio while zooming.", NULL);
+  gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Fix the aspect ratio while zooming.") : NULL);
   g_signal_connect (G_OBJECT (tgl), "toggled",
                     G_CALLBACK (aspect_ratio_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (vb), tgl, false, false, 3);
@@ -433,11 +430,10 @@ cpanel_scale_make (ggobid * gg)
   g_object_set_data (G_OBJECT (adjx), "name", "SCALE:x_pan_adj");
   g_signal_connect (G_OBJECT (adjx), "value_changed",
                     G_CALLBACK (pan_cb), gg);
-  sbarx = gtk_hscale_new (GTK_ADJUSTMENT (adjx));
+  sbarx = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (adjx));
   gtk_widget_set_name (sbarx, "SCALE:x_pan");
   scale_set_default_values (GTK_SCALE (sbarx));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbarx,
-                        "Pan horizontally", NULL);
+  gtk_widget_set_tooltip_text ((sbarx), gg->tips ? ("Pan horizontally") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), sbarx, true, true, 0);
 
   adjy = (GtkAdjustment *)
@@ -445,11 +441,10 @@ cpanel_scale_make (ggobid * gg)
   g_object_set_data (G_OBJECT (adjy), "name", "SCALE:y_pan_adj");
   g_signal_connect (G_OBJECT (adjy), "value_changed",
                     G_CALLBACK (pan_cb), gg);
-  sbary = gtk_hscale_new (GTK_ADJUSTMENT (adjy));
+  sbary = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (adjy));
   gtk_widget_set_name (sbary, "SCALE:y_pan");
   scale_set_default_values (GTK_SCALE (sbary));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbary,
-                        "Pan vertically", NULL);
+  gtk_widget_set_tooltip_text ((sbary), gg->tips ? ("Pan vertically") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), sbary, true, true, 0);
 
 

@@ -160,12 +160,14 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
                       table, false, false, 5);
 
   w = gtk_label_new ("Record number");
-  gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+  gtk_label_set_xalign (GTK_LABEL (w), 1);
+  gtk_label_set_yalign (GTK_LABEL (w), .5);
   gtk_table_attach (GTK_TABLE (table),
                     w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
   lbl = g_strdup_printf ("%d", dtarget->nrows);
   w = gtk_label_new (lbl);
-  gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
+  gtk_label_set_xalign (GTK_LABEL (w), .5);
+  gtk_label_set_yalign (GTK_LABEL (w), .5);
   gtk_table_attach (GTK_TABLE (table),
                     w, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
   g_free (lbl);
@@ -173,31 +175,36 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
 
   if (cpanel->ee_mode == ADDING_EDGES) {
     w = gtk_label_new ("Edge source");
-    gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+    gtk_label_set_xalign (GTK_LABEL (w), 1);
+    gtk_label_set_yalign (GTK_LABEL (w), .5);
     gtk_table_attach (GTK_TABLE (table),
                       w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
     /* This label should include both the rowlab and the rowId */
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, gg->edgeedit.a);
     w = gtk_label_new (lbl);
-    gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
+    gtk_label_set_xalign (GTK_LABEL (w), .5);
+    gtk_label_set_yalign (GTK_LABEL (w), .5);
     gtk_table_attach (GTK_TABLE (table),
                       w, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
     row++;
 
     w = gtk_label_new ("Edge destination");
-    gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+    gtk_label_set_xalign (GTK_LABEL (w), 1);
+    gtk_label_set_yalign (GTK_LABEL (w), .5);
     gtk_table_attach (GTK_TABLE (table),
                       w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, d->nearest_point);
     w = gtk_label_new (lbl);
-    gtk_misc_set_alignment (GTK_MISC (w), .5, .5);
+    gtk_label_set_xalign (GTK_LABEL (w), .5);
+    gtk_label_set_yalign (GTK_LABEL (w), .5);
     gtk_table_attach (GTK_TABLE (table),
                       w, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
     row++;
   }
 
   w = gtk_label_new_with_mnemonic ("Record _label");
-  gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+  gtk_label_set_xalign (GTK_LABEL (w), 1);
+  gtk_label_set_yalign (GTK_LABEL (w), .5);
   gtk_table_attach (GTK_TABLE (table),
                     w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
   entry = gtk_entry_new ();
@@ -214,7 +221,8 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   if ((cpanel->ee_mode == ADDING_POINTS && d->idTable) ||
       (cpanel->ee_mode == ADDING_EDGES && e->idTable)) {
     w = gtk_label_new_with_mnemonic ("Record _id");
-    gtk_misc_set_alignment (GTK_MISC (w), 1, .5);
+    gtk_label_set_xalign (GTK_LABEL (w), 1);
+    gtk_label_set_yalign (GTK_LABEL (w), .5);
     gtk_table_attach (GTK_TABLE (table),
                       w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
     entry = gtk_entry_new ();
@@ -263,9 +271,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
 
   /*-- ok button --*/
   w = gtk_button_new_from_stock (GTK_STOCK_APPLY);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), w,
-                        "Add the point or edge.  To avoid seeing this dialog, use the left button.",
-                        NULL);
+  gtk_widget_set_tooltip_text ((w), gg->tips ? ("Add the point or edge") : NULL);
   g_signal_connect (G_OBJECT (w), "clicked",
                     G_CALLBACK (add_record_dialog_apply), dsp);
   gtk_container_add (GTK_CONTAINER (add_record_dialog_action_area (dialog)), w);
@@ -533,9 +539,7 @@ cpanel_edgeedit_make (ggobid * gg)
   if (adding_edges)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio1), true);
 
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio1,
-                        "Add new edges using the mouse. The right or middle button opens a dialog window; the left button adds an edge using defaults.",
-                        NULL);
+  gtk_widget_set_tooltip_text ((radio1), gg->tips ? ("Add new edges using the mouse. The right or middle button opens a dialog window; the left button adds an edge using defaults.") : NULL);
   g_signal_connect (G_OBJECT (radio1), "toggled",
                     G_CALLBACK (add_edges_or_points_cb), gg);
   gtk_box_pack_start (GTK_BOX (vb), radio1, false, false, 0);
@@ -544,9 +548,7 @@ cpanel_edgeedit_make (ggobid * gg)
 
   radio2 = gtk_radio_button_new_with_mnemonic (group, "Add _points");
   gtk_widget_set_name (radio2, "EDGEEDIT:add_points_radio_button");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), radio2,
-                        "Add points using the mouse.  The right or button opens a dialog window; the left button adds a point using defaults.",
-                        NULL);
+  gtk_widget_set_tooltip_text ((radio2), gg->tips ? ("Add points using the mouse.  The right or button opens a dialog window; the left button adds a point using defaults.") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), radio2, false, false, 0);
 
   w = gtk_label_new (tip_edges);
@@ -557,8 +559,7 @@ cpanel_edgeedit_make (ggobid * gg)
   /*-- Undo --*/
   /*   not implemented
      btn = gtk_button_new_with_label ("Undo");
-     gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-     "Undo last action", NULL);
+     gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Undo last action") : NULL);
      gtk_box_pack_start (GTK_BOX (panel->w),
      btn, false, false, 1);
      g_signal_connect (G_OBJECT (btn), "clicked",

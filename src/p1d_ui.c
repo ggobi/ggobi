@@ -173,11 +173,9 @@ cpanel_p1dplot_make (ggobid * gg)
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
  /*-- option menu --*/
-  opt = gtk_combo_box_new_text ();
+  opt = gtk_combo_box_text_new ();
   gtk_widget_set_name (opt, "P1PLOT:type_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "Display either textured dot plots or average shifted histograms",
-                        NULL);
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Display either textured dot plots or average shifted histograms") : NULL);
   gtk_box_pack_start (GTK_BOX (panel->w), opt, false, false, 0);
   populate_combo_box (opt, type_lbl, G_N_ELEMENTS (type_lbl),
                       G_CALLBACK (type_cb), gg);
@@ -194,9 +192,7 @@ cpanel_p1dplot_make (ggobid * gg)
   /*-- ASH line segments --*/
   btn = gtk_check_button_new_with_mnemonic ("ASH: _add lines");
   gtk_widget_set_name (btn, "P1PLOT:ASH_add_lines");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "When displaying ASHes, add lines connecting each point to the baseline.",
-                        NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("When displaying ASHes") : NULL);
   /*-- cpanel may not be available, so initialize this to false --*/
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
   g_signal_connect (G_OBJECT (btn), "toggled",
@@ -215,11 +211,10 @@ cpanel_p1dplot_make (ggobid * gg)
   g_signal_connect (G_OBJECT (adj), "value_changed",
                     G_CALLBACK (ash_smoothness_cb), gg);
 
-  sbar = gtk_hscale_new (adj);
+  sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, adj);
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), sbar);
   gtk_widget_set_name (sbar, "P1PLOT:ASH_smooth");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-                        "Adjust ASH smoothness", NULL);
+  gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Adjust ASH smoothness") : NULL);
   gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
   gtk_scale_set_digits (GTK_SCALE (sbar), 2);
 
@@ -241,8 +236,7 @@ cpanel_p1dplot_make (ggobid * gg)
 
   tgl = gtk_check_button_new_with_mnemonic ("_Cycle");
   gtk_widget_set_name (tgl, "P1PLOT:cycle_toggle");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), tgl,
-                        "Cycle through 1D plots", NULL);
+  gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Cycle through 1D plots") : NULL);
   g_signal_connect (G_OBJECT (tgl), "toggled",
                     G_CALLBACK (cycle_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (vb), tgl, false, false, 1);
@@ -258,15 +252,13 @@ cpanel_p1dplot_make (ggobid * gg)
   g_signal_connect (G_OBJECT (gg->p1d.cycle_delay_adj), "value_changed",
                     G_CALLBACK (cycle_speed_cb), gg);
 
-  sbar = gtk_hscale_new (GTK_ADJUSTMENT (gg->p1d.cycle_delay_adj));
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-                        "Adjust cycling speed", NULL);
+  sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, GTK_ADJUSTMENT (gg->p1d.cycle_delay_adj));
+  gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Adjust cycling speed") : NULL);
   scale_set_default_values (GTK_SCALE (sbar));
   gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 1);
 
   btn = gtk_button_new_with_mnemonic ("Change di_rection");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Change cycling direction", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Change cycling direction") : NULL);
   gtk_box_pack_start (GTK_BOX (vb), btn, false, false, 1);
   g_signal_connect (G_OBJECT (btn), "clicked", G_CALLBACK (chdir_cb), gg);
 

@@ -269,7 +269,7 @@ enum { VARLIST_NAME, VARLIST_INDEX, VARLIST_NCOLS };
 
 /*-- macros --*/
 
-#define EVENT_METHOD(i,x) GTK_OBJECT_GET_CLASS(GTK_OBJECT(i))->x
+#define EVENT_METHOD(i,x) (G_OBJECT_GET_CLASS (i)->x)
 
 #define BETWEEN(a,b,x) ( ((a)<=(x) && (x)<=(b)) || ((a)>=(x) && (x)>=(b)) )
 

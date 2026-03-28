@@ -444,7 +444,7 @@ const gchar *GGOBI (getViewTypeName) (displayd * dpy)
     return (NULL);
 
 /*
- or use gtk_type_name(GTK_OBJECT_TYPE(dpy))
+ or use g_type_name (G_OBJECT_TYPE (dpy))
  */
   val = GGOBI_EXTENDED_DISPLAY_GET_CLASS (dpy)->treeLabel;
 
@@ -1284,7 +1284,7 @@ GGOBI (setPlotRange) (double *x, double *y, int plotNum, displayd * display,
      tfmax.x = x[1];
      tfmax.y = y[1];
 
-     if (GTK_WIDGET_VISIBLE (display->hrule)) {
+     if (gtk_widget_get_visible (display->hrule)) {
      if (((gfloat) GTK_RULER (display->hrule)->lower != tfmin.x) ||
      ((gfloat) GTK_RULER (display->hrule)->upper != tfmax.x))
      {
@@ -1293,7 +1293,7 @@ GGOBI (setPlotRange) (double *x, double *y, int plotNum, displayd * display,
      }
      }
 
-     if (GTK_WIDGET_VISIBLE (display->vrule)) {
+     if (gtk_widget_get_visible (display->vrule)) {
      if (((gfloat) GTK_RULER (display->vrule)->upper != tfmin.y) ||
      ((gfloat) GTK_RULER (display->vrule)->lower != tfmax.y))
      {

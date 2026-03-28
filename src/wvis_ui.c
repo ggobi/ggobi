@@ -45,7 +45,7 @@ static gboolean da_draw_cb (GtkWidget *w, cairo_t *cr, ggobid *gg);
  * so that I can add a signal appropriately to the new page in
  * the notebook.
  * Only one line is different:
-    GtkSignalFunc func = selection_made_cb;
+    GCallback func = G_CALLBACK (selection_made_cb);
 */
 
 static void 
@@ -80,7 +80,7 @@ CHECK_EVENT_SIGNATURE(variable_notebook_list_changed_cb, variable_list_changed_f
 
 GtkWidget *
 wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode, 
-  GtkSignalFunc func, ggobid *gg)
+  GCallback func, ggobid *gg)
 {
   GtkWidget *notebook;
   gint nd = g_slist_length (gg->d);
@@ -111,16 +111,16 @@ wvis_create_variable_notebook (GtkWidget *box, GtkSelectionMode mode,
   g_signal_connect (G_OBJECT (gg),
     "variable_added",
      G_CALLBACK (variable_notebook_varchange_cb),
-     GTK_OBJECT (notebook));
+     notebook);
   g_signal_connect (G_OBJECT (gg),
     "variable_list_changed",
      G_CALLBACK (variable_notebook_list_changed_cb),
-     GTK_OBJECT (notebook));
+     notebook);
 
   /*-- listen for variable_added events on main_window --*/
   g_signal_connect (G_OBJECT (gg),
     "datad_added", G_CALLBACK (wvis_variable_notebook_adddata_cb),
-     GTK_OBJECT (notebook));
+     notebook);
 
   return notebook;
 }
@@ -651,7 +651,6 @@ wvis_window_open (ggobid *gg)
 
     /*-- now we get fancy:  draw the scale, with glyphs and colors --*/
     gg->wvis.da = gtk_drawing_area_new ();
-    gtk_widget_set_double_buffered(gg->wvis.da, false);
     gtk_widget_set_size_request (GTK_WIDGET (gg->wvis.da), 400, 200);
     g_object_set_data(G_OBJECT (gg->wvis.da), "notebook", notebook);
     gtk_box_pack_start (GTK_BOX (vbox), gg->wvis.da, false, false, 0);
@@ -682,10 +681,9 @@ wvis_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
     /*-- option menu for choosing the method of binning --*/
-    opt = gtk_combo_box_new_text ();
+    opt = gtk_combo_box_text_new ();
     gtk_widget_set_name (opt, "WVIS:binning_method");
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "Select a binning method", NULL);
+    gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Select a binning method") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), opt,
       false, false, 0);
     populate_combo_box (opt, (gchar**) binning_method_lbl, G_N_ELEMENTS(binning_method_lbl),
@@ -693,16 +691,14 @@ wvis_window_open (ggobid *gg)
 
     /*-- option menu for choosing the method of updating --*/
     /* This should be a checkbox, I think ... */
-    opt = gtk_combo_box_new_text ();
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-      "How to update the displays in response to movements of the sliders",
-      NULL);
+    opt = gtk_combo_box_text_new ();
+    gtk_widget_set_tooltip_text ((opt), gg->tips ? ("How to update the displays in response to movements of the sliders") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), opt, true, true, 0);
     populate_combo_box (opt, (gchar**) update_method_lbl, G_N_ELEMENTS(update_method_lbl),
       G_CALLBACK(update_method_cb), gg);
 
     /*-- hbox for buttons --*/
-    gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new(),
+    gtk_box_pack_start (GTK_BOX (vbox), gtk_separator_new (GTK_ORIENTATION_HORIZONTAL),
       false, true, 2);
     hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
@@ -710,9 +706,7 @@ wvis_window_open (ggobid *gg)
     /* Apply button */
     btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
     g_object_set_data(G_OBJECT (btn), "notebook", notebook);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Apply the color scale, using the values of the variable selected in the list above",
-      NULL);
+    gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Apply the color scale") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 1);
     g_signal_connect (G_OBJECT (btn), "clicked",
                         G_CALLBACK (scale_apply_cb), gg);
@@ -721,8 +715,7 @@ wvis_window_open (ggobid *gg)
 
 
     btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
-    gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-      "Close the window", NULL);
+    gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Close the window") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",
                         G_CALLBACK (close_btn_cb), gg);

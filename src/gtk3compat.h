@@ -8,40 +8,6 @@
 
 #if GTK_MAJOR_VERSION >= 3
 
-typedef GObject GtkObject;
-typedef GCallback GtkSignalFunc;
-typedef gpointer GtkArg;
-#define GTK_OBJECT(obj) (G_OBJECT (obj))
-#define GTK_OBJECT_CLASS(klass) (G_OBJECT_CLASS (klass))
-#define GTK_OBJECT_GET_CLASS(obj) (G_OBJECT_GET_CLASS (obj))
-#define GTK_OBJECT_TYPE(obj) (G_OBJECT_TYPE (obj))
-#define gtk_object_destroy(obj) gtk_widget_destroy (GTK_WIDGET (obj))
-#define gtk_type_name(type) g_type_name (type)
-
-typedef gboolean GtkTooltips;
-
-#ifndef GTK_TOOLTIPS
-#define GTK_TOOLTIPS(obj) (obj)
-#endif
-
-void ggobi_gtk_tooltips_set_tip (GtkTooltips tips, GtkWidget *widget,
-                                 const gchar *tip_text);
-
-#define gtk_tooltips_new() (TRUE)
-#define gtk_tooltips_enable(tips) ((tips) = TRUE)
-#define gtk_tooltips_disable(tips) ((tips) = FALSE)
-#define gtk_tooltips_set_tip(tips, widget, tip_text, tip_private) \
-  ((void) (tip_private),                                              \
-   ggobi_gtk_tooltips_set_tip ((tips), GTK_WIDGET (widget), (tip_text)))
-
-#define gtk_combo_box_new_text() gtk_combo_box_text_new ()
-#define gtk_combo_box_append_text(combo_box, text) \
-  gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo_box), text)
-
-#define gtk_widget_set_double_buffered(widget, setting) ((void) 0)
-#define GTK_WIDGET_VISIBLE(widget) gtk_widget_get_visible (GTK_WIDGET (widget))
-#define GTK_WIDGET_REALIZED(widget) gtk_widget_get_realized (GTK_WIDGET (widget))
-
 typedef struct _GGobiDrawStyle {
   GdkColor foreground;
   GdkColor background;

@@ -849,8 +849,8 @@ display_tailpipe (displayd * display, RedrawStyle type, ggobid * gg)
       void (*f) (gboolean, displayd *, splotd *, ggobid *);
       f = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->ruler_ranges_set;
       if (f) {
-        f (GTK_WIDGET_VISIBLE (display->hrule) ||
-           GTK_WIDGET_VISIBLE (display->vrule), display, sp, gg);
+        f (gtk_widget_get_visible (display->hrule) ||
+           gtk_widget_get_visible (display->vrule), display, sp, gg);
       }
     }
 

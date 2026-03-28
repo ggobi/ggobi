@@ -438,10 +438,10 @@ splot_free (splotd *sp, displayd *display, ggobid *gg)
   g_free ((gpointer) sp->screen);
   vectorf_free (&sp->p1d.spread_data);
 
-  if(GGOBI_IS_EXTENDED_SPLOT(sp))
-     gtk_object_destroy(GTK_OBJECT(sp));
+  if (GGOBI_IS_EXTENDED_SPLOT (sp))
+    gtk_widget_destroy (GTK_WIDGET (sp));
   else
-     gtk_widget_destroy (GTK_WIDGET(sp));
+    gtk_widget_destroy (GTK_WIDGET (sp));
 }
 
 splotd *
@@ -472,8 +472,6 @@ splot_init(splotd *sp, displayd *display, ggobid *gg)
   */
   g_object_set_data(G_OBJECT (sp->da), "splotd", (gpointer) sp);
   GGobi_widget_set (sp->da, gg, true);
-
-  gtk_widget_set_double_buffered(sp->da, false);
 
   g_signal_connect (G_OBJECT (sp->da),
                       "draw",
@@ -936,7 +934,7 @@ splot_cursor_unset (splotd *sp)
 
   window = gtk_widget_get_window (sp->da);
 
-  if (!GTK_WIDGET_REALIZED(sp->da) || window == NULL)
+  if (!gtk_widget_get_realized (sp->da) || window == NULL)
     return;
 
   sp->jcursor = 0;
@@ -956,7 +954,7 @@ splot_cursor_set (GdkCursorType jcursor, splotd *sp)
 
   window = gtk_widget_get_window (sp->da);
 
-  if (!GTK_WIDGET_REALIZED(sp->da) || window == NULL)
+  if (!gtk_widget_get_realized (sp->da) || window == NULL)
     return;
 
   sp->jcursor = jcursor;

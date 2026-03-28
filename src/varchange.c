@@ -92,7 +92,7 @@ tour_realloc_up (GGobiData *d, gint nc)
   g_signal_connect (G_OBJECT (gg),
                       "variable_added", 
                       G_CALLBACK (variable_notebook_varchange_cb),
-                      GTK_OBJECT (notebook));
+                      notebook);
 
 void 
 variable_notebook_varchange_cb (ggobid *gg, vartabled *vt, gint which,

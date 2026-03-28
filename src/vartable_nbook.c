@@ -399,8 +399,7 @@ pages any more!
   ebox = gtk_event_box_new ();
   gtk_container_add (GTK_CONTAINER (ebox), wlbl);
   gtk_widget_show(wlbl);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-    "Table of statistics for real, integer and counter variables", NULL);
+  gtk_widget_set_tooltip_text ((ebox), gg->tips ? ("Table of statistics for real variables") : NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), sw, wlbl);
@@ -430,8 +429,7 @@ pages any more!
   ebox = gtk_event_box_new ();
   gtk_container_add (GTK_CONTAINER (ebox), wlbl);
   gtk_widget_show(wlbl);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), ebox,
-    "Table of statistics for categorical variables", NULL);
+  gtk_widget_set_tooltip_text ((ebox), gg->tips ? ("Table of statistics for categorical variables") : NULL);
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), scrolled_window, ebox);
 */
   gtk_notebook_append_page (GTK_NOTEBOOK (nbook), sw, wlbl);
@@ -495,7 +493,7 @@ vartable_open (ggobid *gg)
   /*-- listen for datad_added events --*/
   g_signal_connect (G_OBJECT (gg),
     "datad_added", G_CALLBACK (vartable_notebook_adddata_cb),
-     GTK_OBJECT (gg->vartable_ui.notebook));
+     gg->vartable_ui.notebook);
 
   hbox = vartable_buttonbox_build (gg);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 1);

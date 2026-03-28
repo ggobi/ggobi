@@ -433,12 +433,8 @@ static void
 varpanelTooltipsSet (displayd * dpy, ggobid * gg, GtkWidget * wx,
                      GtkWidget * wy, GtkWidget * xz, GtkWidget * label)
 {
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                        "Toggle to append or delete; drag plots to reorder",
-                        NULL);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                        "Toggle to append or delete; drag plots to reorder",
-                        NULL);
+  gtk_widget_set_tooltip_text ((wx), gg->tips ? ("Toggle to append or delete; drag plots to reorder") : NULL);
+  gtk_widget_set_tooltip_text ((label), gg->tips ? ("Toggle to append or delete; drag plots to reorder") : NULL);
 }
 
 /* Are these ordered?  Maybe so */

@@ -369,10 +369,9 @@ cpanel_identify_make (ggobid * gg)
   gtk_container_set_border_width (GTK_CONTAINER (panel->w), 5);
 
   /*-- option menu --*/
-  opt = gtk_combo_box_new_text ();
+  opt = gtk_combo_box_text_new ();
   gtk_widget_set_name (opt, "IDENTIFY:target_option_menu");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                        "Label points or edges", NULL);
+  gtk_widget_set_tooltip_text ((opt), gg->tips ? ("Label points or edges") : NULL);
   gtk_box_pack_start (GTK_BOX (panel->w), opt, false, false, 0);
   populate_combo_box (opt, target_lbl, G_N_ELEMENTS (target_lbl),
                       G_CALLBACK (identify_target_cb), gg);
@@ -392,8 +391,7 @@ cpanel_identify_make (ggobid * gg)
  /*-- button for removing all labels --*/
   btn = gtk_button_new_with_mnemonic ("_Remove labels");
   gtk_widget_set_name (btn, "IDENTIFY:remove_sticky_labels");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-                        btn, "Remove all labels", NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Remove all labels") : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (id_remove_labels_cb), gg);
   gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
@@ -402,9 +400,7 @@ cpanel_identify_make (ggobid * gg)
  * button for making all labels sticky
 */
   btn = gtk_button_new_with_mnemonic ("Label all");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Make all labels sticky, or persistent (to make the nearest point label sticky, click middle or right in the plot)",
-                        NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Make all labels sticky") : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (id_all_sticky_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (panel->w), btn, false, false, 1);
@@ -421,9 +417,7 @@ cpanel_identify_make (ggobid * gg)
 
   btn = gtk_button_new_with_mnemonic ("Re_center");
   gtk_widget_set_name (btn, "IDENT:recenter_btn");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                        "Make one point sticky, and then click here to recenter the data around that point. (If there are no sticky labels, restore default centering.)",
-                        NULL);
+  gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Make one point sticky") : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (recenter_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (framevb), btn, false, false, 0);

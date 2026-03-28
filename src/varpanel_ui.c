@@ -89,7 +89,8 @@ varpanel_label_set (gint j, GGobiData * d)
   if (!labelw)
     return;
   /*-- make sure it stays left-aligned --*/
-  gtk_misc_set_alignment (GTK_MISC (labelw), 0, .5);
+  gtk_label_set_xalign (GTK_LABEL (labelw), 0);
+  gtk_label_set_yalign (GTK_LABEL (labelw), .5);
   gtk_label_set_text (GTK_LABEL (labelw), ggobi_data_get_col_name(d, j));
 }
 
@@ -104,7 +105,7 @@ varpanel_widget_set_visible (gint jbutton, gint jvar, gboolean show,
   child = (GtkWidget *) g_object_get_data (G_OBJECT (box),
                                            varpanel_names[jbutton]);
 
-  visible = GTK_WIDGET_VISIBLE (child);
+  visible = gtk_widget_get_visible (child);
   if (visible != show) {
     if (show)
       gtk_widget_show (child);
@@ -568,7 +569,7 @@ varpanel_clear (GGobiData * d, ggobid * gg)
   gint k;
 
   if (gg->varpanel_ui.notebook != NULL &&
-      GTK_WIDGET_REALIZED (gg->varpanel_ui.notebook)) {
+      gtk_widget_get_realized (gg->varpanel_ui.notebook)) {
     pages =
       gtk_container_get_children (GTK_CONTAINER (gg->varpanel_ui.notebook));
     npages = g_list_length (pages);
@@ -691,10 +692,8 @@ varpanel_tooltips_set (displayd * display, ggobid * gg)
           break;
         label = varpanel_widget_get_nth (VARSEL_LABEL, j, d);
 
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), wx,
-                              "Unable to plot without a display", NULL);
-        gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), label,
-                              "Unable to plot without a display", NULL);
+        gtk_widget_set_tooltip_text ((wx), gg->tips ? ("Unable to plot without a display") : NULL);
+        gtk_widget_set_tooltip_text ((label), gg->tips ? ("Unable to plot without a display") : NULL);
       }
     }
   }

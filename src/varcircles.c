@@ -413,7 +413,6 @@ varcircles_populate (GGobiData * d, ggobid * gg)
 
   /* -- a drawing area to place next to the manip button as a color key -- */
   da = gtk_drawing_area_new ();
-  gtk_widget_set_double_buffered (da, false);
   gtk_widget_set_size_request (GTK_WIDGET (da), 8, 8);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da, false, false, 2);
@@ -423,9 +422,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gtk_widget_show (da);
 
   d->vcirc_ui.manip_btn = gtk_button_new_with_label ("Manip");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), d->vcirc_ui.manip_btn,
-                        "Click here, then click on the variable you wish to manipulate",
-                        NULL);
+  gtk_widget_set_tooltip_text ((d->vcirc_ui.manip_btn), gg->tips ? ("Click here") : NULL);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), d->vcirc_ui.manip_btn,
                       true, true, 2);
   g_signal_connect (G_OBJECT (d->vcirc_ui.manip_btn),
@@ -435,7 +432,6 @@ varcircles_populate (GGobiData * d, ggobid * gg)
 #ifdef FREEZE_IMPLEMENTED
   /* -- a drawing area to place next to the freeze button as a color key -- */
   da = gtk_drawing_area_new ();
-  gtk_widget_set_double_buffered (da, false);
   gtk_widget_set_size_request (GTK_WIDGET (da), 8, 8);
   gtk_widget_set_events (da, GDK_EXPOSURE_MASK);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), da, false, false, 2);
@@ -445,9 +441,7 @@ varcircles_populate (GGobiData * d, ggobid * gg)
   gtk_widget_show (da);
 
   d->vcirc_ui.freeze_btn = gtk_button_new_with_label ("Freeze");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), d->vcirc_ui.freeze_btn,
-                        "Click here, then click on the variable you wish to freeze",
-                        NULL);
+  gtk_widget_set_tooltip_text ((d->vcirc_ui.freeze_btn), gg->tips ? ("Click here") : NULL);
   gtk_box_pack_start (GTK_BOX (d->vcirc_ui.hbox), d->vcirc_ui.freeze_btn,
                       true, true, 2);
   g_signal_connect (G_OBJECT (d->vcirc_ui.freeze_btn),
@@ -567,7 +561,6 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
 
   /*-- a drawing area to contain the variable circle --*/
   da = gtk_drawing_area_new ();
-  gtk_widget_set_double_buffered (da, false);
   d->vcirc_ui.da = g_slist_append (d->vcirc_ui.da, da);
   gtk_widget_set_size_request (GTK_WIDGET (da),
                                VAR_CIRCLE_DIAM + 2, VAR_CIRCLE_DIAM + 2);
@@ -576,8 +569,7 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
                          | GDK_LEAVE_NOTIFY_MASK
                          | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), da,
-                        "Click left to select or deselect", NULL);
+  gtk_widget_set_tooltip_text ((da), gg->tips ? ("Click left to select or deselect") : NULL);
 
   g_signal_connect (G_OBJECT (da), "draw",
                     G_CALLBACK (da_draw_cb), GINT_TO_POINTER (j));
@@ -590,11 +582,10 @@ varcircle_create (gint j, GGobiData * d, ggobid * gg)
 
   /*-- label --*/
   lbl = gtk_label_new (ggobi_data_get_col_name(d, j));
-  gtk_misc_set_alignment (GTK_MISC (lbl), 0, .5);  /*- x: left, y: middle --*/
+  gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+  gtk_label_set_yalign (GTK_LABEL (lbl), .5);  /*- x: left, y: middle --*/
   d->vcirc_ui.label = g_slist_append (d->vcirc_ui.label, lbl);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips),
-                        lbl, "Click left on the circle to select or deselect",
-                        NULL);
+  gtk_widget_set_tooltip_text ((lbl), gg->tips ? ("Click left on the circle to select or deselect") : NULL);
   g_object_set_data (G_OBJECT (lbl), "datad", d);
   GGobi_widget_set (GTK_WIDGET (lbl), gg, true);
   /*gtk_container_add (GTK_CONTAINER (vb), lbl); */
@@ -618,7 +609,7 @@ varcircles_refresh (GGobiData * d, ggobid * gg)
 
   for (j = 0; j < d->ncols; j++) {
     da = varcircles_get_nth (DA, j, d);
-    if (GTK_WIDGET_REALIZED (da) && GTK_WIDGET_VISIBLE (da))
+    if (gtk_widget_get_realized (da) && gtk_widget_get_visible (da))
       varcircle_draw (j, d, gg);
   }
 }

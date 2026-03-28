@@ -121,9 +121,9 @@ void
 tooltips_show (gboolean show, ggobid * gg)
 {
   if (show)
-    gtk_tooltips_enable (gg->tips);
+    gg->tips = TRUE;
   else
-    gtk_tooltips_disable (gg->tips);
+    gg->tips = FALSE;
 }
 
 void
@@ -219,14 +219,14 @@ static gboolean
 varpanel_shows_circles (GGobiData * d)
 {
   return (d != NULL &&
-          d->vcirc_ui.ebox != NULL && GTK_WIDGET_REALIZED (d->vcirc_ui.ebox));
+          d->vcirc_ui.ebox != NULL && gtk_widget_get_realized (d->vcirc_ui.ebox));
 }
 
 static gboolean
 varpanel_shows_checkboxes (GGobiData * d)
 {
   return (d != NULL &&
-          d->vcbox_ui.ebox != NULL && GTK_WIDGET_REALIZED (d->vcbox_ui.ebox));
+          d->vcbox_ui.ebox != NULL && gtk_widget_get_realized (d->vcbox_ui.ebox));
 }
 
 void
@@ -1095,7 +1095,7 @@ make_ui (ggobid * gg)
   GtkWidget *hbox, *vbox, *statusbar;
   GtkWidget *basement;
 
-  gg->tips = gtk_tooltips_new ();
+  gg->tips = TRUE;
 
   gg->main_window = window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), "GGobi");

@@ -285,13 +285,6 @@ ggobi_gc_apply (cairo_t *cr, const GGobiDrawStyle *style)
   }
 }
 
-void
-ggobi_gtk_tooltips_set_tip (GtkTooltips tips, GtkWidget *widget,
-                            const gchar *tip_text)
-{
-  gtk_widget_set_tooltip_text (widget, tips ? tip_text : NULL);
-}
-
 cairo_t *
 ggobi_draw_target_cairo_create (gpointer target)
 {

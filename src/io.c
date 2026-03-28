@@ -204,10 +204,10 @@ createInputFileSelectionDialog (gchar * title, ggobid * gg)
   lbl = gtk_label_new_with_mnemonic ("Input _Type:");
   gtk_box_pack_start (GTK_BOX (hbox), lbl, false, false, 0);
 
-  combo = gtk_combo_box_new_text ();
+  combo = gtk_combo_box_text_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (lbl), combo);
   for (l = els; l; l = l->next) {
-    gtk_combo_box_append_text (GTK_COMBO_BOX (combo), l->data);
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), l->data);
     g_free (l->data);
   }
   g_list_free (els);

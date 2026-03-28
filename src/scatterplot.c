@@ -41,11 +41,11 @@ void
 scatterplot_show_hrule (displayd * display, gboolean show)
 {
   if (show) {
-    if (!GTK_WIDGET_VISIBLE (display->hrule))
+    if (!gtk_widget_get_visible (display->hrule))
       gtk_widget_show (display->hrule);
   }
   else {
-    if (GTK_WIDGET_VISIBLE (display->hrule))
+    if (gtk_widget_get_visible (display->hrule))
       gtk_widget_hide (display->hrule);
   }
 }
@@ -53,11 +53,11 @@ void
 scatterplot_show_vrule (displayd * display, gboolean show)
 {
   if (show) {
-    if (!GTK_WIDGET_VISIBLE (display->vrule))
+    if (!gtk_widget_get_visible (display->vrule))
       gtk_widget_show (display->vrule);
   }
   else {
-    if (GTK_WIDGET_VISIBLE (display->vrule))
+    if (gtk_widget_get_visible (display->vrule))
       gtk_widget_hide (display->vrule);
   }
 }
@@ -148,7 +148,7 @@ ruler_ranges_set (gboolean force, displayd * display, splotd * sp,
    * Reset only if necessary:  if the ruler is visible and the
    * ranges have changed.  Force when initializing display.
    */
-  if (force || GTK_WIDGET_VISIBLE (display->hrule)) {
+  if (force || gtk_widget_get_visible (display->hrule)) {
     gdouble lower, upper;
 
     ggobi_gtk_ruler_get_range (display->hrule, &lower, &upper, NULL, NULL);
@@ -161,7 +161,7 @@ ruler_ranges_set (gboolean force, displayd * display, splotd * sp,
     }
   }
 
-  if (force || GTK_WIDGET_VISIBLE (display->vrule)) {
+  if (force || gtk_widget_get_visible (display->vrule)) {
     gdouble lower, upper;
 
     ggobi_gtk_ruler_get_range (display->vrule, &lower, &upper, NULL, NULL);
@@ -189,10 +189,10 @@ static const gchar *scatterplot_ui =
 static void
 display_datad_added_cb (ggobid * gg, GGobiData * d, void *win)
 {
-  windowDisplayd *display = GGOBI_WINDOW_DISPLAY (GTK_OBJECT (win));
+  windowDisplayd *display = GGOBI_WINDOW_DISPLAY (win);
 
   /*-- this is all true even when the display is first opened --*/
-  if (display->window && GTK_WIDGET_REALIZED (display->window)) {
+  if (display->window && gtk_widget_get_realized (display->window)) {
     scatterplot_display_edge_menu_update (GGOBI_DISPLAY (display),
                                           gg->app.sp_accel_group, gg);
   }
@@ -230,7 +230,7 @@ void GGOBI (edge_menus_update) (ggobid * gg)
   for (dlist = gg->displays; dlist != NULL; dlist = dlist->next) {
     display = (displayd *) dlist->data;
     if (GGOBI_WINDOW_DISPLAY (display)->useWindow && 
-        GTK_WIDGET_REALIZED (GGOBI_WINDOW_DISPLAY (display)->window) &&
+        gtk_widget_get_realized (GGOBI_WINDOW_DISPLAY (display)->window) &&
         GGOBI_IS_SCATTERPLOT_DISPLAY (display)) {
       scatterplot_display_edge_menu_update (GGOBI_DISPLAY (display),
                                             gg->app.sp_accel_group, gg);

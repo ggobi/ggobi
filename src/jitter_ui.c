@@ -154,10 +154,8 @@ jitter_window_open (ggobid * gg)
                                            G_CALLBACK (NULL), NULL, gg);
 
       /*-- option menu --*/
-      opt = gtk_combo_box_new_text ();
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), opt,
-                            "The jittering is either distributed uniform or normal",
-                            NULL);
+      opt = gtk_combo_box_text_new ();
+      gtk_widget_set_tooltip_text ((opt), gg->tips ? ("The jittering is either distributed uniform or normal") : NULL);
       gtk_box_pack_start (GTK_BOX (vbox), opt, false, false, 0);
       populate_combo_box (opt, type_lbl, G_N_ELEMENTS (type_lbl),
                           G_CALLBACK (type_cb), gg);
@@ -167,16 +165,16 @@ jitter_window_open (ggobid * gg)
       gtk_box_pack_start (GTK_BOX (vbox), vb, false, false, 1);
 
       lbl = gtk_label_new_with_mnemonic ("_Degree of jitter:");
-      gtk_misc_set_alignment (GTK_MISC (lbl), 0, 0.5);
+      gtk_label_set_xalign (GTK_LABEL (lbl), 0);
+      gtk_label_set_yalign (GTK_LABEL (lbl), 0.5);
       gtk_box_pack_start (GTK_BOX (vb), lbl, false, false, 0);
 
       adj = gtk_adjustment_new (0.0, 0.0, 0.7, 0.01, .01, 0.0);
       g_signal_connect (G_OBJECT (adj), "value_changed",
                         G_CALLBACK (degree_cb), (gpointer) gg);
 
-      sbar = gtk_hscale_new (adj);
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), sbar,
-                            "Set the degree of jitter", NULL);
+      sbar = gtk_scale_new (GTK_ORIENTATION_HORIZONTAL, adj);
+      gtk_widget_set_tooltip_text ((sbar), gg->tips ? ("Set the degree of jitter") : NULL);
       gtk_scale_set_draw_value (GTK_SCALE (sbar), false);
       gtk_scale_set_digits (GTK_SCALE (sbar), 2);
       gtk_scale_set_value_pos (GTK_SCALE (sbar), GTK_POS_BOTTOM);
@@ -186,14 +184,13 @@ jitter_window_open (ggobid * gg)
 
       /*-- Rejitter button --*/
       btn = gtk_button_new_with_mnemonic ("_Jitter");
-      gtk_tooltips_set_tip (GTK_TOOLTIPS (gg->tips), btn,
-                            "Rejitter the data", NULL);
+      gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Rejitter the data") : NULL);
       g_signal_connect (G_OBJECT (btn), "clicked",
                         G_CALLBACK (jitter_cb), (gpointer) gg);
       gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 3);
 
       /*-- Close button --*/
-      gtk_box_pack_start (GTK_BOX (vbox), gtk_hseparator_new (), false, true,
+      gtk_box_pack_start (GTK_BOX (vbox), gtk_separator_new (GTK_ORIENTATION_HORIZONTAL), false, true,
                           2);
       hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
       gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
