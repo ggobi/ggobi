@@ -394,13 +394,11 @@ createScatterplot (displayd * display, gboolean use_window, gboolean missing_p,
       display_tourcorr_init (display, gg);
   }
 
-  table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */
+  table = gtk_grid_new ();
   gtk_box_pack_start (GTK_BOX (vbox), table, true, true, 0);
-  gtk_table_attach (GTK_TABLE (table),
-                    sp->da, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_SHRINK | GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (GTK_SHRINK | GTK_EXPAND | GTK_FILL),
-                    0, 0);
+  gtk_widget_set_hexpand (sp->da, true);
+  gtk_widget_set_vexpand (sp->da, true);
+  gtk_grid_attach (GTK_GRID (table), sp->da, 1, 0, 1, 1);
 
 
   /*
@@ -424,10 +422,7 @@ createScatterplot (displayd * display, gboolean use_window, gboolean missing_p,
 
   /* What about the events above. */
 
-  gtk_table_attach (GTK_TABLE (table),
-                    display->hrule, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
-                    (GtkAttachOptions) GTK_FILL, 0, 0);
+  gtk_grid_attach (GTK_GRID (table), display->hrule, 1, 1, 1, 1);
 
   /*
    * The vertical ruler goes on the left. As the mouse moves across
@@ -445,11 +440,7 @@ createScatterplot (displayd * display, gboolean use_window, gboolean missing_p,
                             "motion_notify_event",
                             G_CALLBACK (ruler_motion_cb), display->vrule);
 
-  gtk_table_attach (GTK_TABLE (table),
-                    display->vrule, 0, 1, 0, 1,
-                    (GtkAttachOptions) GTK_FILL,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
-                    0, 0);
+  gtk_grid_attach (GTK_GRID (table), display->vrule, 0, 0, 1, 1);
   
   scatterplot_show_rulers (display, projection);
   if (GGOBI_IS_WINDOW_DISPLAY (display)

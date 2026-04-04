@@ -164,7 +164,7 @@ scatmat_new (displayd * display, gboolean use_window,
 
   gtk_widget_show (frame);
 
-  display->table = gtk_table_new (scatmat_nvars, scatmat_nvars, false);
+  display->table = gtk_grid_new ();
   gtk_container_add (GTK_CONTAINER (frame), display->table);
   display->splots = NULL;
   ctr = 0;
@@ -180,12 +180,9 @@ scatmat_new (displayd * display, gboolean use_window,
 
       display->splots = g_list_append (display->splots, (gpointer) sp);
 
-      gtk_table_attach (GTK_TABLE (display->table), sp->da, i, i + 1, j,
-                        j + 1,
-                        (GtkAttachOptions) (GTK_SHRINK | GTK_FILL |
-                                            GTK_EXPAND),
-                        (GtkAttachOptions) (GTK_SHRINK | GTK_FILL |
-                                            GTK_EXPAND), 1, 1);
+      gtk_widget_set_hexpand (sp->da, true);
+      gtk_widget_set_vexpand (sp->da, true);
+      gtk_grid_attach (GTK_GRID (display->table), sp->da, i, j, 1, 1);
       gtk_widget_show (sp->da);
     }
   }
@@ -247,11 +244,9 @@ scatmat_add_plot (gint xvar, gint yvar, gint col, gint row,
   sp_new->xyvars.y = yvar;
   sp_new->p1dvar = (sp_new->xyvars.x == sp_new->xyvars.y) ? xvar : -1;
 
-  gtk_table_attach (GTK_TABLE (display->table),
-                    sp_new->da, col, col + 1, row, row + 1,
-                    (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                    (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                    1, 1);
+  gtk_widget_set_hexpand (sp_new->da, true);
+  gtk_widget_set_vexpand (sp_new->da, true);
+  gtk_grid_attach (GTK_GRID (display->table), sp_new->da, col, row, 1, 1);
   gtk_widget_show (sp_new->da);
 
   /* We don't care where, I think */
@@ -333,8 +328,6 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->plotted_vars_get (display,
                                                                     vars, d,
                                                                     gg);
-    gtk_table_resize (GTK_TABLE (display->table), nvars, nvars);
-
     /* Make the first plot the current plot */
     gg->current_splot = (splotd *) g_list_nth_data (display->splots, 0);
     display->current_splot = gg->current_splot;
@@ -378,7 +371,6 @@ scatmat_varsel_simple (cpaneld * cpanel, splotd * sp, gint jvar,
     sp_event_handlers_toggle (sp_new, on, cpanel->pmode, cpanel->imode);
 
 
-    gtk_table_resize (GTK_TABLE (display->table), nvars, nvars);
     redraw = true;
     g_free (vars);
   }

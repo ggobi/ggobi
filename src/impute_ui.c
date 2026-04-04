@@ -262,7 +262,9 @@ impute_window_open (ggobid * gg)
                                          all_datatypes, G_CALLBACK (NULL),
                                          NULL, gg);
     row = 0;
-    table = gtk_table_new (6, 2, false);
+    table = gtk_grid_new ();
+    gtk_grid_set_column_spacing (GTK_GRID (table), 8);
+    gtk_grid_set_row_spacing (GTK_GRID (table), 4);
     gtk_box_pack_start (GTK_BOX (vb), table, false, false, 2);
 
     /* Random */
@@ -271,19 +273,13 @@ impute_window_open (ggobid * gg)
     g_signal_connect (G_OBJECT (radio), "toggled",
                       G_CALLBACK (set_random_cb), (gpointer) gg);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio), true);
-    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), radio, 0, row, 1, 1);
     tgl =
       gtk_check_button_new_with_mnemonic ("Condition on symbol and _color");
     gtk_widget_set_tooltip_text ((tgl), gg->tips ? ("Condition the random imputation on the symbol and color; these groups can be seen in the case clusters window") : NULL);
     g_signal_connect (G_OBJECT (tgl), "toggled", G_CALLBACK (group_cb),
                       (gpointer) gg);
-    gtk_table_attach (GTK_TABLE (table), tgl, 1, 2, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), tgl, 1, row, 1, 1);
     row++;
 
 
@@ -296,10 +292,7 @@ impute_window_open (ggobid * gg)
     gtk_widget_set_tooltip_text ((radio), gg->tips ? ("Assign the variable mean to each missing value") : NULL);
     g_signal_connect (G_OBJECT (radio), "toggled", G_CALLBACK (set_mean_cb),
                       (gpointer) gg);
-    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), radio, 0, row, 1, 1);
     row++;
 
     /* Median */
@@ -310,10 +303,7 @@ impute_window_open (ggobid * gg)
     gtk_widget_set_tooltip_text ((radio), gg->tips ? ("Assign the variable median to each missing value") : NULL);
     g_signal_connect (G_OBJECT (radio), "toggled", G_CALLBACK (set_median_cb),
                       (gpointer) gg);
-    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), radio, 0, row, 1, 1);
     row++;
 
 
@@ -325,17 +315,11 @@ impute_window_open (ggobid * gg)
     gtk_widget_set_tooltip_text ((radio), gg->tips ? ("Assign a fixed value to each missing variable value") : NULL);
     g_signal_connect (G_OBJECT (radio), "toggled", G_CALLBACK (set_fixed_cb),
                       (gpointer) gg);
-    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), radio, 0, row, 1, 1);
     entry = gtk_entry_new ();
     gtk_widget_set_name (entry, "IMPUTE:entry_val");
     gtk_entry_set_text (GTK_ENTRY (entry), "0");
-    gtk_table_attach (GTK_TABLE (table), entry, 1, 2, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), entry, 1, row, 1, 1);
     row++;
 
     /* Pctage below min */
@@ -346,17 +330,11 @@ impute_window_open (ggobid * gg)
     gtk_widget_set_tooltip_text ((radio), gg->tips ? ("Assign a fixed value which is some percentage below the minimum value for the variable") : NULL);
     g_signal_connect (G_OBJECT (radio), "toggled",
                       G_CALLBACK (set_fixed_below_cb), (gpointer) gg);
-    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), radio, 0, row, 1, 1);
     entry = gtk_entry_new ();
     gtk_entry_set_text (GTK_ENTRY (entry), "10");
     gtk_widget_set_name (entry, "IMPUTE:entry_below");
-    gtk_table_attach (GTK_TABLE (table), entry, 1, 2, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), entry, 1, row, 1, 1);
     row++;
 
     /* Pctage above min */
@@ -367,17 +345,11 @@ impute_window_open (ggobid * gg)
     gtk_widget_set_tooltip_text ((radio), gg->tips ? ("Assign a fixed value which is some percentage above the minimum value for the variable") : NULL);
     g_signal_connect (G_OBJECT (radio), "toggled",
                       G_CALLBACK (set_fixed_above_cb), (gpointer) gg);
-    gtk_table_attach (GTK_TABLE (table), radio, 0, 1, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), radio, 0, row, 1, 1);
     entry = gtk_entry_new ();
     gtk_entry_set_text (GTK_ENTRY (entry), "10");
     gtk_widget_set_name (entry, "IMPUTE:entry_above");
-    gtk_table_attach (GTK_TABLE (table), entry, 1, 2, row, row + 1,
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      (GtkAttachOptions) (GTK_SHRINK | GTK_FILL | GTK_EXPAND),
-                      1, 1);
+    gtk_grid_attach (GTK_GRID (table), entry, 1, row, 1, 1);
     row++;
 
    /*-- hbox to hold a few buttons --*/

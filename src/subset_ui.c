@@ -365,8 +365,9 @@ subset_window_open (ggobid *gg) {
       frame = gtk_frame_new ("Consecutive block");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-      t = gtk_table_new (2, 2, true);
-      gtk_table_set_col_spacing (GTK_TABLE (t), 0, 20);
+      t = gtk_grid_new ();
+      gtk_grid_set_column_homogeneous (GTK_GRID (t), true);
+      gtk_grid_set_column_spacing (GTK_GRID (t), 20);
       gtk_container_set_border_width (GTK_CONTAINER (t), 5);
       gtk_container_add (GTK_CONTAINER (frame), t);
 
@@ -383,7 +384,7 @@ subset_window_open (ggobid *gg) {
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_widget_set_tooltip_text ((spinbtn), gg->tips ? ("Specify the first row of the block") : NULL);
       gtk_box_pack_start (GTK_BOX (vb), spinbtn, false, false, 0);
-      gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
+      gtk_grid_attach (GTK_GRID (t), vb, 0, 0, 1, 1);
 
       /*-- Block subsetting: blocksize (bsize) --*/
       vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
@@ -398,7 +399,7 @@ subset_window_open (ggobid *gg) {
       gtk_widget_set_tooltip_text ((spinbtn), gg->tips ? ("Specify the size of the block") : NULL);
       gtk_box_pack_start (GTK_BOX (vb),
         spinbtn, false, false, 0);
-      gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
+      gtk_grid_attach (GTK_GRID (t), vb, 1, 0, 1, 1);
 
 
       label = gtk_label_new_with_mnemonic ("_Block");
@@ -428,8 +429,9 @@ subset_window_open (ggobid *gg) {
       frame = gtk_frame_new ("Every nth case");
       gtk_container_set_border_width (GTK_CONTAINER (frame), 5);
 
-      t = gtk_table_new (1, 2, true);
-      gtk_table_set_col_spacing (GTK_TABLE (t), 0, 20);
+      t = gtk_grid_new ();
+      gtk_grid_set_column_homogeneous (GTK_GRID (t), true);
+      gtk_grid_set_column_spacing (GTK_GRID (t), 20);
       gtk_container_set_border_width (GTK_CONTAINER (t), 5);
       gtk_container_add (GTK_CONTAINER (frame), t);
 
@@ -446,7 +448,7 @@ subset_window_open (ggobid *gg) {
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_widget_set_tooltip_text ((spinbtn), gg->tips ? ("Specify the first row of the block") : NULL);
       gtk_box_pack_start (GTK_BOX (vb), spinbtn, false, false, 0);
-      gtk_table_attach_defaults (GTK_TABLE (t), vb, 0,1,0,1);
+      gtk_grid_attach (GTK_GRID (t), vb, 0, 0, 1, 1);
 
       /*-- everyn subsetting: stepsize --*/
       vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
@@ -461,7 +463,7 @@ subset_window_open (ggobid *gg) {
       gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinbtn), false);
       gtk_widget_set_tooltip_text ((spinbtn), gg->tips ? ("Specify the size of the block") : NULL);
       gtk_box_pack_start (GTK_BOX (vb), spinbtn, false, false, 0);
-      gtk_table_attach_defaults (GTK_TABLE (t), vb, 1,2,0,1);
+      gtk_grid_attach (GTK_GRID (t), vb, 1, 0, 1, 1);
 
       label = gtk_label_new_with_mnemonic ("_Every n");
       gtk_notebook_append_page (GTK_NOTEBOOK (gg->subset_ui.notebook),

@@ -121,7 +121,9 @@ writeall_window_open (ggobid *gg) {
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, VBOX_SPACING);
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
-  table = gtk_table_new (7, 2, false);
+  table = gtk_grid_new ();
+  gtk_grid_set_column_spacing (GTK_GRID (table), 10);
+  gtk_grid_set_row_spacing (GTK_GRID (table), 5);
   gtk_box_pack_start (GTK_BOX (vbox), table,
     true, true, 3);
 
@@ -139,10 +141,8 @@ writeall_window_open (ggobid *gg) {
 
   lbl = gtk_label_new_with_mnemonic ("_Format:");
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-  gtk_table_attach (GTK_TABLE (table), lbl,
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), opt,
-    1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
+  gtk_grid_attach (GTK_GRID (table), lbl, 0, j, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), opt, 1, j, 1, 1);
 
 
   /*-- Data objects --*/
@@ -171,10 +171,10 @@ writeall_window_open (ggobid *gg) {
 
   lbl = gtk_label_new_with_mnemonic ("_Data:");
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), swin);
-  gtk_table_attach (GTK_TABLE (table), lbl,
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), swin,
-    1, 2, j, j+1, GTK_EXPAND|GTK_FILL, GTK_EXPAND|GTK_FILL, 5, 0);
+  gtk_widget_set_hexpand (swin, true);
+  gtk_widget_set_vexpand (swin, true);
+  gtk_grid_attach (GTK_GRID (table), lbl, 0, j, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), swin, 1, j, 1, 1);
 
 
   /*-- Stage --*/
@@ -189,10 +189,8 @@ writeall_window_open (ggobid *gg) {
 
   lbl = gtk_label_new_with_mnemonic ("_Stage:");
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-  gtk_table_attach (GTK_TABLE (table), lbl,
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), opt,
-    1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
+  gtk_grid_attach (GTK_GRID (table), lbl, 0, j, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), opt, 1, j, 1, 1);
 
   /*-- Jitter? --*/
 /*
@@ -203,11 +201,8 @@ writeall_window_open (ggobid *gg) {
     sizeof (jitter_lbl) / sizeof (gchar *), jitterp_set_cb, "GGobi", gg);
   gtk_combo_box_set_active (GTK_COMBO_BOX (opt), true);
 
-  gtk_table_attach (GTK_TABLE (table),
-    gtk_label_new ("Jitter?:"),
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), opt,
-    1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
+  gtk_grid_attach (GTK_GRID (table), gtk_label_new ("Jitter?:"), 0, j, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), opt, 1, j, 1, 1);
 */
 
   /*-- Which rows --*/
@@ -221,10 +216,8 @@ writeall_window_open (ggobid *gg) {
 
   lbl = gtk_label_new_with_mnemonic ("_Cases:");
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-  gtk_table_attach (GTK_TABLE (table), lbl,
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), opt,
-    1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
+  gtk_grid_attach (GTK_GRID (table), lbl, 0, j, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), opt, 1, j, 1, 1);
 
   /*-- Which columns --*/
   j++;
@@ -237,10 +230,8 @@ writeall_window_open (ggobid *gg) {
 
   lbl = gtk_label_new_with_mnemonic ("_Variables:");
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-  gtk_table_attach (GTK_TABLE (table), lbl,
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), opt,
-    1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
+  gtk_grid_attach (GTK_GRID (table), lbl, 0, j, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), opt, 1, j, 1, 1);
 
   /*-- Format for missings --*/
   j++;
@@ -253,10 +244,8 @@ writeall_window_open (ggobid *gg) {
 
   lbl = gtk_label_new_with_mnemonic ("Format for _missings:");
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-  gtk_table_attach (GTK_TABLE (table), lbl,
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), opt,
-    1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
+  gtk_grid_attach (GTK_GRID (table), lbl, 0, j, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), opt, 1, j, 1, 1);
 
   /*-- edges? --*/
   j++;
@@ -275,10 +264,8 @@ writeall_window_open (ggobid *gg) {
 
   lbl = gtk_label_new_with_mnemonic ("_Edges?:");
   gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), opt);
-  gtk_table_attach (GTK_TABLE (table), lbl,
-    0, 1, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
-  gtk_table_attach (GTK_TABLE (table), opt,
-    1, 2, j, j+1, GTK_FILL, GTK_FILL, 5, 0);
+  gtk_grid_attach (GTK_GRID (table), lbl, 0, j, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), opt, 1, j, 1, 1);
 
 /*
  * Add a button to open a file selection box; see filename_get_w in io.c

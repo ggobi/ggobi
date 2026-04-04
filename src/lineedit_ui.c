@@ -140,8 +140,6 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   GtkWidget *entry, *w;
   gchar *lbl;
   cpaneld *cpanel = &dsp->cpanel;
-  /*  GtkAttachOptions table_opt = GTK_SHRINK|GTK_FILL|GTK_EXPAND; */
-  GtkAttachOptions table_opt = GTK_SHRINK;
   gint row = 0;
   GGobiData *dtarget;
 
@@ -155,21 +153,21 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   dialog = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (dialog), "Add a Record");
 
-  table = gtk_table_new (5, 2, false);
+  table = gtk_grid_new ();
+  gtk_grid_set_column_spacing (GTK_GRID (table), 8);
+  gtk_grid_set_row_spacing (GTK_GRID (table), 4);
   gtk_box_pack_start (GTK_BOX (add_record_dialog_content_area (dialog)),
                       table, false, false, 5);
 
   w = gtk_label_new ("Record number");
   gtk_label_set_xalign (GTK_LABEL (w), 1);
   gtk_label_set_yalign (GTK_LABEL (w), .5);
-  gtk_table_attach (GTK_TABLE (table),
-                    w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), w, 0, row, 1, 1);
   lbl = g_strdup_printf ("%d", dtarget->nrows);
   w = gtk_label_new (lbl);
   gtk_label_set_xalign (GTK_LABEL (w), .5);
   gtk_label_set_yalign (GTK_LABEL (w), .5);
-  gtk_table_attach (GTK_TABLE (table),
-                    w, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), w, 1, row, 1, 1);
   g_free (lbl);
   row++;
 
@@ -177,36 +175,31 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
     w = gtk_label_new ("Edge source");
     gtk_label_set_xalign (GTK_LABEL (w), 1);
     gtk_label_set_yalign (GTK_LABEL (w), .5);
-    gtk_table_attach (GTK_TABLE (table),
-                      w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
+    gtk_grid_attach (GTK_GRID (table), w, 0, row, 1, 1);
     /* This label should include both the rowlab and the rowId */
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, gg->edgeedit.a);
     w = gtk_label_new (lbl);
     gtk_label_set_xalign (GTK_LABEL (w), .5);
     gtk_label_set_yalign (GTK_LABEL (w), .5);
-    gtk_table_attach (GTK_TABLE (table),
-                      w, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
+    gtk_grid_attach (GTK_GRID (table), w, 1, row, 1, 1);
     row++;
 
     w = gtk_label_new ("Edge destination");
     gtk_label_set_xalign (GTK_LABEL (w), 1);
     gtk_label_set_yalign (GTK_LABEL (w), .5);
-    gtk_table_attach (GTK_TABLE (table),
-                      w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
+    gtk_grid_attach (GTK_GRID (table), w, 0, row, 1, 1);
     lbl = (gchar *) g_array_index (d->rowlab, gchar *, d->nearest_point);
     w = gtk_label_new (lbl);
     gtk_label_set_xalign (GTK_LABEL (w), .5);
     gtk_label_set_yalign (GTK_LABEL (w), .5);
-    gtk_table_attach (GTK_TABLE (table),
-                      w, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
+    gtk_grid_attach (GTK_GRID (table), w, 1, row, 1, 1);
     row++;
   }
 
   w = gtk_label_new_with_mnemonic ("Record _label");
   gtk_label_set_xalign (GTK_LABEL (w), 1);
   gtk_label_set_yalign (GTK_LABEL (w), .5);
-  gtk_table_attach (GTK_TABLE (table),
-                    w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), w, 0, row, 1, 1);
   entry = gtk_entry_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (w), entry);
   lbl = g_strdup_printf ("%d", dtarget->nrows + 1);
@@ -214,8 +207,7 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   g_free (lbl);
 
   gtk_widget_set_name (entry, "EE:rowlabel");
-  gtk_table_attach (GTK_TABLE (table),
-                    entry, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
+  gtk_grid_attach (GTK_GRID (table), entry, 1, row, 1, 1);
   row++;
 
   if ((cpanel->ee_mode == ADDING_POINTS && d->idTable) ||
@@ -223,16 +215,14 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
     w = gtk_label_new_with_mnemonic ("Record _id");
     gtk_label_set_xalign (GTK_LABEL (w), 1);
     gtk_label_set_yalign (GTK_LABEL (w), .5);
-    gtk_table_attach (GTK_TABLE (table),
-                      w, 0, 1, row, row + 1, table_opt, table_opt, 1, 1);
+    gtk_grid_attach (GTK_GRID (table), w, 0, row, 1, 1);
     entry = gtk_entry_new ();
     gtk_label_set_mnemonic_widget (GTK_LABEL (w), entry);
     lbl = g_strdup_printf ("%d", dtarget->nrows + 1);
     gtk_entry_set_text (GTK_ENTRY (entry), lbl);
     g_free (lbl);
     gtk_widget_set_name (entry, "EE:recordid");
-    gtk_table_attach (GTK_TABLE (table),
-                      entry, 1, 2, row, row + 1, table_opt, table_opt, 1, 1);
+    gtk_grid_attach (GTK_GRID (table), entry, 1, row, 1, 1);
     row++;
   }
 
@@ -247,20 +237,20 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
                                              ggobid * gg);
     fetch_default_record_values (vals, dtarget, dsp, gg);
 
-    tablev = gtk_table_new (dtarget->ncols, 2, false);
+    tablev = gtk_grid_new ();
+    gtk_grid_set_column_spacing (GTK_GRID (tablev), 8);
+    gtk_grid_set_row_spacing (GTK_GRID (tablev), 4);
     gtk_widget_set_name (tablev, "EE:tablev");
     gtk_box_pack_start (GTK_BOX (add_record_dialog_content_area (dialog)),
                         tablev, false, false, 5);
 
     for (j = 0; j < dtarget->ncols; j++) {
       w = gtk_label_new (ggobi_data_get_col_name(d, j));
-      gtk_table_attach (GTK_TABLE (tablev),
-                        w, 0, 1, j, j + 1, table_opt, table_opt, 1, 1);
+      gtk_grid_attach (GTK_GRID (tablev), w, 0, j, 1, 1);
 
       entry = gtk_entry_new ();
       gtk_entry_set_text (GTK_ENTRY (entry), vals[j]);
-      gtk_table_attach (GTK_TABLE (tablev),
-                        entry, 1, 2, j, j + 1, table_opt, table_opt, 1, 1);
+      gtk_grid_attach (GTK_GRID (tablev), entry, 1, j, 1, 1);
     }
 
     /* free vals, I think */

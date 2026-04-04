@@ -180,13 +180,11 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
   if (d->ncols >= MIN_NVARS_FOR_TOUR1D)
     display_tour1d_init (display, gg);
 
-  table = gtk_table_new (3, 2, false);  /* rows, columns, homogeneous */
+  table = gtk_grid_new ();
   gtk_box_pack_start (GTK_BOX (vbox), table, true, true, 0);
-  gtk_table_attach (GTK_TABLE (table),
-                    sp->da, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_SHRINK | GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (GTK_SHRINK | GTK_EXPAND | GTK_FILL),
-                    0, 0);
+  gtk_widget_set_hexpand (sp->da, true);
+  gtk_widget_set_vexpand (sp->da, true);
+  gtk_grid_attach (GTK_GRID (table), sp->da, 1, 0, 1, 1);
 
 
 
@@ -198,10 +196,7 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
 
   display->hrule = gtk_hruler_new ();
 /*
-  gtk_table_attach (GTK_TABLE (table),
-                    display->hrule, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
-                    (GtkAttachOptions) GTK_FILL, 0, 0);
+  gtk_grid_attach (GTK_GRID (table), display->hrule, 1, 1, 1, 1);
 */
 
 
@@ -214,11 +209,7 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
 
   display->vrule = gtk_vruler_new ();
 /*
-  gtk_table_attach (GTK_TABLE (table),
-                    display->vrule, 0, 1, 0, 1,
-                    (GtkAttachOptions) GTK_FILL,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
-                    0, 0);
+  gtk_grid_attach (GTK_GRID (table), display->vrule, 0, 0, 1, 1);
 
   display->p1d_orientation = VERTICAL;
   scatterplot_show_rulers (display, P1PLOT);  

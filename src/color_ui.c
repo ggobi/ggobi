@@ -950,7 +950,8 @@ make_symbol_window (ggobid * gg)
     gtk_container_add (GTK_CONTAINER (fg_frame), ebox);
 
     /*-- create MAXNCOLORS drawing areas, showing gg->activeColorScheme->n of them --*/
-    fg_table = gtk_table_new (1, MAXNCOLORS, true);
+    fg_table = gtk_grid_new ();
+    gtk_grid_set_column_homogeneous (GTK_GRID (fg_table), true);
     gtk_container_add (GTK_CONTAINER (ebox), fg_table);
 
     k = 0;
@@ -973,9 +974,7 @@ make_symbol_window (ggobid * gg)
                         "button_press_event", G_CALLBACK (set_color_id), gg);
       g_signal_connect (G_OBJECT (gg->color_ui.fg_da[k]),
                         "draw", G_CALLBACK (color_draw_fg), gg);
-      gtk_table_attach (GTK_TABLE (fg_table),
-                        gg->color_ui.fg_da[k], i, i + 1, j, j + 1,
-                        GTK_FILL, GTK_FILL, 10, 10);
+      gtk_grid_attach (GTK_GRID (fg_table), gg->color_ui.fg_da[k], i, j, 1, 1);
 
       k++;
     }
@@ -991,7 +990,8 @@ make_symbol_window (ggobid * gg)
     ebox = gtk_event_box_new ();
     gtk_container_add (GTK_CONTAINER (bg_frame), ebox);
 
-    bg_table = gtk_table_new (1, 5, true);
+    bg_table = gtk_grid_new ();
+    gtk_grid_set_column_homogeneous (GTK_GRID (bg_table), true);
     gtk_container_add (GTK_CONTAINER (ebox), bg_table);
 
     gg->color_ui.bg_da = gtk_drawing_area_new ();
@@ -1009,9 +1009,7 @@ make_symbol_window (ggobid * gg)
     g_signal_connect (G_OBJECT (gg->color_ui.bg_da),
                       "button_press_event", G_CALLBACK (set_color_id), gg);
 
-    gtk_table_attach (GTK_TABLE (bg_table),
-                      gg->color_ui.bg_da, 0, 1, 0, 1,
-                      GTK_FILL, GTK_FILL, 10, 10);
+    gtk_grid_attach (GTK_GRID (bg_table), gg->color_ui.bg_da, 0, 0, 1, 1);
 
     /*-- Accent color --*/
     accent_frame = gtk_frame_new ("Accent color");
@@ -1020,7 +1018,8 @@ make_symbol_window (ggobid * gg)
     ebox = gtk_event_box_new ();
     gtk_container_add (GTK_CONTAINER (accent_frame), ebox);
 
-    accent_table = gtk_table_new (1, 5, true);
+    accent_table = gtk_grid_new ();
+    gtk_grid_set_column_homogeneous (GTK_GRID (accent_table), true);
     gtk_container_add (GTK_CONTAINER (ebox), accent_table);
 
     gg->color_ui.accent_da = gtk_drawing_area_new ();
@@ -1036,9 +1035,8 @@ make_symbol_window (ggobid * gg)
     g_signal_connect (G_OBJECT (gg->color_ui.accent_da),
                       "button_press_event", G_CALLBACK (set_color_id), gg);
 
-    gtk_table_attach (GTK_TABLE (accent_table),
-                      gg->color_ui.accent_da, 0, 1, 0, 1,
-                      GTK_FILL, GTK_FILL, 10, 10);
+    gtk_grid_attach (GTK_GRID (accent_table), gg->color_ui.accent_da, 0, 0, 1,
+                     1);
 
     /*-- Shadow (hidden) color --*/
     hidden_frame = gtk_frame_new ("Shadow color");
@@ -1047,7 +1045,8 @@ make_symbol_window (ggobid * gg)
     ebox = gtk_event_box_new ();
     gtk_container_add (GTK_CONTAINER (hidden_frame), ebox);
 
-    hidden_table = gtk_table_new (1, 5, true);
+    hidden_table = gtk_grid_new ();
+    gtk_grid_set_column_homogeneous (GTK_GRID (hidden_table), true);
     gtk_container_add (GTK_CONTAINER (ebox), hidden_table);
 
     gg->color_ui.hidden_da = gtk_drawing_area_new ();
@@ -1063,9 +1062,8 @@ make_symbol_window (ggobid * gg)
     g_signal_connect (G_OBJECT (gg->color_ui.hidden_da),
                       "button_press_event", G_CALLBACK (set_color_id), gg);
 
-    gtk_table_attach (GTK_TABLE (hidden_table),
-                      gg->color_ui.hidden_da, 0, 1, 0, 1,
-                      GTK_FILL, GTK_FILL, 10, 10);
+    gtk_grid_attach (GTK_GRID (hidden_table), gg->color_ui.hidden_da, 0, 0, 1,
+                     1);
 
     /*-- Temporary, perhaps: reverse video button --*/
     btn = gtk_button_new_with_mnemonic ("_Reverse video");

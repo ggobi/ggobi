@@ -457,8 +457,9 @@ sphere_panel_open (ggobid * gg)
     //gtk_frame_set_shadow_type (GTK_FRAME (frame0), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame0, false, false, 1);
 
-    table = gtk_table_new (3, 2, false);
-    gtk_table_set_col_spacings (GTK_TABLE (table), 4);
+    table = gtk_grid_new ();
+    gtk_grid_set_column_spacing (GTK_GRID (table), 4);
+    gtk_grid_set_row_spacing (GTK_GRID (table), 4);
     gtk_container_add (GTK_CONTAINER (frame0), table);
     gtk_container_set_border_width (GTK_CONTAINER (table), 4);
 
@@ -466,8 +467,7 @@ sphere_panel_open (ggobid * gg)
     label = gtk_label_new_with_mnemonic ("Set number of _PCs");
     gtk_label_set_xalign (GTK_LABEL (label), 0);
     gtk_label_set_yalign (GTK_LABEL (label), 0.5);
-    gtk_table_attach (GTK_TABLE (table), label,
-                      0, 1, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach (GTK_GRID (table), label, 0, 0, 1, 1);
 
     /* Spinner: number of principal components */
     /*-- the parameters of the adjustment should be reset each time --*/
@@ -484,15 +484,13 @@ sphere_panel_open (ggobid * gg)
     gtk_label_set_mnemonic_widget (GTK_LABEL (label), spinner);
     gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), false);
     gtk_widget_set_tooltip_text ((spinner), gg->tips ? ("Specify the number of principal components") : NULL);
-    gtk_table_attach (GTK_TABLE (table), spinner,
-                      1, 2, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach (GTK_GRID (table), spinner, 1, 0, 1, 1);
 
     /*-- total variance --*/
     label = gtk_label_new_with_mnemonic ("_Variance");
     gtk_label_set_xalign (GTK_LABEL (label), 0);
     gtk_label_set_yalign (GTK_LABEL (label), 0.5);
-    gtk_table_attach (GTK_TABLE (table), label,
-                      0, 1, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach (GTK_GRID (table), label, 0, 1, 1, 1);
 
     gg->sphere_ui.variance_entry = gtk_entry_new ();
     gtk_label_set_mnemonic_widget (GTK_LABEL (label),
@@ -503,15 +501,14 @@ sphere_panel_open (ggobid * gg)
     gtk_widget_show (gg->sphere_ui.variance_entry);
     gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.variance_entry), "-");
 
-    gtk_table_attach (GTK_TABLE (table), gg->sphere_ui.variance_entry,
-                      1, 2, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach (GTK_GRID (table), gg->sphere_ui.variance_entry, 1, 1, 1,
+                     1);
 
     /*-- condition number --*/
     label = gtk_label_new_with_mnemonic ("Condition _number");
     gtk_label_set_xalign (GTK_LABEL (label), 0);
     gtk_label_set_yalign (GTK_LABEL (label), 0.5);
-    gtk_table_attach (GTK_TABLE (table), label,
-                      0, 1, 2, 3, GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach (GTK_GRID (table), label, 0, 2, 1, 1);
 
     gg->sphere_ui.condnum_entry = gtk_entry_new ();
     gtk_label_set_mnemonic_widget (GTK_LABEL (label),
@@ -520,8 +517,8 @@ sphere_panel_open (ggobid * gg)
                                false);
     gtk_entry_set_text (GTK_ENTRY (gg->sphere_ui.condnum_entry), "-");
     gtk_widget_set_tooltip_text ((gg->sphere_ui.condnum_entry), gg->tips ? ("The condition number for the specified number of principal components") : NULL);
-    gtk_table_attach (GTK_TABLE (table), gg->sphere_ui.condnum_entry, 1, 2, 2,
-                      3, GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach (GTK_GRID (table), gg->sphere_ui.condnum_entry, 1, 2, 1,
+                     1);
 
     frame = gtk_frame_new ("Sphere");
     //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
