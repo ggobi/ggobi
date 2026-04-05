@@ -237,14 +237,14 @@ edgeset_add (displayd * display)
  on the plot.
  */
 void
-edgeset_add_cb (GtkAction * action, GGobiData * e)
+edgeset_add_cb (GtkWidget *item, GGobiData *e)
 {
   ggobid *gg = e->gg;
-  displayd *display = GGOBI_DISPLAY (g_object_get_data (G_OBJECT (action),
+  displayd *display = GGOBI_DISPLAY (g_object_get_data (G_OBJECT (item),
                                                         "display"));
 
-  if (GTK_IS_TOGGLE_ACTION (action)
-      && !gtk_toggle_action_get_active (GTK_TOGGLE_ACTION (action)))
+  if (GTK_IS_CHECK_MENU_ITEM (item)
+      && !gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (item)))
     return;
 
   if (e != display->e) {
@@ -258,9 +258,10 @@ edgeset_add_cb (GtkAction * action, GGobiData * e)
   if (!display->options.edges_undirected_show_p &&
       !display->options.edges_directed_show_p &&
       !display->options.edges_arrowheads_show_p) {
-    GtkAction *action = gtk_ui_manager_get_action (display->menu_manager,
-                                                   "/menubar/Edges/ShowUndirectedEdges");
-    gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action), true);
+    GtkWidget *menuitem =
+      widget_find_by_name (display->menubar, "DISPLAY:show_undirected_edges");
+    if (GTK_IS_CHECK_MENU_ITEM (menuitem))
+      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (menuitem), true);
   }
 }
 

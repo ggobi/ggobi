@@ -199,37 +199,6 @@ cpanel_parcoords_make (ggobid * gg)
   return (panel->w);
 }
 
-
-/*--------------------------------------------------------------------*/
-/*                   Resetting the main menubar                       */
-/*--------------------------------------------------------------------*/
-
-static const gchar *mode_ui_str =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='IMode'>"
-  "			<menuitem action='DefaultIMode'/>"
-  "			<separator/>"
-  "			<menuitem action='Brush'/>"
-  "			<menuitem action='Identify'/>" "		</menu>" "	</menubar>" "</ui>";
-
-const gchar *
-parcoords_mode_ui_get (displayd * dsp)
-{
-  return (mode_ui_str);
-}
-
-/*
-  The useIds indicates whether the callback data should be integers
-  identifying the menu item or the global gg.
-  At present, this is always false.
-  See scatmat_mode_menu_make and scatterplot_mode_menu_make.
- */
-
-/*--------------------------------------------------------------------*/
-/*                   End of main menubar section                      */
-/*--------------------------------------------------------------------*/
-
 /*--------------------------------------------------------------------*/
 /*                      Control panel updating                        */
 /*--------------------------------------------------------------------*/

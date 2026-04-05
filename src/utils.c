@@ -248,7 +248,7 @@ widget_name_p (GtkWidget * w, gchar * name)
  * a widget with the name 'name'
 */
 GtkWidget *
-widget_find_by_name (GtkWidget * parent, gchar * name)
+widget_find_by_name (GtkWidget * parent, const gchar * name)
 {
   GtkWidget *w, *namedw = NULL;
   GList *children, *l;

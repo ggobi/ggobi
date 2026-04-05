@@ -1537,7 +1537,6 @@ scatterplotDisplayClassInit (GGobiScatterplotDisplayClass * klass)
 
   klass->parent_class.cpanel_set = cpanelSet;
   klass->parent_class.display_set = displaySet;
-  klass->parent_class.mode_ui_get = scatterplot_mode_ui_get;
 
   klass->parent_class.handles_projection = handlesProjection;
   klass->parent_class.handles_interaction = handlesInteraction;

@@ -12,24 +12,25 @@
 
 void       close_graphact_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_graphact_window(ggobid *gg, PluginInstance *inst);
-void       show_graphact_window (GtkAction *action, PluginInstance *inst);
+void       show_graphact_window (GtkWidget *widget, PluginInstance *inst);
 
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  static GtkActionEntry entry = {
-	"GraphAction", NULL, "Graph _Operations", NULL, "Perform misc operations on a graph", 
-		G_CALLBACK (show_graphact_window)
+  static const GGobiToolActionEntry entry = {
+    "GraphAction", "Graph _Operations", NULL,
+    "Perform misc operations on a graph", G_CALLBACK (show_graphact_window)
   };
-  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
+  GGOBI(addToolAction)(&entry, inst, gg);
   return(true);
 }
 
 
 void
-show_graphact_window (GtkAction *action, PluginInstance *inst)
+show_graphact_window (GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
   graphactd *ga;
 
   if (g_slist_length(inst->gg->d) < 1) {
@@ -127,7 +128,6 @@ GtkWidget *
 create_graphact_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *main_vbox, *notebook, *label, *frame, *vbox, *btn, *opt;
-  GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *tree_view_titles[2] = {"node sets", "edge sets"};
   GGobiData *d;
@@ -235,24 +235,24 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
   btn = gtk_button_new_with_mnemonic ("Shadow _leaves");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Recursively shadow brush leaf nodes and edges", NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Recursively shadow brush leaf nodes and edges" : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
     G_CALLBACK (ga_leaf_hide_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
   btn = gtk_button_new_with_mnemonic ("Shadow _orphans");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Shadow brush nodes without any edges that are both included and not shadowed",
-    NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Shadow brush nodes without any edges that are both included and not shadowed"
+    : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
     G_CALLBACK (ga_orphans_hide_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
 
   btn = gtk_button_new_with_mnemonic ("Show _all");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Show all nodes and edges", NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Show all nodes and edges" : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
     G_CALLBACK (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
@@ -284,15 +284,16 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   btn = gtk_check_button_new_with_mnemonic ("Show _neighbors");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "To display only a node and its neighbors, turn this on, select 'Identify' in ggobi, and double-click to make a label 'sticky.'", NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "To display only a node and its neighbors, turn this on, select 'Identify' in ggobi, and double-click to make a label 'sticky.'"
+    : NULL);
   g_signal_connect (G_OBJECT (btn), "toggled",
     G_CALLBACK (show_neighbors_toggle_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
 
   btn = gtk_button_new_with_mnemonic ("Show _all");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Show all nodes and edges", NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Show all nodes and edges" : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
     G_CALLBACK (ga_nodes_show_cb), inst);  /*-- show all nodes --*/
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);
@@ -305,8 +306,9 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   gtk_box_pack_start (GTK_BOX (hbox), label, false, false, 0);
   opt = gtk_combo_box_new_text();
   gtk_label_set_mnemonic_widget(GTK_LABEL(label), opt);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), opt,
-    "Select the size of the selected node's neighborhood to show; ie, the number of steps from the node.", NULL);
+  gtk_widget_set_tooltip_text (opt, gg->tips ?
+    "Select the size of the selected node's neighborhood to show; ie, the number of steps from the node."
+    : NULL);
   gtk_box_pack_start (GTK_BOX (hbox), opt, false, false, 0);
   populate_combo_box (opt, (gchar**) neighborhood_depth_lbl, G_N_ELEMENTS(neighborhood_depth_lbl),
     G_CALLBACK(neighborhood_depth_cb), inst);
@@ -326,8 +328,8 @@ create_graphact_window(ggobid *gg, PluginInstance *inst)
   hbox = gtk_hbox_new (true, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
   btn = gtk_button_new_with_mnemonic ("_Shadow orphaned edges");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Shadow brush edges connected to shadowed nodes", NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Shadow brush edges connected to shadowed nodes" : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
     G_CALLBACK (ga_edge_tidy_cb), inst);
   gtk_box_pack_start (GTK_BOX (hbox), btn, false, false, 2);

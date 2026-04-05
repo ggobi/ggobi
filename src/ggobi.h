@@ -148,14 +148,11 @@ struct _ggobid {
   GList *control_panels;
 
   GtkWidget *main_window, *main_menubar;
-  GtkUIManager *main_menu_manager;
   GtkWidget *display_menu; /*-- menu labelled 'Window' --*/
-  GtkAccelGroup *main_accel_group, *pmode_accel_group, *imode_accel_group;
-  GtkWidget *pmode_item, *imode_item;
+  GtkAccelGroup *main_accel_group;
   GtkWidget *imode_frame;  /* this should be cpanel_frame, actually */
   gboolean tips;
   gboolean firsttime;
-  guint mode_merge_id;
 
   /* status bar in main console window */
   void (*status_message_func) (gchar *, ggobid *);

@@ -535,7 +535,6 @@ scatmatDisplayClassInit (GGobiScatmatDisplayClass * klass)
   klass->parent_class.plotted_vars_get = plottedVarsGet;
   klass->parent_class.createWithVars = createWithVars;
   klass->parent_class.display_set = displaySet;
-  klass->parent_class.mode_ui_get = scatmat_mode_ui_get;
   klass->parent_class.handles_interaction = handlesInteraction;
 
   klass->parent_class.event_handlers_toggle = scatmatEventHandlersToggle;

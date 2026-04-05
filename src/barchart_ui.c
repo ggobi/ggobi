@@ -84,34 +84,6 @@ cpanel_barchart_make (ggobid * gg)
 }
 
 /*--------------------------------------------------------------------*/
-/*                   Resetting the main menubar                       */
-/*--------------------------------------------------------------------*/
-
-static const gchar *mode_ui_str = "<ui>" "	<menubar>"
-/*"		<menu action='PMode'>"
-"			<menuitem action='ExtendedDisplayPMode'/>"
-"			<menuitem action='1D Tour'/>"
-"		</menu>"*/
-  "		<menu action='IMode'>"
-  "			<menuitem action='DefaultIMode'/>" "			<separator/>"
-#if BARCHART_SCALE
-  "			<menuitem action='Scale'/>"
-#endif
-  "			<menuitem action='Brush'/>"
-  "			<menuitem action='Identify'/>" "		</menu>" "	</menubar>" "</ui>";
-
-
-const gchar *
-barchart_mode_ui_get (displayd * display)
-{
-  return (mode_ui_str);
-}
-
-/*--------------------------------------------------------------------*/
-/*                   End of main menubar section                      */
-/*--------------------------------------------------------------------*/
-
-/*--------------------------------------------------------------------*/
 /*                      Control panel updating                        */
 /*--------------------------------------------------------------------*/
 

@@ -46,15 +46,73 @@ ggobi_button_new_with_icon_name (const gchar *mnemonic, const gchar *icon_name)
   return button;
 }
 
-void
-ggobi_action_group_set_icon_name (GtkActionGroup *group,
-                                  const gchar *action_name,
-                                  const gchar *icon_name)
+GtkAccelGroup *
+ggobi_window_add_accel_group (GtkWidget *window)
 {
-  GtkAction *action = gtk_action_group_get_action (group, action_name);
+  GtkAccelGroup *accel_group = gtk_accel_group_new ();
 
-  if (action != NULL)
-    g_object_set (G_OBJECT (action), "icon-name", icon_name, NULL);
+  gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
+  return accel_group;
+}
+
+GtkWidget *
+ggobi_menu_add_submenu (GtkWidget *menu_bar, const gchar *label)
+{
+  GtkWidget *item = gtk_menu_item_new_with_mnemonic (label);
+  GtkWidget *menu = gtk_menu_new ();
+
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu_bar), item);
+
+  return menu;
+}
+
+static void
+ggobi_menu_item_add_accelerator (GtkWidget *item, const gchar *accel,
+                                 GtkAccelGroup *accel_group)
+{
+  guint key = 0;
+  GdkModifierType modifiers = 0;
+
+  if (accel == NULL || *accel == '\0' || accel_group == NULL)
+    return;
+
+  gtk_accelerator_parse (accel, &key, &modifiers);
+  if (key != 0)
+    gtk_widget_add_accelerator (item, "activate", accel_group, key,
+                                modifiers, GTK_ACCEL_VISIBLE);
+}
+
+GtkWidget *
+ggobi_menu_append_item (GtkWidget *menu, const gchar *label, const gchar *accel,
+                        GtkAccelGroup *accel_group, GCallback callback,
+                        gpointer data)
+{
+  GtkWidget *item = gtk_menu_item_new_with_mnemonic (label);
+
+  if (callback != NULL)
+    g_signal_connect (G_OBJECT (item), "activate", callback, data);
+  ggobi_menu_item_add_accelerator (item, accel, accel_group);
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+
+  return item;
+}
+
+GtkWidget *
+ggobi_menu_append_check_item (GtkWidget *menu, const gchar *label,
+                              const gchar *accel, GtkAccelGroup *accel_group,
+                              gboolean active, GCallback callback,
+                              gpointer data)
+{
+  GtkWidget *item = gtk_check_menu_item_new_with_mnemonic (label);
+
+  if (callback != NULL)
+    g_signal_connect (G_OBJECT (item), "toggled", callback, data);
+  ggobi_menu_item_add_accelerator (item, accel, accel_group);
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), active);
+
+  return item;
 }
 
 /*
@@ -226,36 +284,6 @@ quick_message (const gchar * const message, gboolean modal)
   gtk_dialog_run (GTK_DIALOG (dialog));
 
   gtk_widget_destroy (dialog);
-}
-
-/* This function produces a menu bar from a GtkUIManager and ui spec.
-   It accepts a GtkUIManager that is assumed to be configured with
-   the necessary actions referenced from the ui_xml that is loaded into the
-   manager before creation of the menubar. If window is non-NULL then the
-   accelerators from the GtkUIManager are loaded into the specified window.
-*/
-GtkWidget *
-create_menu_bar (GtkUIManager * manager, const gchar * ui_xml,
-                 GtkWidget * window)
-{
-  GError *error = NULL;
-  GtkWidget *mbar = NULL;
-
-  if (!gtk_ui_manager_add_ui_from_string (manager, ui_xml, -1, &error)) {
-    g_message ("building ui failed: %s\n", error->message);
-    g_error_free (error);
-  }
-  else {
-    if (window) {
-      gtk_window_add_accel_group (GTK_WINDOW (window),
-                                  gtk_ui_manager_get_accel_group (manager));
-      g_object_set_data_full (G_OBJECT (window), "ui-manager", manager,
-                              g_object_unref);
-    }
-    mbar = gtk_ui_manager_get_widget (manager, "/menubar");
-  }
-
-  return (mbar);
 }
 
 void
@@ -788,7 +816,6 @@ create_prefixed_variable_notebook (GtkWidget * box,
 /*--------------------------------------------------------------------*/
 /* These are for the benefit of plugins, though they might have other */
 /* uses as well                                                       */
-/* - might be nice to move to a GtkUIManager paradigm here... mfl     */
 /*--------------------------------------------------------------------*/
 
 GtkWidget *
@@ -820,10 +847,7 @@ gboolean
 GGobi_addToolsMenuWidget (GtkWidget * entry, ggobid * gg)
 {
   GtkWidget *tools_menu = NULL, *tools_item = NULL;
-  GtkUIManager *manager;
-
-  manager = gg->main_menu_manager;  /* gtk_item_factory_from_path ("<main>"); */
-  tools_item = gtk_ui_manager_get_widget (manager, "/menubar/Tools");
+  tools_item = widget_find_by_name (gg->main_menubar, "MAIN:tools_topmenu");
 
   if (tools_item)
     tools_menu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (tools_item));
@@ -838,15 +862,34 @@ GGobi_addToolsMenuWidget (GtkWidget * entry, ggobid * gg)
 }
 
 void
-GGobi_addToolAction (GtkActionEntry * entry, gpointer * data, ggobid * gg)
+GGobi_addToolAction (const GGobiToolActionEntry *entry, gpointer data,
+                     ggobid *gg)
 {
-  GtkActionGroup *actions = gtk_action_group_new (entry->name);
-  gtk_action_group_add_actions (actions, entry, 1, data);
-  gtk_ui_manager_insert_action_group (gg->main_menu_manager, actions, -1);
-  gtk_ui_manager_add_ui (gg->main_menu_manager,
-                         gtk_ui_manager_new_merge_id (gg->main_menu_manager),
-                         "/menubar/Tools/", entry->name, entry->name,
-                         GTK_UI_MANAGER_AUTO, false);
+  GtkWidget *item;
+  guint key = 0;
+  GdkModifierType modifiers = 0;
+
+  if (entry == NULL || entry->label == NULL)
+    return;
+
+  item = gtk_menu_item_new_with_mnemonic (entry->label);
+  if (entry->tooltip != NULL)
+    gtk_widget_set_tooltip_text (item, gg->tips ? entry->tooltip : NULL);
+  if (entry->callback != NULL)
+    g_signal_connect (G_OBJECT (item), "activate", entry->callback, data);
+  if (entry->accel != NULL && gg->main_accel_group != NULL) {
+    gtk_accelerator_parse (entry->accel, &key, &modifiers);
+    if (key != 0)
+      gtk_widget_add_accelerator (item, "activate", gg->main_accel_group,
+                                  key, modifiers, GTK_ACCEL_VISIBLE);
+  }
+  if (entry->name != NULL)
+    gtk_widget_set_name (item, entry->name);
+  GGobi_widget_set (item, gg, true);
+  if (GGobi_addToolsMenuWidget (item, gg))
+    gtk_widget_show (item);
+  else
+    gtk_widget_destroy (item);
 }
 
 GtkWidget *

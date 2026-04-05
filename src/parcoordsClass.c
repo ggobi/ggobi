@@ -613,8 +613,6 @@ parcoordsDisplayClassInit (GGobiParCoordsDisplayClass * klass)
   /* no unset */
   klass->parent_class.display_set = displaySet;
 
-  klass->parent_class.mode_ui_get = parcoords_mode_ui_get;
-
   /* no build_symbol_vectors */
 
   /* ruler ranges set. */

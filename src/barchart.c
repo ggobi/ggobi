@@ -58,25 +58,12 @@ static const gchar *menu_ui =
   "			<menuitem action='ShowAxes'/>" "		</menu>" "	</menubar>" "</ui>";
 */
 
-static const gchar *menu_ui =
-  "<ui>"
-  "	<menubar>"
-  "	</menubar>" "</ui>";
-
 static void
-action_toggle_show_bars (GtkToggleAction * action, displayd * display)
+action_toggle_show_bars (GtkCheckMenuItem *item, displayd *display)
 {
-  set_display_option (gtk_toggle_action_get_active (action), DOPT_POINTS,
+  set_display_option (gtk_check_menu_item_get_active (item), DOPT_POINTS,
                       display);
 }
-
-/* the 'ShowPoints' display action is overridden here for bar display */
-static GtkToggleActionEntry toggle_entries[] = {
-  {"ShowPoints", NULL, "Show _bars", "<control>B", "Toggle bar display",
-   G_CALLBACK (action_toggle_show_bars), true},
-};
-
-static guint n_toggle_entries = G_N_ELEMENTS (toggle_entries);
 
 displayd *
 barchart_new (gboolean use_window, gboolean missing_p, splotd * sp, GGobiData * d, ggobid * gg)
@@ -96,6 +83,10 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
                 splotd * sp, gint var, GGobiData * d, ggobid * gg)
 {
   GtkWidget *table, *vbox;
+  GtkWidget *options_item, *options_menu, *show_bars_item;
+  GtkAccelGroup *accel_group = NULL;
+  guint key = 0;
+  GdkModifierType modifiers = 0;
 
   if (d == NULL || d->ncols < 1)
     return (NULL);
@@ -127,17 +118,26 @@ createBarchart (displayd * display, gboolean use_window, gboolean missing_p,
   /*-- Add the main menu bar --*/
   vbox = GTK_WIDGET (display);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
-  display->menu_manager = display_menu_manager_create (display);
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->window) {
-    GtkActionGroup *actions = gtk_action_group_new ("BarchartActions");
-    gtk_action_group_add_toggle_actions (actions, toggle_entries,
-                                         n_toggle_entries, display);
-    gtk_ui_manager_insert_action_group (display->menu_manager, actions, 0);
-    g_object_unref (G_OBJECT (actions));
-    display->menubar =
-      create_menu_bar (display->menu_manager, menu_ui,
-                       GGOBI_WINDOW_DISPLAY (display)->window);
+    display_menu_bar_create (display, GGOBI_WINDOW_DISPLAY (display)->window);
+    accel_group = display_menu_accel_group_get (display);
+
+    options_item = gtk_menu_item_new_with_mnemonic ("_Options");
+    options_menu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (options_item), options_menu);
+    gtk_menu_shell_append (GTK_MENU_SHELL (display->menubar), options_item);
+
+    show_bars_item = gtk_check_menu_item_new_with_mnemonic ("Show _bars");
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (show_bars_item),
+                                    display->options.points_show_p);
+    g_signal_connect (G_OBJECT (show_bars_item), "toggled",
+                      G_CALLBACK (action_toggle_show_bars), display);
+    gtk_accelerator_parse ("<control>B", &key, &modifiers);
+    if (key != 0 && accel_group != NULL)
+      gtk_widget_add_accelerator (show_bars_item, "activate", accel_group,
+                                  key, modifiers, GTK_ACCEL_VISIBLE);
+    gtk_menu_shell_append (GTK_MENU_SHELL (options_menu), show_bars_item);
 
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY (display)->window),
                        vbox);

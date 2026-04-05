@@ -480,7 +480,6 @@ barchartDisplayClassInit (GGobiBarChartDisplayClass * klass)
   klass->parent_class.cpanel_set = barchartCPanelSet;
   klass->parent_class.display_unset = NULL;
   klass->parent_class.display_set = barchartDisplaySet;
-  klass->parent_class.mode_ui_get = barchart_mode_ui_get;
   klass->parent_class.variable_plotted_p = barchart_is_variable_plotted;
 
   klass->parent_class.build_symbol_vectors = barchart_build_symbol_vectors;

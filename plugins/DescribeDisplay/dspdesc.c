@@ -12,7 +12,7 @@
 
 void       close_dspdesc_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_dspdesc_window(ggobid *gg, PluginInstance *inst);
-void       show_dspdesc_window(GtkAction *action, PluginInstance *inst);
+void       show_dspdesc_window(GtkWidget *widget, PluginInstance *inst);
 
 static void plugin_destroy (PluginInstance *inst);
 
@@ -33,9 +33,9 @@ dspdesc_init (dspdescd *desc)
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  static GtkActionEntry entry = {
-    "DescribeDisplay", NULL, "Save Display Description", 
-    NULL, "Save an S-language description of this display", 
+  static const GGobiToolActionEntry entry = {
+    "DescribeDisplay", "Save Display Description",
+    NULL, "Save an S-language description of this display",
     G_CALLBACK (show_dspdesc_window)
   };
   
@@ -43,15 +43,16 @@ addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   inst->info = plugin;
   inst->gg = gg;
 
-  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
+  GGOBI(addToolAction)(&entry, inst, gg);
   
   return(true);
 }
 
 
 void
-show_dspdesc_window (GtkAction *action, PluginInstance *inst)
+show_dspdesc_window (GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
   dspdescd *desc;
   desc = (dspdescd *) g_malloc (sizeof (dspdescd));
 
@@ -73,7 +74,6 @@ GtkWidget *
 create_dspdesc_window(ggobid *gg, PluginInstance *inst)
 {
   GtkWidget *window, *hb, *label, *entry;
-  GtkTooltips *tips = gtk_tooltips_new ();
   dspdescd *desc = dspdescFromInst (inst); 
 
   window = gtk_file_chooser_dialog_new("Save display description", NULL, 
@@ -91,8 +91,8 @@ create_dspdesc_window(ggobid *gg, PluginInstance *inst)
   entry = gtk_entry_new ();
   gtk_label_set_mnemonic_widget(GTK_LABEL(label), entry);
   g_object_set_data(G_OBJECT(window), "TITLE", entry);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
-    "Type in the figure title", NULL);
+  gtk_widget_set_tooltip_text (entry, gg->tips ?
+    "Type in the figure title" : NULL);
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
   gtk_widget_show_all(hb);
   
@@ -127,4 +127,3 @@ void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   plugin_destroy(inst);
 }
-

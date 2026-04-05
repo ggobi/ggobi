@@ -27,18 +27,6 @@
 #define WIDTH   150
 #define HEIGHT  100
 
-/*--------------------------------------------------------------------*/
-/*                   Options section                                  */
-/*--------------------------------------------------------------------*/
-
-static const gchar *timeplot_ui =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='Options'>"
-  "			<menuitem action='ShowPoints'/>"
-  "			<menuitem action='ShowLines'/>" "		</menu>" "	</menubar>" "</ui>";
-
-
 void
 tsplot_reset_arrangement (displayd * display, gint arrangement, ggobid * gg)
 {
@@ -97,7 +85,7 @@ displayd *
 tsplot_new (displayd * display, gboolean use_window, gboolean missing_p, 
             gint nvars, gint * vars, GGobiData * d, ggobid * gg)
 {
-  GtkWidget *vbox, *frame;
+  GtkWidget *vbox, *frame, *options_menu;
   gint i, timeVariable, cur;
   splotd *sp;
   gint nplots;
@@ -207,14 +195,17 @@ tsplot_new (displayd * display, gboolean use_window, gboolean missing_p,
 */
   vbox = GTK_WIDGET (display);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
-  display->menu_manager = display_menu_manager_create (display);
-  
   if (GGOBI_WINDOW_DISPLAY (display)->useWindow) {
+    GtkWidget *options_menu;
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY (display)->window),
                        vbox);
-    display->menubar = create_menu_bar (display->menu_manager, timeplot_ui,
-                                        GGOBI_WINDOW_DISPLAY (display)->
-                                        window);
+    display_menu_bar_create (display, GGOBI_WINDOW_DISPLAY (display)->window);
+    options_menu = display_menu_ensure (display, "_Options",
+                                        "DISPLAY:options_topmenu");
+    display_menu_append_display_option_item (options_menu, DOPT_POINTS,
+                                             display);
+    display_menu_append_display_option_item (options_menu, DOPT_WHISKERS,
+                                             display);
 
     gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
   }

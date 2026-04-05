@@ -125,30 +125,6 @@ cpanel_tsplot_make (ggobid * gg)
   return (cpanel);
 }
 
-
-/*--------------------------------------------------------------------*/
-/*                   Resetting the main menubar                       */
-/*--------------------------------------------------------------------*/
-
-static const gchar *mode_ui_str =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='IMode'>"
-  "			<menuitem action='DefaultIMode'/>"
-  "			<separator/>"
-  "			<menuitem action='Brush'/>"
-  "			<menuitem action='Identify'/>" "		</menu>" "	</menubar>" "</ui>";
-
-const gchar *
-tsplot_mode_ui_get (displayd * display)
-{
-  return (mode_ui_str);
-}
-
-/*--------------------------------------------------------------------*/
-/*                   End of main menubar section                      */
-/*--------------------------------------------------------------------*/
-
 /*--------------------------------------------------------------------*/
 /*                      Control panel updating                        */
 /*--------------------------------------------------------------------*/

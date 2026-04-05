@@ -43,28 +43,6 @@ cpanel_scatmat_make (ggobid * gg)
   return panel->w;
 }
 
-
-/*------------------------------------------------------------------------*/
-/*                       Resetting the main menubar                       */
-/*------------------------------------------------------------------------*/
-
-static const gchar *mode_ui_str =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='IMode'>"
-  "			<menuitem action='DefaultIMode'/>"
-  "			<separator/>"
-  "			<menuitem action='Scale'/>"
-  "			<menuitem action='Brush'/>"
-  "			<menuitem action='Identify'/>" "		</menu>" "	</menubar>" "</ui>";
-
-const gchar *
-scatmat_mode_ui_get (displayd * display)
-{
-  return (mode_ui_str);
-}
-
-
 /*--------------------------------------------------------------------*/
 /*                      Control panel updating                        */
 /*--------------------------------------------------------------------*/

@@ -12,57 +12,19 @@
 
 void       close_ggvis_window(GtkWidget *w, PluginInstance *inst);
 void       create_ggvis_window(ggvisd *ggv, PluginInstance *inst);
-void       show_ggvis_window (GtkAction *action, PluginInstance *inst);
+void       show_ggvis_window (GtkWidget *widget, PluginInstance *inst);
+static GtkWidget *create_ggvis_menubar (GtkWidget *window, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  static GtkActionEntry entry = {
-    "GGVis", NULL, "ggvis (MDS)", NULL, "Multi-dimensional scaling tool", 
+  static const GGobiToolActionEntry entry = {
+    "GGVis", "ggvis (MDS)", NULL, "Multi-dimensional scaling tool",
     G_CALLBACK (show_ggvis_window)
   };
-  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
+  GGOBI(addToolAction)(&entry, inst, gg);
   return(true);
 }
-
-static const gchar *menu_ui =
-"<ui>"
-"	<menubar>"
-"		<menu action='View'>"
-"			<menuitem action='ShepardPlot'/>"
-"		</menu>"
-"		<menu action='Reset'>"
-"			<menuitem action='ReinitLayout'/>"
-"			<menuitem action='ScrambleLayout'/>"
-"			<menuitem action='ResetMDSParameters'/>"
-"		</menu>"
-#if 0
-"		<menu action='Help'>"
-"			<menuitem action='MDSBackground'/>"
-"			<menuitem action='MDSControls'/>"
-"			<menuitem action='KruskalShepardFormula'/>"
-"			<menuitem action='TorgersonGowerFormula'/>"
-"		</menu>"
-#endif
-"	</menubar>"
-"</ui>";
-
-static GtkActionEntry entries[] = {
-  { "View", NULL, "_View" },
-  { "ShepardPlot", NULL, "_Shepard Plot", "<control>S", "Display a Shepard Plot", 
-    G_CALLBACK(create_shepard_data_cb)
-  },
-  { "Reset", NULL, "_Reset" },
-  { "ReinitLayout", GTK_STOCK_REFRESH, "Reinit _Layout", "<control>L", "Reinitialize the layout",
-    G_CALLBACK(mds_reinit_cb)
-  },
-  { "ScrambleLayout", NULL, "_Scramble Layout", "<control>A", "Scramble the layout",
-    G_CALLBACK(mds_scramble_cb)
-  },
-  { "ResetMDSParameters", NULL, "Reset MDS _Parameters", "<control>P", "Reset the MDS Parameters",
-    G_CALLBACK(mds_reset_params_cb)
-  },
-};
 
 static const gchar *const dsource_lbl[] = {
   "Unweighted graph dist", 
@@ -86,8 +48,9 @@ static const gchar *const constrained_lbl[] = {
   "First two variables frozen"};
 
 void
-show_ggvis_window (GtkAction *action, PluginInstance *inst)
+show_ggvis_window (GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
   GSList *l;
   GGobiData *d;
   gboolean ok = false;
@@ -133,6 +96,28 @@ ggvisFromInst (PluginInstance *inst)
     ggv = (ggvisd *) g_object_get_data(G_OBJECT(window), "ggvisd");
 
   return ggv;
+}
+
+static GtkWidget *
+create_ggvis_menubar (GtkWidget *window, PluginInstance *inst)
+{
+  GtkWidget *menu_bar = gtk_menu_bar_new ();
+  GtkWidget *menu;
+  GtkAccelGroup *accel_group = ggobi_window_add_accel_group (window);
+
+  menu = ggobi_menu_add_submenu (menu_bar, "_View");
+  ggobi_menu_append_item (menu, "_Shepard Plot", "<control>S", accel_group,
+                          G_CALLBACK (create_shepard_data_cb), inst);
+
+  menu = ggobi_menu_add_submenu (menu_bar, "_Reset");
+  ggobi_menu_append_item (menu, "Reinit _Layout", "<control>L", accel_group,
+                          G_CALLBACK (mds_reinit_cb), inst);
+  ggobi_menu_append_item (menu, "_Scramble Layout", "<control>A",
+                          accel_group, G_CALLBACK (mds_scramble_cb), inst);
+  ggobi_menu_append_item (menu, "Reset MDS _Parameters", "<control>P",
+                          accel_group, G_CALLBACK (mds_reset_params_cb), inst);
+
+  return menu_bar;
 }
 
 void ggvis_scale_set_default_values (GtkScale *scale)
@@ -226,10 +211,6 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   GtkWidget *swin, *tree_view;
   GSList *l;
   GtkListStore *model;
-  GtkUIManager *manager;
-  GtkActionGroup *actions;
-
-  ggv->tips = gtk_tooltips_new ();
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   g_object_set_data(G_OBJECT (window), "ggvisd", ggv);
@@ -240,16 +221,12 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   g_signal_connect (G_OBJECT (window), "destroy",
     G_CALLBACK (close_ggvis_window), inst);
 
-  main_vbox = gtk_vbox_new (false, 1);
+  main_vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER(main_vbox), 5); 
   gtk_container_add (GTK_CONTAINER(window), main_vbox);
 
   /* main menu bar */
-  manager = gtk_ui_manager_new();
-  actions = gtk_action_group_new("ggvis");
-  gtk_action_group_add_actions(actions, entries, G_N_ELEMENTS(entries), inst);
-  gtk_ui_manager_insert_action_group(manager, actions, 0);
-  menubar = create_menu_bar (manager, menu_ui, window);
+  menubar = create_ggvis_menubar (window, inst);
   gtk_box_pack_start (GTK_BOX (main_vbox), menubar, false, false, 0);
 
 /*-- notebook for datads, distance matrix, run controls --*/
@@ -260,7 +237,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
 /*-- "Specify datasets" list widgets --*/
 
-  hbox = gtk_hbox_new (true, 10);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
 
 /*
@@ -312,7 +289,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
   g_signal_connect (G_OBJECT (gg), "datad_added",
-    G_CALLBACK(ggv_tree_view_datad_added_cb), GTK_OBJECT (tree_view));
+    G_CALLBACK(ggv_tree_view_datad_added_cb), tree_view);
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
@@ -332,28 +309,28 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /*-- Task controls --*/
 
-  vbox = gtk_hbox_new (false, 1);
+  vbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
 
   frame = gtk_frame_new ("Task Definition");
   gtk_container_set_border_width (GTK_CONTAINER (frame), 1);
   gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 2);
 
-  vb = gtk_vbox_new (false, 1);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
   radio1 = gtk_radio_button_new_with_mnemonic (NULL, "_Dissimilarity analysis");
   gtk_widget_set_name (GTK_WIDGET(radio1), "MDS");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), radio1,
-    "Perform multidimensional scaling (MDS) for the purpose of dissimilarity analysis; dissimilarities (distances) are provided as an edge variable.",
-    NULL);
+  gtk_widget_set_tooltip_text (radio1, gg->tips ?
+    "Perform multidimensional scaling (MDS) for the purpose of dissimilarity analysis; dissimilarities (distances) are provided as an edge variable."
+    : NULL);
   group = gtk_radio_button_group (GTK_RADIO_BUTTON (radio1));
   radio2 = gtk_radio_button_new_with_mnemonic (group, "Graph _Layout");
   gtk_widget_set_name (GTK_WIDGET(radio2), "GRAPH_LAYOUT");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), radio2,
-    "Perform multidimensional scaling (MDS) for the purpose of laying out a graph.",
-    NULL);
+  gtk_widget_set_tooltip_text (radio2, gg->tips ?
+    "Perform multidimensional scaling (MDS) for the purpose of laying out a graph."
+    : NULL);
 
   GTK_TOGGLE_BUTTON(radio1)->active = (ggv->mds_task == DissimAnalysis);
   GTK_TOGGLE_BUTTON(radio2)->active = (ggv->mds_task == GraphLayout);
@@ -370,15 +347,15 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   gtk_container_set_border_width (GTK_CONTAINER (frame), 1);
   gtk_box_pack_start (GTK_BOX (vbox), frame, true, true, 2);
 
-  vb = gtk_vbox_new (false, 1);
+  vb = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vb), 3);
   gtk_container_add (GTK_CONTAINER(frame), vb);
 
   btn = gtk_check_button_new_with_mnemonic ("Use edge _weights");
   gtk_widget_set_name (GTK_WIDGET(btn), "MDS_WEIGHTS");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), btn,
-    "The distance matrix for a graph is the minimum number of edges connecting any pair of nodes.  These distances can be weighted if an edge variable is supplied.",
-    NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "The distance matrix for a graph is the minimum number of edges connecting any pair of nodes.  These distances can be weighted if an edge variable is supplied."
+    : NULL);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (btn), false);
   gtk_widget_set_sensitive (btn, ggv->mds_task == GraphLayout);
   g_signal_connect (G_OBJECT (btn), "toggled",
@@ -387,9 +364,9 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   btn = gtk_check_button_new_with_mnemonic ("_Complete graph distances");
   gtk_widget_set_name (GTK_WIDGET(btn), "MDS_COMPLETE");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), btn,
-    "Fill in a missing D[i,j] using a shortest path algorithm when a path exists from i to j; if not checked, D[i,j] is treated as missing.",
-    NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Fill in a missing D[i,j] using a shortest path algorithm when a path exists from i to j; if not checked, D[i,j] is treated as missing."
+    : NULL);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
     ggv->Dtarget_source == LinkDist);
   gtk_widget_set_sensitive (btn, (ggv->mds_task == GraphLayout));
@@ -402,10 +379,10 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
 /*-- "Definition of D" controls --*/
 
-  hbox = gtk_hbox_new (false, 1);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (hbox), 5);
 
-  vbox = gtk_vbox_new (false, 1);
+  vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 2);
 
   /*-- include only edge sets.  --*/
@@ -421,7 +398,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   } else ggv->tree_view_dist = NULL;
 
   /*-- Report on D --*/
-  hb = gtk_hbox_new (false, 1);
+  hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
   gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 2);
 
   label = gtk_label_new_with_mnemonic ("D_ist");
@@ -476,8 +453,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
   gtk_label_set_mnemonic_widget(GTK_LABEL(label), hscale);
   gtk_widget_set_name (hscale, "stepsize_scale");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (ggv->tips), hscale,
-    "Stepsize", NULL);
+  gtk_widget_set_tooltip_text (hscale, gg->tips ? "Stepsize" : NULL);
   //gtk_widget_set_usize (GTK_WIDGET (hscale), 100, 30);
   ggvis_scale_set_default_values (GTK_SCALE(hscale));
   gtk_scale_set_digits (GTK_SCALE(hscale), 4);
@@ -491,7 +467,7 @@ create_ggvis_window(ggvisd *ggv, PluginInstance *inst)
 
   /* Run and step */
 
-  hbox = gtk_hbox_new (false, 1);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 1);
   gtk_box_pack_start (GTK_BOX (vbox), hbox, false, false, 2);
 
   /*-- run --*/

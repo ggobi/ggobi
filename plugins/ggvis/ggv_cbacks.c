@@ -449,8 +449,9 @@ void mds_step_cb (GtkWidget *btn, PluginInstance *inst)
   mds_once (true, ggv, gg);
   update_ggobi (ggv, gg);
 }
-void mds_reinit_cb (GtkAction *action, PluginInstance *inst)
+void mds_reinit_cb (GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
 
@@ -467,8 +468,9 @@ void mds_reinit_cb (GtkAction *action, PluginInstance *inst)
   update_ggobi (ggv, gg);
 }
 
-void mds_scramble_cb (GtkAction *action, PluginInstance *inst)
+void mds_scramble_cb (GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
 
@@ -486,8 +488,9 @@ void mds_scramble_cb (GtkAction *action, PluginInstance *inst)
 }
 
 void
-mds_reset_params_cb (GtkAction *action, PluginInstance *inst)
+mds_reset_params_cb (GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
   GtkWidget *window, *w;

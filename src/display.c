@@ -314,7 +314,9 @@ set_display_options (displayd * display, ggobid * gg)
   for (i = DOPT_POINTS; i <= DOPT_WHISKERS; i++) {
     if (i == DOPT_EDGES_U || i == DOPT_EDGES_D || i == DOPT_EDGES_A ||
         i == DOPT_EDGES_H)
-      if (display->edge_merge == -1)
+      if (display->menubar == NULL ||
+          widget_find_by_name (display->menubar,
+                               "DISPLAY:edges_topmenu") == NULL)
         continue;
 
     switch (i) {
@@ -486,7 +488,6 @@ display_add (displayd * display, ggobid * gg)
   /*-- if starting from the API, or changing mode, update the mode menus --*/
   if (pmode_prev != gg->current_display->cpanel.pmode ||
       imode_prev != gg->current_display->cpanel.imode) {
-    /*main_miscmenus_update (pmode_prev, imode_prev, oldDisplay, gg); */
     display_mode_menus_update (pmode_prev, imode_prev,
                                gg->current_display, gg);
   }
@@ -686,20 +687,13 @@ display_set_current (displayd * new_display, ggobid * gg)
        menus.
      */
     if (GGOBI_IS_EXTENDED_DISPLAY (gg->current_display)) {
-      gtk_ui_manager_remove_ui (gg->main_menu_manager, gg->mode_merge_id);
-      /* Allow the extended display to override the submenu_destroy
-         call.  If it doesn't provide a method, then call
-         submenu_destroy. */
       void (*f) (displayd * dpy) =
         GGOBI_EXTENDED_DISPLAY_GET_CLASS (gg->current_display)->display_unset;
-      if (f) {
+      if (f)
         f (gg->current_display);
-        f (gg->current_display);
-      }
     }
   }
 
-  /* Now do the setup for the new display.  */
   if (GGOBI_IS_WINDOW_DISPLAY (new_display)) {
     if (GGOBI_WINDOW_DISPLAY (new_display)->useWindow) {
       title = computeTitle (true, new_display, gg);
@@ -710,26 +704,6 @@ display_set_current (displayd * new_display, ggobid * gg)
         g_free (title);
       }
     }
-
-    if (GGOBI_IS_EXTENDED_DISPLAY (new_display)) {
-      const gchar *(*ui_get) (displayd * dpy) =
-        GGOBI_EXTENDED_DISPLAY_GET_CLASS (new_display)->mode_ui_get;
-      if (ui_get) {
-        GError *error = NULL;
-        const gchar *ui = ui_get (new_display);
-        gg->mode_merge_id =
-          gtk_ui_manager_add_ui_from_string (gg->main_menu_manager, ui, -1,
-                                             &error);
-        if (error) {
-          g_message ("Could not merge main mode ui from display");
-          g_error_free (error);
-        }
-      }
-      void (*f) (displayd * dpy, ggobid * gg) =
-        GGOBI_EXTENDED_DISPLAY_GET_CLASS (new_display)->display_set;
-      if (f)
-        f (new_display, gg);
-    }
   }
 
   gg->current_display = new_display;
@@ -738,6 +712,8 @@ display_set_current (displayd * new_display, ggobid * gg)
     gg->current_splot = (splotd *) new_display->splots->data;
     new_display->current_splot = gg->current_splot;
   }
+
+  rebuild_mode_menus (new_display, gg);
 
   g_signal_emit (G_OBJECT (gg), GGobiSignals[DISPLAY_SELECTED_SIGNAL], 0,
                  new_display);
@@ -913,11 +889,12 @@ display_type_handles_projection (displayd * display, ProjectionMode pmode)
 {
   gboolean handles = false;
   ProjectionMode v = pmode;
+  GGobiExtendedDisplayClass *klass;
 
   if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
-    handles =
-      GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->handles_projection (display,
-                                                                      v);
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+    if (klass->handles_projection != NULL)
+      handles = klass->handles_projection (display, v);
   }
 
   return handles;
@@ -928,11 +905,12 @@ display_type_handles_interaction (displayd * display, InteractionMode imode)
 {
   gboolean handles = false;
   InteractionMode v = imode;
+  GGobiExtendedDisplayClass *klass;
 
   if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
-    handles =
-      GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->
-      handles_interaction (display, v);
+    klass = GGOBI_EXTENDED_DISPLAY_GET_CLASS (display);
+    if (klass->handles_interaction != NULL)
+      handles = klass->handles_interaction (display, v);
   }
 
   return handles;
@@ -941,31 +919,28 @@ display_type_handles_interaction (displayd * display, InteractionMode imode)
 gboolean
 display_copy_edge_options (displayd * dsp, displayd * dspnew)
 {
-  GtkAction *action;
+  GtkWidget *item;
 
   dspnew->options.edges_undirected_show_p =
     dsp->options.edges_undirected_show_p;
-  action = gtk_ui_manager_get_action (dspnew->menu_manager,
-                                      "/menubar/Edges/ShowUndirectedEdges");
-  if (action) {
-    gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action),
+  item = widget_find_by_name (dspnew->menubar, "DISPLAY:show_undirected_edges");
+  if (GTK_IS_CHECK_MENU_ITEM (item)) {
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item),
                                   dspnew->options.edges_undirected_show_p);
   }
 
   dspnew->options.edges_directed_show_p = dsp->options.edges_directed_show_p;
-  action = gtk_ui_manager_get_action (dspnew->menu_manager,
-                                      "/menubar/Edges/ShowDirectedEdges");
-  if (action) {
-    gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action),
+  item = widget_find_by_name (dspnew->menubar, "DISPLAY:show_directed_edges");
+  if (GTK_IS_CHECK_MENU_ITEM (item)) {
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item),
                                   dspnew->options.edges_directed_show_p);
   }
 
   dspnew->options.edges_arrowheads_show_p =
     dsp->options.edges_arrowheads_show_p;
-  action = gtk_ui_manager_get_action (dspnew->menu_manager,
-                                      "/menubar/Edges/ShowArrowheadsOnly");
-  if (action) {
-    gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action),
+  item = widget_find_by_name (dspnew->menubar, "DISPLAY:show_arrowheads_only");
+  if (GTK_IS_CHECK_MENU_ITEM (item)) {
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item),
                                   dspnew->options.edges_arrowheads_show_p);
   }
 

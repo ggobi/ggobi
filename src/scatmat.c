@@ -30,15 +30,6 @@
 #define HEIGHT 200
 #define MAXNVARS 4              /* only used to set up the initial matrix */
 
-static const gchar *scatmat_ui =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='Options'>"
-  "			<menuitem action='ShowPoints'/>" "		</menu>" "	</menubar>" "</ui>";
-
-
-
-
 displayd *
 scatmat_new (displayd * display, gboolean use_window,
              gboolean missing_p, gint numRows, gint * rows,
@@ -142,12 +133,12 @@ scatmat_new (displayd * display, gboolean use_window,
 */
   vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
-  display->menu_manager = display_menu_manager_create (display);
   if (wdpy && wdpy->useWindow) {
     gtk_container_add (GTK_CONTAINER (wdpy->window), vbox);
-
-    display->menubar =
-      create_menu_bar (display->menu_manager, scatmat_ui, wdpy->window);
+    display_menu_bar_create (display, wdpy->window);
+    display_menu_append_display_option_item
+      (display_menu_ensure (display, "_Options", "DISPLAY:options_topmenu"),
+       DOPT_POINTS, display);
 
     /*
      * After creating the menubar, and populating the file menu,

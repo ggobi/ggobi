@@ -24,21 +24,6 @@
 #define HEIGHT  300
 
 
-/*--------------------------------------------------------------------*/
-/*                   Options section                                  */
-/*--------------------------------------------------------------------*/
-
-static const gchar* parcoords_ui =
-"<ui>"
-"	<menubar>"
-"		<menu action='Options'>"
-"			<menuitem action='ShowPoints'/>"
-"			<menuitem action='ShowLines'/>"
-"		</menu>"
-"	</menubar>"
-"</ui>";
-
-
 void
 parcoords_reset_arrangement (displayd *display, gint arrangement, ggobid *gg) {
   GList *l;
@@ -193,13 +178,16 @@ parcoords_new (displayd *display, gboolean use_window, gboolean missing_p,
 */
   vbox = GTK_WIDGET(display); 
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
-  display->menu_manager = display_menu_manager_create(display);
-  
   if(GGOBI_IS_WINDOW_DISPLAY(display) && GGOBI_WINDOW_DISPLAY(display)->window) {
+    GtkWidget *options_menu;
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY(display)->window), vbox);
-    //gg->parcoords.accel_group = gtk_accel_group_new ();
-    display->menubar = create_menu_bar(display->menu_manager, parcoords_ui,
-			     GGOBI_WINDOW_DISPLAY(display)->window);
+    display_menu_bar_create (display, GGOBI_WINDOW_DISPLAY (display)->window);
+    options_menu = display_menu_ensure (display, "_Options",
+                                        "DISPLAY:options_topmenu");
+    display_menu_append_display_option_item (options_menu, DOPT_POINTS,
+                                             display);
+    display_menu_append_display_option_item (options_menu, DOPT_WHISKERS,
+                                             display);
 
     /*-- add a tooltip to the file menu --*/
     /* - tooltips are generally not done for toplevel menus

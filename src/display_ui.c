@@ -53,7 +53,6 @@ display_menu_build (ggobid * gg)
   gint nd;
   GGobiData *d0;
   GtkWidget *item;
-
   if (gg == NULL || gg->d == NULL)
     return;
 
@@ -71,9 +70,6 @@ display_menu_build (ggobid * gg)
     }
   }
 
-  item = gtk_tearoff_menu_item_new ();
-  gtk_menu_shell_prepend (GTK_MENU_SHELL (gg->display_menu), item);
-
   /* Experiment: move the DisplayTree to the Display menu -- dfs */
   /* Add a separator before the mode-specific items */
   CreateMenuItem (gg->display_menu, NULL, "", "", NULL, NULL, NULL, NULL, gg);
@@ -89,11 +85,13 @@ display_menu_build (ggobid * gg)
 
   /*-- these two lines replace gtk_menu_popup --*/
   if (nd) {
+    GtkWidget *display_item =
+      widget_find_by_name (gg->main_menubar, "MAIN:display_topmenu");
+
     gtk_widget_show_all (gg->display_menu);
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM
-                               (gtk_ui_manager_get_widget
-                                (gg->main_menu_manager, "/menubar/Display")),
-                               gg->display_menu);
+    if (display_item != NULL)
+      gtk_menu_item_set_submenu (GTK_MENU_ITEM (display_item),
+                                 gg->display_menu);
   }
 }
 
@@ -223,265 +221,197 @@ buildExtendedDisplayMenu (ggobid * gg, gint nd, GGobiData * d0)
     el = el->next;
   }
 }
-#if 0 // unused on 3/12/06
 static void
-action_show_control_panel_cb (GtkAction * action, displayd * display)
-{
-  show_display_control_panel (display);
-}
-#endif
-static void
-action_close_cb (GtkAction * action, displayd * display)
+display_close_menu_cb (GtkWidget *item, displayd *display)
 {
   display_close (display);
 }
+
 static void
-action_exclude_shadowed_points_cb (GtkAction * action, displayd * display)
+display_option_menu_toggled_cb (GtkCheckMenuItem *item, displayd *display)
 {
-  brush_reset (display, RESET_EXCLUDE_SHADOW_POINTS);
-}
-static void
-action_include_shadowed_points_cb (GtkAction * action, displayd * display)
-{
-  brush_reset (display, RESET_INCLUDE_SHADOW_POINTS);
-}
-static void
-action_unshadow_all_points_cb (GtkAction * action, displayd * display)
-{
-  brush_reset (display, RESET_UNSHADOW_POINTS);
-}
-static void
-action_exclude_shadowed_edges_cb (GtkAction * action, displayd * display)
-{
-  brush_reset (display, RESET_EXCLUDE_SHADOW_EDGES);
-}
-static void
-action_include_shadowed_edges_cb (GtkAction * action, displayd * display)
-{
-  brush_reset (display, RESET_INCLUDE_SHADOW_EDGES);
-}
-static void
-action_unshadow_all_edges_cb (GtkAction * action, displayd * display)
-{
-  brush_reset (display, RESET_UNSHADOW_EDGES);
-}
-static void
-action_reset_brush_cb (GtkAction * action, displayd * display)
-{
-  brush_reset (display, RESET_INIT_BRUSH);
-}
-static void
-action_reset_pan_cb (GtkAction * action, displayd * display)
-{
-  scale_pan_reset (display);
-}
-static void
-action_reset_zoom_cb (GtkAction * action, displayd * display)
-{
-  scale_zoom_reset (display);
-}
-static void
-action_toggle_scale_update_cb (GtkToggleAction * action, displayd * display)
-{
-  scale_update_set (gtk_toggle_action_get_active (action), display,
-                    display->ggobi);
-}
-static void
-action_select_all_1d_cb (GtkAction * action, displayd * display)
-{
-  tour1d_all_vars (display);
-}
-static void
-action_select_all_2d_cb (GtkAction * action, displayd * display)
-{
-  tour2d_all_vars (display);
-}
-static void
-action_toggle_axes_cb (GtkToggleAction * action, displayd * display)
-{
-  set_display_option (gtk_toggle_action_get_active (action), DOPT_AXES,
-                      display);
-}
-static void
-action_toggle_axes_labels_cb (GtkToggleAction * action, displayd * display)
-{
-  set_display_option (gtk_toggle_action_get_active (action), DOPT_AXESLAB,
-                      display);
-}
-static void
-action_toggle_axes_vals_cb (GtkToggleAction * action, displayd * display)
-{
-  set_display_option (gtk_toggle_action_get_active (action), DOPT_AXESVALS,
-                      display);
-}
-static void
-action_toggle_lines_cb (GtkToggleAction * action, displayd * display)
-{
-  set_display_option (gtk_toggle_action_get_active (action), DOPT_WHISKERS,
-                      display);
-}
-static void
-action_toggle_points_cb (GtkToggleAction * action, displayd * display)
-{
-  set_display_option (gtk_toggle_action_get_active (action), DOPT_POINTS,
-                      display);
-}
-static void
-action_toggle_fade_vars_1d_cb (GtkToggleAction * action, displayd * display)
-{
-  tour1d_fade_vars (gtk_toggle_action_get_active (action), display->ggobi);
-}
-static void
-action_toggle_fade_vars_2d_cb (GtkToggleAction * action, displayd * display)
-{
-  tour2d_fade_vars (gtk_toggle_action_get_active (action), display->ggobi);
-}
-static void
-action_toggle_fade_vars_co_cb (GtkToggleAction * action, displayd * display)
-{
-  tourcorr_fade_vars (gtk_toggle_action_get_active (action), display->ggobi);
-}
-static void
-action_toggle_brush_update_cb (GtkToggleAction * action, displayd * display)
-{
-  brush_update_set (gtk_toggle_action_get_active (action), display,
-                    display->ggobi);
-}
-static void
-action_toggle_brush_on_cb (GtkToggleAction * action, displayd * display)
-{
-  brush_on_set (gtk_toggle_action_get_active (action), display,
-                display->ggobi);
+  guint option = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (item),
+                                                      "display-option"));
+  set_display_option (gtk_check_menu_item_get_active (item), option, display);
 }
 
-static GtkActionEntry disp_action_entries[] = {
-  {"File", NULL, "_File"},
-  {"Close", NULL, "_Close", "<control>C", "Close this display",
-   G_CALLBACK (action_close_cb)},
-  {"Options", NULL, "_Options", NULL, "Options for this display"},
-  /* imode brush specific */
-  {"Brush", NULL, "_Brush"},
-  {"ExcludeShadowedPoints", NULL, "E_xclude shadowed points", "<control>X",
-   "Exclude the points that are currently shadowed",
-   G_CALLBACK (action_exclude_shadowed_points_cb)
-   },
-  {"IncludeShadowedPoints", NULL, "_Include shadowed points", "<control>I",
-   "Include the points that are currently shadowed",
-   G_CALLBACK (action_include_shadowed_points_cb)
-   },
-  {"UnshadowAllPoints", NULL, "_Unshadow all points", "<control>U",
-   "Make all points unshadowed", G_CALLBACK (action_unshadow_all_points_cb)
-   },
-  {"ExcludeShadowedEdges", NULL, "_Exclude shadowed edges", "<control>E",
-   "Exclude the edges that are shadowed",
-   G_CALLBACK (action_exclude_shadowed_edges_cb)
-   },
-  {"IncludeShadowedEdges", NULL, "Include s_hadowed edges", "<control>H",
-   "Include the edges that are shadowed",
-   G_CALLBACK (action_include_shadowed_edges_cb)
-   },
-  {"UnshadowAllEdges", NULL, "U_nshadow all edges", "<control>N",
-   "Make all edges unshadowed", G_CALLBACK (action_unshadow_all_edges_cb)
-   },
-  {"ResetBrushSize", NULL, "_Reset brush", "<control>R",
-   "Reset the size of the brush", G_CALLBACK (action_reset_brush_cb)
-   },
-  /* i-mode scale specific */
-  {"Scale", NULL, "_Scale"},
-  {"ResetPan", NULL, "Reset _pan", "<control>P",
-   "Return to initial position", G_CALLBACK (action_reset_pan_cb)
-   },
-  {"ResetZoom", NULL, "Reset _zoom", "<control>Z",
-   "Return to initial zoom", G_CALLBACK (action_reset_zoom_cb)
-   },
-
-  /* p-mode specific stuff - should move elsewhere */
-  {"Tour1D", NULL, "_Tour1D"},
-  {"SelectAllVariables1D", NULL, "_Select all variables", "<control>S",
-   "Select all variables for this 1D tour",
-   G_CALLBACK (action_select_all_1d_cb)
-   },
-  {"Tour2D", NULL, "_Tour2D"},
-  {"SelectAllVariables2D", NULL, "_Select all variables", "<control>S",
-   "Select all variables for this 2D tour",
-   G_CALLBACK (action_select_all_2d_cb)
-   },
-  {"CorrTour", NULL, "_Correlation Tour"}
-};
-
-GtkActionGroup *
-display_default_actions_create (displayd * display)
+GtkAccelGroup *
+display_menu_accel_group_get (displayd *display)
 {
-  GtkToggleActionEntry disp_t_action_entries[] = {
-    {"ShowAxes", NULL, "Show _Axes", "<control>A",
-     "Toggle visibility of axes on this display",
-     G_CALLBACK (action_toggle_axes_cb), display->options.axes_show_p},
-    {"ShowLines", NULL, "Show _Lines", "<control>L",
-     "Toggle visibility of lines on this display",
-     G_CALLBACK (action_toggle_lines_cb), display->options.whiskers_show_p},
-    {"ShowPoints", NULL, "Show P_oints", "<control>O",
-     "Toggle visibility of points on this display",
-     G_CALLBACK (action_toggle_points_cb), display->options.points_show_p},
-    {"ShowAxesLabels", NULL, "Show Axes _Labels", "<control>L",
-     "Toggle display of the axes labels",
-     G_CALLBACK (action_toggle_axes_labels_cb),
-     display->options.axes_label_p},
-    {"ShowAxesVals", NULL, "Show Projection _Vals", "<control>V",
-     "Toggle display of the projection values",
-     G_CALLBACK (action_toggle_axes_vals_cb), display->options.axes_values_p},
-    {"FadeVariables1D", NULL, "_Fade Variables on Deselection", NULL,
-     "Toggle whether variables fade on when de-selected from the 1D tour",
-     G_CALLBACK (action_toggle_fade_vars_1d_cb),
-     display->ggobi->tour1d.fade_vars},
-    {"FadeVariables2D", NULL, "_Fade Variables on Deselection", NULL,
-     "Toggle whether variables fade on when de-selected from the 2D tour",
-     G_CALLBACK (action_toggle_fade_vars_2d_cb),
-     display->ggobi->tour2d.fade_vars},
-    {"FadeVariablesCo", NULL, "_Fade Variables on Deselection", NULL,
-     "Toggle whether variables fade on when de-selected from the corr tour",
-     G_CALLBACK (action_toggle_fade_vars_co_cb), display->ggobi->tourcorr.fade_vars}, /* i-mode specific */
-    /* I'm going to make these display-specific since
-       they're on the display menu -- dfs */
-    {"UpdateBrushContinuously", NULL, "Update Brushing _Continuously", NULL,
-     "Toggle whether the brush operates continuously",
-     G_CALLBACK (action_toggle_brush_update_cb), display->cpanel.br.updateAlways_p},  /* i-mode specific */
-    {"BrushOn", NULL, "Brush _On", NULL,
-     "Toggle whether the brush is active",
-     G_CALLBACK (action_toggle_brush_on_cb), display->cpanel.br.brush_on_p},
-    {"UpdateContinuously", NULL, "Update _Continuously", NULL,
-     "Toggle whether panning and zooming operates continuously",
-     G_CALLBACK (action_toggle_scale_update_cb),
-     display->cpanel.scale.updateAlways_p}
-  };
+  if (display == NULL || display->menubar == NULL)
+    return NULL;
 
-  GtkActionGroup *actions = gtk_action_group_new ("DisplayActions");
-  gtk_action_group_add_actions (actions, disp_action_entries,
-                                G_N_ELEMENTS (disp_action_entries), display);
-  gtk_action_group_add_toggle_actions (actions, disp_t_action_entries,
-                                       G_N_ELEMENTS (disp_t_action_entries),
-                                       display);
-  ggobi_action_group_set_icon_name (actions, "Close", "window-close");
-  return (actions);
+  return g_object_get_data (G_OBJECT (display->menubar), "DISPLAY:accel_group");
 }
 
-static const gchar *display_default_ui =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='File'>"
-  "			<menuitem action='Close'/>" "		</menu>" "	</menubar>" "</ui>";
-
-GtkUIManager *
-display_menu_manager_create (displayd * display)
+void
+display_menu_clear (GtkWidget *menu)
 {
-  GError *error = NULL;
-  GtkUIManager *manager = gtk_ui_manager_new ();
-  GtkActionGroup *disp_actions = display_default_actions_create (display);
-  gtk_ui_manager_insert_action_group (manager, disp_actions, 0);
-  g_object_unref (G_OBJECT (disp_actions));
-  gtk_ui_manager_add_ui_from_string (manager, display_default_ui, -1, &error);
-  if (error) {
-    g_message ("Could not add default display ui!");
-    g_error_free (error);
+  GList *children, *l;
+
+  children = gtk_container_get_children (GTK_CONTAINER (menu));
+  for (l = children; l != NULL; l = l->next)
+    gtk_widget_destroy (GTK_WIDGET (l->data));
+  g_list_free (children);
+}
+
+GtkWidget *
+display_menu_ensure (displayd *display, const gchar *label, const gchar *name)
+{
+  GtkWidget *item, *menu;
+
+  item = widget_find_by_name (display->menubar, name);
+  if (item != NULL)
+    return gtk_menu_item_get_submenu (GTK_MENU_ITEM (item));
+
+  item = gtk_menu_item_new_with_mnemonic (label);
+  gtk_widget_set_name (item, name);
+  menu = gtk_menu_new ();
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
+  gtk_menu_shell_append (GTK_MENU_SHELL (display->menubar), item);
+  gtk_widget_show (item);
+
+  return menu;
+}
+
+GtkWidget *
+display_menu_append_item (GtkWidget *menu, const gchar *label,
+                          const gchar *name, const gchar *tooltip,
+                          const gchar *accel, GCallback func, gpointer data,
+                          GtkAccelGroup *accel_group)
+{
+  GtkWidget *item = gtk_menu_item_new_with_mnemonic (label);
+  guint key = 0;
+  GdkModifierType modifiers = 0;
+
+  if (name != NULL)
+    gtk_widget_set_name (item, name);
+  if (tooltip != NULL)
+    gtk_widget_set_tooltip_text (item, tooltip);
+  if (func != NULL)
+    g_signal_connect (G_OBJECT (item), "activate", func, data);
+  if (accel != NULL && accel_group != NULL) {
+    gtk_accelerator_parse (accel, &key, &modifiers);
+    if (key != 0)
+      gtk_widget_add_accelerator (item, "activate", accel_group, key,
+                                  modifiers, GTK_ACCEL_VISIBLE);
   }
-  return (manager);
+
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+  gtk_widget_show (item);
+
+  return item;
+}
+
+GtkWidget *
+display_menu_append_toggle_item (GtkWidget *menu, const gchar *label,
+                                 const gchar *name, const gchar *tooltip,
+                                 const gchar *accel, gboolean active,
+                                 GCallback func, gpointer data,
+                                 GtkAccelGroup *accel_group)
+{
+  GtkWidget *item = gtk_check_menu_item_new_with_mnemonic (label);
+  guint key = 0;
+  GdkModifierType modifiers = 0;
+
+  if (name != NULL)
+    gtk_widget_set_name (item, name);
+  if (tooltip != NULL)
+    gtk_widget_set_tooltip_text (item, tooltip);
+  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), active);
+  if (func != NULL)
+    g_signal_connect (G_OBJECT (item), "toggled", func, data);
+  if (accel != NULL && accel_group != NULL) {
+    gtk_accelerator_parse (accel, &key, &modifiers);
+    if (key != 0)
+      gtk_widget_add_accelerator (item, "activate", accel_group, key,
+                                  modifiers, GTK_ACCEL_VISIBLE);
+  }
+
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+  gtk_widget_show (item);
+
+  return item;
+}
+
+GtkWidget *
+display_menu_append_display_option_item (GtkWidget *menu, guint option,
+                                         displayd *display)
+{
+  const gchar *label = NULL, *name = NULL, *tooltip = NULL, *accel = NULL;
+  gboolean active = false;
+  GtkWidget *item;
+
+  switch (option) {
+  case DOPT_POINTS:
+    label = "Show P_oints";
+    name = "DISPLAY:show_points";
+    tooltip = "Toggle visibility of points on this display";
+    accel = "<control>O";
+    active = display->options.points_show_p;
+    break;
+  case DOPT_WHISKERS:
+    label = "Show _Lines";
+    name = "DISPLAY:show_lines";
+    tooltip = "Toggle visibility of lines on this display";
+    accel = "<control>L";
+    active = display->options.whiskers_show_p;
+    break;
+  case DOPT_AXES:
+    label = "Show _Axes";
+    name = "DISPLAY:show_axes";
+    tooltip = "Toggle visibility of axes on this display";
+    accel = "<control>A";
+    active = display->options.axes_show_p;
+    break;
+  case DOPT_AXESLAB:
+    label = "Show Axes _Labels";
+    name = "DISPLAY:show_axes_labels";
+    tooltip = "Toggle display of the axes labels";
+    accel = "<control>L";
+    active = display->options.axes_label_p;
+    break;
+  case DOPT_AXESVALS:
+    label = "Show Projection _Vals";
+    name = "DISPLAY:show_axes_vals";
+    tooltip = "Toggle display of the projection values";
+    accel = "<control>V";
+    active = display->options.axes_values_p;
+    break;
+  default:
+    g_return_val_if_reached (NULL);
+  }
+
+  item = display_menu_append_toggle_item (menu, label, name, tooltip, accel,
+                                          active,
+                                          G_CALLBACK (display_option_menu_toggled_cb),
+                                          display,
+                                          display_menu_accel_group_get (display));
+  g_object_set_data (G_OBJECT (item), "display-option",
+                     GUINT_TO_POINTER (option));
+
+  return item;
+}
+
+GtkWidget *
+display_menu_bar_create (displayd *display, GtkWidget *window)
+{
+  GtkWidget *menubar;
+  GtkWidget *file_menu;
+  GtkAccelGroup *accel_group = NULL;
+
+  menubar = gtk_menu_bar_new ();
+  if (window != NULL) {
+    accel_group = ggobi_window_add_accel_group (window);
+    g_object_set_data (G_OBJECT (menubar), "DISPLAY:accel_group", accel_group);
+  }
+
+  display->menubar = menubar;
+  file_menu = display_menu_ensure (display, "_File", "DISPLAY:file_topmenu");
+  display_menu_append_item (file_menu, "_Close", "DISPLAY:close_display",
+                            "Close this display", "<control>C",
+                            G_CALLBACK (display_close_menu_cb), display,
+                            accel_group);
+
+  return menubar;
 }

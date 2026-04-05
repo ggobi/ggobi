@@ -9,12 +9,13 @@
 #include "ggvis.h"
 
 void
-create_shepard_data_cb (GtkAction *action, PluginInstance *inst)
+create_shepard_data_cb (GtkWidget *widget, PluginInstance *inst)
 /*
  * Create a new datad containing the Shepard plot describing the
  * distance matrix.
 */
 {
+  (void) widget;
   ggvisd *ggv = ggvisFromInst (inst);
   ggobid *gg = inst->gg;
   gint i, j;

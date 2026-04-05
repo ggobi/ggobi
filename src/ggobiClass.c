@@ -230,8 +230,6 @@ display_init (displayd * display)
   display->t2d_window = NULL;
   display->t1d_pp_surface = NULL;
   display->t2d_pp_surface = NULL;
-
-  display->pmode_merge_id = display->imode_merge_id = 0;
 }
 
 

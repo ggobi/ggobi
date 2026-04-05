@@ -29,7 +29,7 @@ static GtkAdjustment *param_adj;
 */
 
 /*-- called when closed from the close menu item --*/
-static void action_close_cb (GtkAction *action, displayd *dsp) {
+static void action_close_cb (GtkWidget *w, displayd *dsp) {
   gtk_widget_hide (dsp->t2d_window);
   t1d_optimz(0, &dsp->t2d.get_new_target, 
     &dsp->t2d.target_selection_method, dsp);
@@ -67,11 +67,11 @@ hide_cb (GtkWidget *w) {
 */
 
 static void
-action_show_controls_cb(GtkToggleAction *action, displayd *dsp) {
-      if (gtk_toggle_action_get_active(action))
-        gtk_widget_show (dsp->t1d_control_frame);
+action_show_controls_cb(GtkCheckMenuItem *item, displayd *dsp) {
+      if (gtk_check_menu_item_get_active(item))
+        gtk_widget_show (dsp->t2d_control_frame);
       else
-        gtk_widget_hide (dsp->t1d_control_frame);
+        gtk_widget_hide (dsp->t2d_control_frame);
 }
 
 /*static void
@@ -238,44 +238,17 @@ t2d_ppda_draw_cb (GtkWidget *w, cairo_t *cr, displayd *dsp)
   return t2d_ppda_present (w, cr, dsp);
 }
 
-static const gchar* tour2dpp_ui =
-"<ui>"
-"	<menubar>"
-"		<menu action='File'>"
-"			<menuitem action='Close'/>"
-"		</menu>"
-"		<menu action='Options'>"
-"			<menuitem action='ShowControls'/>"
-"		</menu>"
-"	</menubar>"
-"</ui>";
-
-static GtkActionEntry entries[] = {
-	{ "File", NULL, "_File" },
-	{ "Close", NULL, "_Close", "<control>C",
-		"Hide the projection pursuit window", G_CALLBACK(action_close_cb)
-	},
-	{ "Options", NULL, "_Options" }
-};
-static GtkToggleActionEntry t_entries[] = {
-	{ "ShowControls", NULL, "_Show controls", "<control>S",
-		"Hide the controls on the left so that the graph consumes the entire window",
-		G_CALLBACK(action_show_controls_cb), true
-	}
-};
-
-
-
 void
 tour2dpp_window_open (ggobid *gg) {
   /*GtkWidget **btn, *label, *da, *entry;*/
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar, *lbl;
+  GtkWidget *file_menu, *options_menu;
   GtkAdjustment *adj;
+  GtkAccelGroup *accel_group = NULL;
   displayd *dsp = gg->current_display;  /* ok as long as we only use the gui */
   GGobiData *d = dsp->d;
   gboolean vars_sphered = true;
   /*-- to initialize the checkboxes in the menu --*/
-  GtkWidget *item;
 
   if (dsp == NULL)
     return;
@@ -305,9 +278,6 @@ tour2dpp_window_open (ggobid *gg) {
   } else {
 
     if (dsp->t2d_window == NULL) {
-		GtkUIManager *manager = gtk_ui_manager_new();
-		GtkActionGroup *actions = gtk_action_group_new("Tour2DPPActions");
-		
       dsp->t2d_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
       gtk_window_set_title (GTK_WINDOW (dsp->t2d_window), 
         "Projection Pursuit - 2D");
@@ -326,19 +296,16 @@ tour2dpp_window_open (ggobid *gg) {
       vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
       gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
       gtk_container_add (GTK_CONTAINER (dsp->t2d_window), vbox);
-
-	  gtk_action_group_add_actions(actions, entries, G_N_ELEMENTS(entries), dsp);
-	  gtk_action_group_add_toggle_actions(actions, t_entries, G_N_ELEMENTS(t_entries), dsp);
-	  ggobi_action_group_set_icon_name (actions, "Close", "window-close");
-	  gtk_ui_manager_insert_action_group(manager, actions, 0);
-	  g_object_unref(G_OBJECT(actions));
-	  dsp->t2d_mbar = create_menu_bar(manager, tour2dpp_ui, dsp->t2d_window);
-	
-      /*dsp->t2d_pp_accel_group = gtk_accel_group_new ();
-      factory = get_main_menu (menu_items,
-        sizeof (menu_items) / sizeof (menu_items[0]),
-        dsp->t2d_pp_accel_group, dsp->t2d_window, &dsp->t2d_mbar,
-        (gpointer) dsp);*/
+      accel_group = ggobi_window_add_accel_group (dsp->t2d_window);
+      dsp->t2d_mbar = gtk_menu_bar_new ();
+      file_menu = ggobi_menu_add_submenu (dsp->t2d_mbar, "_File");
+      ggobi_menu_append_item (file_menu, "_Close", "<control>C",
+                              accel_group, G_CALLBACK (action_close_cb), dsp);
+      options_menu = ggobi_menu_add_submenu (dsp->t2d_mbar, "_Options");
+      ggobi_menu_append_check_item (options_menu, "_Show controls",
+                                    "<control>S", accel_group, true,
+                                    G_CALLBACK (action_show_controls_cb),
+                                    dsp);
       gtk_box_pack_start (GTK_BOX (vbox), dsp->t2d_mbar, false, true, 0);
 
 
@@ -518,10 +485,6 @@ tour2dpp_window_open (ggobid *gg) {
   
       gtk_container_add (GTK_CONTAINER (frame), dsp->t2d_ppda);
       gtk_widget_show_all (dsp->t2d_window);
-
-      /*-- Set the appropriate check menu items to true. -- dfs --*/
-      item = gtk_ui_manager_get_widget (manager, "/menubar/Options/ShowControls");
-      gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
 
     }
 

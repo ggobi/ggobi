@@ -22,7 +22,7 @@ GtkWidget* create_ggobi_sheet(GGobiData *data, ggobid *gg);
 void       add_ggobi_data(GGobiData *data, GtkTreeModel *model);
 GtkWidget *create_ggobi_worksheet_window(ggobid *gg, PluginInstance *inst);
 
-void       show_data_edit_window(GtkAction *actions, PluginInstance *inst);
+void       show_data_edit_window(GtkWidget *widget, PluginInstance *inst);
 
 GtkWidget* create_ggobi_sheet(GGobiData *data, ggobid *gg);
 void update_cell(gint row, gint column, double value, GGobiData *data);
@@ -47,9 +47,9 @@ static GdkColor black;
 gboolean
 addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  static GtkActionEntry entry = {
-	"DataView", NULL, "_Data Viewer", NULL, "View the data elements on a grid", 
-		G_CALLBACK (show_data_edit_window)
+  static const GGobiToolActionEntry entry = {
+    "DataView", "_Data Viewer", NULL, "View the data elements on a grid",
+    G_CALLBACK (show_data_edit_window)
   };
   
   inst->data = NULL;
@@ -61,7 +61,7 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   gdk_colormap_alloc_color(gdk_colormap_get_system(), &red, TRUE, TRUE);
   gdk_color_black(gdk_colormap_get_system(), &black);
   
-  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
+  GGOBI(addToolAction)(&entry, inst, gg);
 
   return(true);
 }
@@ -72,8 +72,9 @@ addToMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
   for the GGobi instance associated with the menu.
  */
 void
-show_data_edit_window(GtkAction *action, PluginInstance *inst)
+show_data_edit_window(GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
   if(g_slist_length(inst->gg->d) < 1) {
       fprintf(stderr, "No datasets to show\n");fflush(stderr);
       return;
@@ -554,4 +555,3 @@ brush_change(ggobid *gg, splotd *sp, GdkEventMotion *ev, GGobiData *d, GtkWidget
       color_row(sheet, i, d->ncols, &black);
   }
 }
-

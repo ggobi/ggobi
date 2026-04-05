@@ -330,8 +330,6 @@ GGOBI(splot_set_current_full)(displayd *display, splotd *sp, ggobid *gg)
     gg->current_splot = sp->displayptr->current_splot = sp;
     splot_set_current (sp, on, gg);
 
-    /*main_miscmenus_update (pmode_prev, imode_prev, display_prev, gg);*/
-
     /*
      * if the previous splot is in transient brushing mode, a FULL
      * redraw is required.

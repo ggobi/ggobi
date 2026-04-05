@@ -274,7 +274,6 @@ timeSeriesClassInit(GGobiTimeSeriesDisplayClass *klass)
     klass->parent_class.cpanel_set = tsplotCPanelSet;
     klass->parent_class.display_unset = NULL;
     klass->parent_class.display_set = tsplotDisplaySet;
-    klass->parent_class.mode_ui_get = tsplot_mode_ui_get;
     klass->parent_class.varpanel_refresh = tsplotVarpanelRefresh;
 
     klass->parent_class.handles_interaction = tsplotHandlesInteraction;

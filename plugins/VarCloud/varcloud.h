@@ -8,8 +8,6 @@ typedef struct {
   GGobiData *dsrc;
   gint xcoord, ycoord, var1, var2;
 
-  GtkTooltips *tips;
-
 } vcld;
 
 

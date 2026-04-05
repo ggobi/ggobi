@@ -174,18 +174,6 @@ ruler_ranges_set (gboolean force, displayd * display, splotd * sp,
   }
 }
 
-/*----------------------------------------------------------------------*/
-/*                          Options section                             */
-/*----------------------------------------------------------------------*/
-
-static const gchar *scatterplot_ui =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='Edges'/>"
-  "		<menu action='Options'>"
-  "			<menuitem action='ShowPoints'/>"
-  "			<menuitem action='ShowAxes'/>" "		</menu>" "	</menubar>" "</ui>";
-
 static void
 display_datad_added_cb (ggobid * gg, GGobiData * d, void *win)
 {
@@ -193,8 +181,7 @@ display_datad_added_cb (ggobid * gg, GGobiData * d, void *win)
 
   /*-- this is all true even when the display is first opened --*/
   if (display->window && gtk_widget_get_realized (display->window)) {
-    scatterplot_display_edge_menu_update (GGOBI_DISPLAY (display),
-                                          gg->app.sp_accel_group, gg);
+    scatterplot_display_edge_menu_update (GGOBI_DISPLAY (display), gg);
   }
 }
 
@@ -232,33 +219,9 @@ void GGOBI (edge_menus_update) (ggobid * gg)
     if (GGOBI_WINDOW_DISPLAY (display)->useWindow && 
         gtk_widget_get_realized (GGOBI_WINDOW_DISPLAY (display)->window) &&
         GGOBI_IS_SCATTERPLOT_DISPLAY (display)) {
-      scatterplot_display_edge_menu_update (GGOBI_DISPLAY (display),
-                                            gg->app.sp_accel_group, gg);
+      scatterplot_display_edge_menu_update (GGOBI_DISPLAY (display), gg);
     }
   }
-}
-
-static GtkActionEntry edge_actions[] = {
-  {"Edges", NULL, "_Edges"},
-  {"Edgesets", NULL, "_Attach edge set"}
-};
-static GtkRadioActionEntry edge_radio_actions[] = {
-  {"ShowUndirectedEdges", NULL, "Show _lines only", "<control>L",
-   "Show edges without arrowheads", DOPT_EDGES_U},
-  {"ShowDirectedEdges", NULL, "Show lines _with arrowheads", "<control>W",
-   "Show edges with arrowheads", DOPT_EDGES_D},
-  {"ShowArrowheadsOnly", NULL, "Show arrowheads _only", "<control>O",
-   "Show only the arrowheads, no line", DOPT_EDGES_A},
-  {"HideEdges", NULL, "_Hide edges", "<control>H",
-   "Make the edges invisible", DOPT_EDGES_H}
-};
-
-static void
-edge_options_cb (GtkRadioAction * action, GtkRadioAction * current,
-                 displayd * dsp)
-{
-  gint active = gtk_radio_action_get_current_value (action);
-  set_display_option (true, active, dsp);
 }
 
 displayd *
@@ -266,6 +229,7 @@ createScatterplot (displayd * display, gboolean use_window, gboolean missing_p,
                    splotd * sp, gint numVars, gint * vars, GGobiData * d, ggobid * gg)
 {
   GtkWidget *table, *vbox;
+  GtkWidget *options_menu;
   ProjectionMode projection;
 
   if (d == NULL || d->ncols < 1)
@@ -293,19 +257,9 @@ createScatterplot (displayd * display, gboolean use_window, gboolean missing_p,
   scatterplot_cpanel_init (&display->cpanel, projection, DEFAULT_IMODE, gg);
 
   vbox = GTK_WIDGET (display);  /* gtk_box_new (GTK_ORIENTATION_VERTICAL, 1); */
-  display->menu_manager = display_menu_manager_create (display);
   
   if (GGOBI_IS_WINDOW_DISPLAY (display)
       && GGOBI_WINDOW_DISPLAY (display)->useWindow) {
-    GtkActionGroup *actions = gtk_action_group_new ("Edge Actions");
-    gtk_action_group_add_actions (actions, edge_actions,
-                                  G_N_ELEMENTS (edge_actions), NULL);
-    gtk_action_group_add_radio_actions (actions, edge_radio_actions,
-                                        G_N_ELEMENTS (edge_radio_actions),
-                                        DOPT_EDGES_H,
-                                        G_CALLBACK (edge_options_cb),
-                                        display);
-
     display_window_init (GGOBI_WINDOW_DISPLAY (display), WIDTH, HEIGHT, 3,
                          gg);
 
@@ -314,18 +268,19 @@ createScatterplot (displayd * display, gboolean use_window, gboolean missing_p,
     gtk_container_add (GTK_CONTAINER (GGOBI_WINDOW_DISPLAY (display)->window),
                        vbox);
 
-    gtk_ui_manager_insert_action_group (display->menu_manager, actions, -1);
-    g_object_unref (actions);
-    display->menubar = create_menu_bar (display->menu_manager, scatterplot_ui,
-                                        GGOBI_WINDOW_DISPLAY (display)->
-                                        window);
+    display_menu_bar_create (display, GGOBI_WINDOW_DISPLAY (display)->window);
+    options_menu = display_menu_ensure (display, "_Options",
+                                        "DISPLAY:options_topmenu");
+    display_menu_append_display_option_item (options_menu, DOPT_POINTS,
+                                             display);
+    display_menu_append_display_option_item (options_menu, DOPT_AXES,
+                                             display);
 
     /*
      * After creating the menubar, and populating the file menu,
      * add the other menus manually
      */
-    scatterplot_display_edge_menu_update (display, gg->app.sp_accel_group,
-                                          gg);
+    scatterplot_display_edge_menu_update (display, gg);
     gtk_box_pack_start (GTK_BOX (vbox), display->menubar, false, true, 0);
   }
 

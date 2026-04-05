@@ -122,8 +122,6 @@ typedef struct {
   GtkWidget *anchor_frame, *anchor_table;
   gint n_anchors;
 
-  GtkTooltips *tips;
-
   GtkWidget *varnotebook;  /* this might make it easier to destroy */
 
   /*-- for Shepard plot --*/
@@ -140,9 +138,9 @@ void ggvis_init (ggvisd *, ggobid *gg);
 ggvisd* ggvisFromInst (PluginInstance *inst);
 void mds_run_cb (GtkToggleButton *btn, PluginInstance *inst);
 void mds_step_cb (GtkWidget *btn, PluginInstance *inst);
-void mds_reinit_cb (GtkAction *action, PluginInstance *inst);
-void mds_scramble_cb (GtkAction *action, PluginInstance *inst);
-void mds_reset_params_cb (GtkAction *action, PluginInstance *inst);
+void mds_reinit_cb (GtkWidget *widget, PluginInstance *inst);
+void mds_scramble_cb (GtkWidget *widget, PluginInstance *inst);
+void mds_reset_params_cb (GtkWidget *widget, PluginInstance *inst);
 void update_ggobi (ggvisd *ggv, ggobid *gg);
 
 /*void ggv_dsource_cb (GtkWidget *w, gpointer cbd);*/
@@ -191,7 +189,7 @@ void mds_once (gboolean doit, ggvisd *ggv, ggobid *gg);
 void mds_open_display_cb (GtkWidget *btn, PluginInstance *inst);
 
 void clusters_changed_cb (ggobid *, GGobiData *, void *);
-void create_shepard_data_cb (GtkAction *action, PluginInstance *inst);
+void create_shepard_data_cb (GtkWidget *widget, PluginInstance *inst);
 
 void ggv_free (ggvisd *);
 

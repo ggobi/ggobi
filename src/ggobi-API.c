@@ -219,10 +219,6 @@ GGOBI (setData) (gdouble * values, gchar ** rownames, gchar ** colnames,
     GGOBI (displays_release) (gg);
     varpanel_clear (d, gg);
     GGOBI (data_release) (d, gg);
-    /* ?? */
-    gtk_ui_manager_remove_ui (gg->main_menu_manager, gg->mode_merge_id);
-    /*submenu_destroy (gg->pmode_item);
-       submenu_destroy (gg->imode_item); */
   }
 
   d->input = desc;
@@ -732,15 +728,14 @@ gboolean GGOBI (getShowLines) ()
 /* uh.. this takes a boolean value but always shows lines... what's up */
 gboolean GGOBI (setShowLines) (displayd * dsp, gboolean val)
 {
-  GtkAction *action;
+  GtkWidget *item;
   gboolean old = GGOBI (getShowLines) ();
   /*GGOBI(getDefaultDisplayOptions)()->edges_undirected_show_p = val; */
   dsp->options.edges_undirected_show_p = true;
 
-  action = gtk_ui_manager_get_action (dsp->menu_manager,
-                                      "/menubar/Edges/ShowUndirectedEdges");
-  if (action)
-    gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action), true);
+  item = widget_find_by_name (dsp->menubar, "DISPLAY:show_undirected_edges");
+  if (GTK_IS_CHECK_MENU_ITEM (item))
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item), true);
 
   return (old);
 }

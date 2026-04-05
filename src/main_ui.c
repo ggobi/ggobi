@@ -62,6 +62,8 @@ GGOBI (IModeKeys)[] =
 "", "s", "b", "i", "e", "m", "", ""};
 
 void addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg);
+static void pmode_menu_item_toggled_cb (GtkCheckMenuItem * item, ggobid * gg);
+static void imode_menu_item_toggled_cb (GtkCheckMenuItem * item, ggobid * gg);
 
 #ifdef STORE_SESSION_ENABLED
 void store_session (ggobid * gg);
@@ -261,81 +263,180 @@ varpanel_reinit (ggobid * gg)
 void
 rebuild_mode_menus (displayd * display, ggobid * gg)
 {
-  static const gchar *iprefix = "/menubar/IMode/", *pprefix =
-    "/menubar/PMode/";
-  gchar *path;
-  GtkAction *action = NULL;
+  static const ProjectionMode projection_modes[] =
+    { P1PLOT, XYPLOT, TOUR1D, TOUR2D3, TOUR2D, COTOUR };
+  static const InteractionMode interaction_modes[] =
+    { DEFAULT_IMODE, SCALE, BRUSH, IDENT, EDGEED, MOVEPTS };
+  GtkWidget *pmode_item = widget_find_by_name (gg->main_menubar,
+                                               "MAIN:pmode_topmenu");
+  GtkWidget *imode_item = widget_find_by_name (gg->main_menubar,
+                                               "MAIN:imode_topmenu");
+  GtkWidget *pmode_menu = NULL;
+  GtkWidget *imode_menu = NULL;
+  GSList *pmode_group = NULL, *imode_group = NULL;
+  guint i;
+  gboolean have_pmode = false, have_imode = false;
+  gboolean imode_separator_added = false;
 
+  if (pmode_item != NULL)
+    pmode_menu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (pmode_item));
+  if (imode_item != NULL)
+    imode_menu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (imode_item));
+
+  if (pmode_menu != NULL)
+    display_menu_clear (pmode_menu);
+  if (imode_menu != NULL)
+    display_menu_clear (imode_menu);
 
   if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
-    gtk_ui_manager_remove_ui (gg->main_menu_manager, gg->mode_merge_id);
-    /* Allow the extended display to override the submenu_destroy call.
-       If it doesn't provide a method, then call submenu_destroy. */
-    void (*f) (displayd * dpy) =
+    void (*unset_display) (displayd * dpy) =
       GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->display_unset;
-    if (f) {
-      f (display);
-      f (display);
-    }                           /*
-                                   else { 
-                                   if (gg->pmode_item)
-                                   submenu_destroy (gg->pmode_item);
-                                   submenu_destroy (gg->imode_item);
-                                   } */
+    if (unset_display != NULL)
+      unset_display (display);
   }
 
-  /* Then rebuild */
-  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
-    const gchar *(*ui_get) (displayd * dpy) =
-      GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->mode_ui_get;
-    if (ui_get) {
-      GError *error = NULL;
-      const gchar *ui = ui_get (display);
-      gg->mode_merge_id =
-        gtk_ui_manager_add_ui_from_string (gg->main_menu_manager, ui, -1,
-                                           &error);
-      if (error) {
-        g_message ("Could not merge main mode ui from display");
-        g_error_free (error);
-      }
+  if (display == NULL) {
+    if (pmode_item != NULL)
+      gtk_widget_hide (pmode_item);
+    if (imode_item != NULL)
+      gtk_widget_hide (imode_item);
+    return;
+  }
+
+  for (i = 0; i < G_N_ELEMENTS (projection_modes); i++) {
+    ProjectionMode pmode = projection_modes[i];
+    GtkWidget *item;
+    const gchar *label;
+    const gchar *accel = NULL;
+
+    if (!display_type_handles_projection (display, pmode))
+      continue;
+
+    label = GGOBI (getPModeScreenName) (pmode, display);
+    switch (pmode) {
+    case P1PLOT:
+      accel = "<control>D";
+      break;
+    case XYPLOT:
+      accel = "<control>X";
+      break;
+    case TOUR1D:
+      accel = "<control>T";
+      break;
+    case TOUR2D3:
+      accel = "<control>R";
+      break;
+    case TOUR2D:
+      accel = "<control>G";
+      break;
+    case COTOUR:
+      accel = "<control>U";
+      break;
+    default:
+      break;
     }
-    void (*f) (displayd * dpy, ggobid * gg) =
-      GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->display_set;
-    if (f)
-      f (display, gg);
 
-    /* use an informative label for the default actions, if necessary */
-    path = g_strdup_printf ("%s%s", pprefix, "ExtendedDisplayPMode");
-    action = gtk_ui_manager_get_action (gg->main_menu_manager, path);
-    if (action)
-      g_object_set (G_OBJECT (action), "label",
-                    GGOBI (getPModeScreenName) (EXTENDED_DISPLAY_PMODE,
-                                                display), NULL);
-    g_free (path);
-    path = g_strdup_printf ("%s%s", iprefix, "DefaultIMode");
-    action = gtk_ui_manager_get_action (gg->main_menu_manager, path);
-    if (action)
-      g_object_set (G_OBJECT (action), "label",
-                    GGOBI (getIModeScreenName) (DEFAULT_IMODE, display),
-                    NULL);
-    g_free (path);
-    /* force the radio actions to update */
-    path = g_strdup_printf ("%s%s", pprefix,
-                            GGOBI (getPModeName) (pmode_get
-                                                  (gg->current_display, gg)));
-    action = gtk_ui_manager_get_action (gg->main_menu_manager, path);
-    if (action)
-      gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action), true);
-    g_free (path);
-    path =
-      g_strdup_printf ("%s%s", iprefix,
-                       GGOBI (getIModeName) (imode_get (gg)));
-    action = gtk_ui_manager_get_action (gg->main_menu_manager, path);
-    if (action)
-      gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action), true);
-    g_free (path);
+    item = gtk_radio_menu_item_new_with_mnemonic (pmode_group, label);
+    pmode_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (item));
+    g_object_set_data (G_OBJECT (item), "pmode", GINT_TO_POINTER (pmode));
+    gtk_menu_shell_append (GTK_MENU_SHELL (pmode_menu), item);
+    if (accel != NULL) {
+      guint key = 0;
+      GdkModifierType modifiers = 0;
+
+      gtk_accelerator_parse (accel, &key, &modifiers);
+      if (key != 0)
+        gtk_widget_add_accelerator (item, "activate", gg->main_accel_group,
+                                    key, modifiers, GTK_ACCEL_VISIBLE);
+    }
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item),
+                                    pmode == pmode_get (display, gg));
+    g_signal_connect (G_OBJECT (item), "toggled",
+                      G_CALLBACK (pmode_menu_item_toggled_cb), gg);
+    gtk_widget_show (item);
+    have_pmode = true;
   }
 
+  for (i = 0; i < G_N_ELEMENTS (interaction_modes); i++) {
+    InteractionMode imode = interaction_modes[i];
+    GtkWidget *item;
+    const gchar *label;
+    const gchar *accel = NULL;
+    if (!display_type_handles_interaction (display, imode))
+      continue;
+
+    label = GGOBI (getIModeScreenName) (imode, display);
+    switch (imode) {
+    case DEFAULT_IMODE:
+      accel = "<control>H";
+      break;
+    case SCALE:
+      accel = "<control>S";
+      break;
+    case BRUSH:
+      accel = "<control>B";
+      break;
+    case IDENT:
+      accel = "<control>I";
+      break;
+    case EDGEED:
+      accel = "<control>E";
+      break;
+    case MOVEPTS:
+      accel = "<control>M";
+      break;
+    default:
+      break;
+    }
+
+    if (imode != DEFAULT_IMODE && !imode_separator_added) {
+      GtkWidget *separator = gtk_separator_menu_item_new ();
+
+      gtk_menu_shell_append (GTK_MENU_SHELL (imode_menu), separator);
+      gtk_widget_show (separator);
+      imode_separator_added = true;
+    }
+
+    item = gtk_radio_menu_item_new_with_mnemonic (imode_group, label);
+    imode_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (item));
+    g_object_set_data (G_OBJECT (item), "imode", GINT_TO_POINTER (imode));
+    gtk_menu_shell_append (GTK_MENU_SHELL (imode_menu), item);
+    if (accel != NULL) {
+      guint key = 0;
+      GdkModifierType modifiers = 0;
+
+      gtk_accelerator_parse (accel, &key, &modifiers);
+      if (key != 0)
+        gtk_widget_add_accelerator (item, "activate", gg->main_accel_group,
+                                    key, modifiers, GTK_ACCEL_VISIBLE);
+    }
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (item),
+                                    imode == imode_get (gg));
+    g_signal_connect (G_OBJECT (item), "toggled",
+                      G_CALLBACK (imode_menu_item_toggled_cb), gg);
+    gtk_widget_show (item);
+    have_imode = true;
+  }
+
+  if (GGOBI_IS_EXTENDED_DISPLAY (display)) {
+    void (*set_display) (displayd * dpy, ggobid * gg) =
+      GGOBI_EXTENDED_DISPLAY_GET_CLASS (display)->display_set;
+    if (set_display != NULL)
+      set_display (display, gg);
+  }
+
+  if (pmode_item != NULL) {
+    if (have_pmode)
+      gtk_widget_show (pmode_item);
+    else
+      gtk_widget_hide (pmode_item);
+  }
+  if (imode_item != NULL) {
+    if (have_imode)
+      gtk_widget_show (imode_item);
+    else
+      gtk_widget_hide (imode_item);
+  }
 }
 
 void
@@ -676,7 +777,6 @@ GGOBI (full_viewmode_set) (ProjectionMode pmode, InteractionMode imode,
      * work out which menus (Options, Reset, I/O) need to be present
      * on the main menubar and the display menubar.
      */
-    /*main_miscmenus_update (gg->pmode_prev, gg->imode_prev, display, gg); */
     display_mode_menus_update (gg->pmode_prev, gg->imode_prev, display, gg);
 
     /*-- redraw this display --*/
@@ -693,11 +793,6 @@ GGOBI (full_viewmode_set) (ProjectionMode pmode, InteractionMode imode,
   else {                        /* if there's no display */
     viewmode_set (NULL_PMODE, NULL_IMODE, gg);
     /*-- need to remove console menus: Options, Reset, ... --*/
-    /*main_miscmenus_update (gg->pmode_prev, gg->imode_prev, NULL, gg); */
-    if (gg->mode_merge_id)
-      gtk_ui_manager_remove_ui (gg->main_menu_manager, gg->mode_merge_id);
-    //submenu_destroy (gg->imode_item);
-
     return (NULL_IMODE);
   }
 
@@ -731,30 +826,105 @@ quit_ggobi (ggobid * gg)
 }
 
 /* action callbacks */
+static GtkWidget *
+main_menu_add_named_submenu (GtkWidget *menu_bar, const gchar *label,
+                             const gchar *name, ggobid *gg)
+{
+  GtkWidget *item = gtk_menu_item_new_with_mnemonic (label);
+  GtkWidget *menu = gtk_menu_new ();
+
+  gtk_widget_set_name (item, name);
+  gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), menu);
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu_bar), item);
+  GGobi_widget_set (item, gg, true);
+  gtk_widget_show (item);
+
+  return menu;
+}
+
+static GtkWidget *
+main_menu_get_submenu (ggobid *gg, const gchar *name)
+{
+  GtkWidget *item = widget_find_by_name (gg->main_menubar, name);
+
+  if (item == NULL)
+    return NULL;
+
+  return gtk_menu_item_get_submenu (GTK_MENU_ITEM (item));
+}
+
+static GtkWidget *
+main_menu_append_item (GtkWidget *menu, const gchar *label, const gchar *name,
+                       const gchar *accel, const gchar *tooltip,
+                       GCallback callback, gpointer data, ggobid *gg)
+{
+  GtkWidget *item =
+    ggobi_menu_append_item (menu, label, accel, gg->main_accel_group,
+                            callback, data);
+
+  if (name != NULL)
+    gtk_widget_set_name (item, name);
+  if (tooltip != NULL)
+    gtk_widget_set_tooltip_text (item, gg->tips ? tooltip : NULL);
+  GGobi_widget_set (item, gg, true);
+  gtk_widget_show (item);
+
+  return item;
+}
+
+static GtkWidget *
+main_menu_append_check_item (GtkWidget *menu, const gchar *label,
+                             const gchar *name, const gchar *accel,
+                             const gchar *tooltip, gboolean active,
+                             GCallback callback, gpointer data, ggobid *gg)
+{
+  GtkWidget *item =
+    ggobi_menu_append_check_item (menu, label, accel, gg->main_accel_group,
+                                  active, callback, data);
+
+  if (name != NULL)
+    gtk_widget_set_name (item, name);
+  if (tooltip != NULL)
+    gtk_widget_set_tooltip_text (item, gg->tips ? tooltip : NULL);
+  GGobi_widget_set (item, gg, true);
+  gtk_widget_show (item);
+
+  return item;
+}
+
 static void
-action_open_cb (GtkAction * action, ggobid * gg)
+main_menu_append_separator (GtkWidget *menu)
+{
+  GtkWidget *item = gtk_separator_menu_item_new ();
+
+  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
+  gtk_widget_show (item);
+}
+
+static void
+action_open_cb (GtkWidget * item, ggobid * gg)
 {
   filename_get_r (gg);
 }
 static void
-action_new_cb (GtkAction * action, ggobid * gg)
+action_new_cb (GtkWidget * item, ggobid * gg)
 {
   create_new_ggobi ();
 }
 static void
-action_save_cb (GtkAction * action, ggobid * gg)
+action_save_cb (GtkWidget * item, ggobid * gg)
 {
   writeall_window_open (gg);
 }
 #ifdef STORE_SESSION_ENABLED
 static void
-action_store_session_cb (GtkAction * action, ggobid * gg)
+action_store_session_cb (GtkWidget * item, ggobid * gg)
 {
   store_session (gg);
 }
 #endif
 static void
-action_close_cb (GtkAction * action, ggobid * gg)
+action_close_cb (GtkWidget * item, ggobid * gg)
 {
   ggobi_close (gg);
 }
@@ -764,342 +934,249 @@ signal_delete_cb (ggobid * gg, GdkEvent * ev, GtkWidget * w)
   ggobi_close (gg);
 }
 static void
-action_quit_cb (GtkAction * action, ggobid * gg)
+action_quit_cb (GtkWidget * item, ggobid * gg)
 {
   quit_ggobi (gg);
 }
 static void
-action_manipulate_cb (GtkAction * action, ggobid * gg)
+action_manipulate_cb (GtkWidget * item, ggobid * gg)
 {
   vartable_open (gg);
 }
 static void
-action_transform_cb (GtkAction * action, ggobid * gg)
+action_transform_cb (GtkWidget * item, ggobid * gg)
 {
   transform_window_open (gg);
 }
 static void
-action_sphere_cb (GtkAction * action, ggobid * gg)
+action_sphere_cb (GtkWidget * item, ggobid * gg)
 {
   sphere_panel_open (gg);
 }
 static void
-action_jitter_cb (GtkAction * action, ggobid * gg)
+action_jitter_cb (GtkWidget * item, ggobid * gg)
 {
   jitter_window_open (gg);
 }
 static void
-action_color_schemes_cb (GtkAction * action, ggobid * gg)
+action_color_schemes_cb (GtkWidget * item, ggobid * gg)
 {
   svis_window_open (gg);
 }
 static void
-action_autobrush_cb (GtkAction * action, ggobid * gg)
+action_autobrush_cb (GtkWidget * item, ggobid * gg)
 {
   wvis_window_open (gg);
 }
 static void
-action_color_glyph_groups_cb (GtkAction * action, ggobid * gg)
+action_color_glyph_groups_cb (GtkWidget * item, ggobid * gg)
 {
   cluster_window_open (gg);
 }
 static void
-action_subset_cb (GtkAction * action, ggobid * gg)
+action_subset_cb (GtkWidget * item, ggobid * gg)
 {
   subset_window_open (gg);
 }
 
 #ifdef SMOOTH_IMPLEMENTED
 static void
-action_smooth_cb (GtkAction * action, ggobid * gg)
+action_smooth_cb (GtkWidget * item, ggobid * gg)
 {
   smooth_window_open (gg);
 }
 #endif
 static void
-action_impute_cb (GtkAction * action, ggobid * gg)
+action_impute_cb (GtkWidget * item, ggobid * gg)
 {
   impute_window_open (gg);
 }
 static void
-action_about_cb (GtkAction * action, ggobid * gg)
+action_about_cb (GtkWidget * item, ggobid * gg)
 {
   splash_show (gg);
 }
 static void
-action_plugins_cb (GtkAction * action, ggobid * gg)
+action_plugins_cb (GtkWidget * item, ggobid * gg)
 {
   show_plugin_list (gg);
 }
 static void
-action_toggle_tooltips_cb (GtkToggleAction * action, ggobid * gg)
+action_toggle_tooltips_cb (GtkCheckMenuItem * item, ggobid * gg)
 {
-  tooltips_show (gtk_toggle_action_get_active (action), gg);
+  tooltips_show (gtk_check_menu_item_get_active (item), gg);
 }
 static void
-action_toggle_cpanel_cb (GtkToggleAction * action, ggobid * gg)
+action_toggle_cpanel_cb (GtkCheckMenuItem * item, ggobid * gg)
 {
-  cpanel_show (gtk_toggle_action_get_active (action), gg);
+  cpanel_show (gtk_check_menu_item_get_active (item), gg);
 }
 static void
-action_toggle_statusbar_cb (GtkToggleAction * action, ggobid * gg)
+action_toggle_statusbar_cb (GtkCheckMenuItem * item, ggobid * gg)
 {
-  statusbar_show (gtk_toggle_action_get_active (action), gg);
+  statusbar_show (gtk_check_menu_item_get_active (item), gg);
 }
 
 static void
-action_radio_pmode_cb (GtkRadioAction * action, GtkRadioAction * current,
-                       ggobid * gg)
+pmode_menu_item_toggled_cb (GtkCheckMenuItem * item, ggobid * gg)
 {
-  ProjectionMode pm =
-    (ProjectionMode) gtk_radio_action_get_current_value (action);
+  ProjectionMode pm;
 
-  /* I don't know why this other test used to be necessary when
-     it doesn't seem to be any more, but I know it does great harm
-     when I'm using radio buttons ... dfs */
+  if (!gtk_check_menu_item_get_active (item) || gg->current_display == NULL)
+    return;
 
-  if ((pm != gg->pmode /*|| gg->imode != DEFAULT_IMODE */ ) &&
+  pm = (ProjectionMode) GPOINTER_TO_INT (g_object_get_data
+                                         (G_OBJECT (item), "pmode"));
+
+  if ((pm != gg->pmode) &&
       projection_ok (pm, gg->current_display)) {
-    /* When the pmode is reset, the imode is set to the default */
     GGOBI (full_viewmode_set) (pm, DEFAULT_IMODE, gg);
   }
 }
 static void
-action_radio_imode_cb (GtkRadioAction * action, GtkRadioAction * current,
-                       ggobid * gg)
+imode_menu_item_toggled_cb (GtkCheckMenuItem * item, ggobid * gg)
 {
   InteractionMode im;
 
-  im = (InteractionMode) gtk_radio_action_get_current_value (action);
+  if (!gtk_check_menu_item_get_active (item))
+    return;
+
+  im = (InteractionMode) GPOINTER_TO_INT (g_object_get_data
+                                          (G_OBJECT (item), "imode"));
   if (im != gg->imode) {
     GGOBI (full_viewmode_set) (NULL_PMODE, im, gg);
   }
 }
 
-static const gchar *main_ui_str =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='File'>"
-  "			<menuitem action='Open'/>"
-  "			<menuitem action='New'/>"
-  "			<menuitem action='Save'/>" "			<menu action='Shortcuts'/>"
-#ifdef STORE_SESSION_ENABLED
-  "			<separator/>" "			<menuitem action='StoreSession'/>"
-#endif
-  "			<separator/>"
-  "			<menu action='Options'>"
-  "				<menuitem action='ShowTooltips'/>"
-  "				<menuitem action='ShowControlPanel'/>"
-  "				<menuitem action='ShowStatusbar'/>"
-  "			</menu>"
-  "			<separator/>"
-  "			<menuitem action='Close'/>"
-  "			<menuitem action='Quit'/>"
-  "		</menu>"
-  "		<menu action='Display'/>"
-  "		<menu action='PMode'/>"
-  "		<menu action='IMode'/>"
-  "		<menu action='Tools'>"
-  "			<menuitem action='VariableManipulation'/>"
-  "			<menuitem action='VariableTransformation'/>"
-  "			<menuitem action='Sphering'/>"
-#ifdef INFERENCE_IMPLEMENTED
-  "			<menuitem action='Inference'/>"
-#endif
-  "			<menuitem action='VariableJittering'/>"
-  "			<separator/>"
-  "			<menuitem action='ColorSchemes'/>"
-  "			<menuitem action='AutoBrushing'/>"
-  "			<menuitem action='ColorAndGlyphGroups'/>"
-  "			<separator/>" "			<menuitem action='CaseSubsettingAndSampling'/>"
-#ifdef SMOOTH_IMPLEMENTED
-  "			<menuitem action='Smooth'/>"
-#endif
-  "			<menuitem action='MissingValues'/>"
-  "			<separator/>"
-  "		</menu>"
-  "		<menu action='Help'>"
-  "			<menuitem action='AboutGGobi'/>"
-  "			<menuitem action='AboutPlugins'/>"
-  "		</menu>" "	</menubar>" "</ui>";
-
-static GtkActionEntry entries[] = {
-  {"File", NULL, "_File"},
-  {"Open", NULL, "_Open", NULL, "Open a datafile",
-   G_CALLBACK (action_open_cb)},
-  {"New", NULL, "_New", NULL, "Create a new GGobi instance",
-   G_CALLBACK (action_new_cb)},
-  {"Save", NULL, "_Save", "<control>V", "Save some data",
-   G_CALLBACK (action_save_cb)},
-  {"Shortcuts", NULL, "Shortc_uts"},
-#ifdef STORE_SESSION_ENABLED
-  {"StoreSession", NULL, "Store Session", NULL,
-   "Save this GGobi session",
-   G_CALLBACK (action_store_session_cb)
-   },
-#endif
-  {"Close", NULL, "_Close", "<control>C",
-   "Close this GGobi instance", G_CALLBACK (action_close_cb)},
-  {"Quit", NULL, "_Quit", "<control>Q", "Quit GGobi",
-   G_CALLBACK (action_quit_cb)},
-
-  {"Display", NULL, "_Display"},
-  {"PMode", NULL, "_View"},
-  {"IMode", NULL, "_Interaction"},
-  {"Options", NULL, "_Options"},
-
-  {"Tools", NULL, "_Tools"},
-  {"VariableManipulation", NULL, "Variable _Manipulation", NULL,
-   "Open a table of variables for manipulation",
-   G_CALLBACK (action_manipulate_cb)
-   },
-  {"VariableTransformation", NULL, "Variable _Transformation",
-   NULL,
-   "Perform transformations on the dataset's variables",
-   G_CALLBACK (action_transform_cb)
-   },
-  {"Sphering", NULL, "_Sphering (PCA)", NULL,
-   "Open a panel to perform sphering",
-   G_CALLBACK (action_sphere_cb)
-   },
-#ifdef INFERENCE_IMPLEMENTED    /* to do */
-  {"Inference", NULL, "_Inference", NULL, "Perform inference",
-   NULL},
-#endif
-  {"VariableJittering", NULL, "Variable _Jittering", NULL,
-   "'Jitter' some variables",
-   G_CALLBACK (action_jitter_cb)
-   },
-  {"ColorSchemes", NULL, "_Color Schemes", NULL,
-   "Configure and pick color schemes",
-   G_CALLBACK (action_color_schemes_cb)
-   },
-  {"AutoBrushing", NULL, "_Automatic Brushing", NULL,
-   "Apply color scheme along a variable",
-   G_CALLBACK (action_autobrush_cb)
-   },
-  {"ColorAndGlyphGroups", NULL, "Color & _Glyph Groups", NULL,
-   "Configure color and glyph groups",
-   G_CALLBACK (action_color_glyph_groups_cb)
-   },
-  {"CaseSubsettingAndSampling", NULL, "Case S_ubsetting and Sampling", NULL,
-   "Extract and resample subsets of cases", G_CALLBACK (action_subset_cb)
-   },
-#ifdef SMOOTH_IMPLEMENTED
-  {"Smoothing", NULL, "Sm_oothing", NULL, "Smooth the data",
-   G_CALLBACK (action_smooth_cb)},
-#endif
-  {"MissingValues", NULL, "Missing _Values", NULL, "Impute missing values",
-   G_CALLBACK (action_impute_cb)
-   },
-
-  {"Help", NULL, "_Help"},
-  {"AboutGGobi", NULL, "About _GGobi", NULL,
-   "Discover the magic behind GGobi",
-   G_CALLBACK (action_about_cb)
-   },
-  {"AboutPlugins", NULL, "About _Plugins", NULL, "Current plugin status",
-   G_CALLBACK (action_plugins_cb)
-   }
-};
-
-static GtkRadioActionEntry pmode_entries[] = {
-  /* here is where the i/p mode stuff goes */
-  {"ExtendedDisplayPMode", NULL, "Default", "<control>H",
-   /* assumes 'extended display pmode' is 'default' */
-   "Switch to the default view mode for this display",
-   EXTENDED_DISPLAY_PMODE},
-  {"1D Plot", NULL, "1_D Plot", "<control>D",
-   "View a 1D plot of the data", P1PLOT},
-  {"XY Plot", NULL, "_XY Plot", "<control>X",
-   "View a 2D plot of the data", XYPLOT},
-  {"1D Tour", NULL, "1D _Tour", "<control>T",
-   "Tour the data in a single dimension", TOUR1D},
-  {"Rotation", NULL, "_Rotation", "<control>R",
-   "Tour the data in two dimensions, three variables at a time", TOUR2D3},
-  {"2D Tour", NULL, "2D To_ur", "<control>G",
-   "Take a grand tour of the data", TOUR2D},
-  {"2x1D Tour", NULL, "2x1D T_our", "<control>U",
-   "Take a 2x1D (correlation) tour of the data", COTOUR}
-};
-
-static GtkRadioActionEntry imode_entries[] = {
-  {"DefaultIMode", NULL, "Default", "<control>H",
-   /* assumes 'extended display pmode' is 'default' */
-   "Switch to the default interaction mode for this view mode",
-   DEFAULT_IMODE},
-  {"Scale", NULL, "_Scale", "<control>S",
-   "Scale (pan and zoom) the data", SCALE},
-  {"Brush", NULL, "_Brush", "<control>B",
-   "Brush (color) points", BRUSH},
-  {"Identify", NULL, "_Identify", "<control>I",
-   "Identify points (query their values)", IDENT},
-  {"Edit Edges", NULL, "_Edit Edges", "<control>E",
-   "Edit the edges in the plot", EDGEED},
-  {"Move Points", NULL, "_Move Points", "<control>M",
-   "Move the points in the plot", MOVEPTS}
-};
-
-GtkActionGroup *
-ggobi_actions_create (ggobid * gg)
+static GtkWidget *
+main_menu_build (ggobid *gg, GtkWidget *window)
 {
-  GtkToggleActionEntry t_entries[] = {  /* not global because depends on gg state */
-    {"ShowTooltips", NULL, "Show _Tooltips", NULL,
-     "Toggle display of helpful tips like this one",
-     G_CALLBACK (action_toggle_tooltips_cb),
-     gg->tips},
-    {"ShowControlPanel", NULL, "Show _Control Panel", NULL,
-     "Toggle display of control panel",
-     G_CALLBACK (action_toggle_cpanel_cb), true},
-    {"ShowStatusbar", NULL, "Show _Statusbar", NULL,
-     "Toggle display of statusbar at bottom",
-     G_CALLBACK (action_toggle_statusbar_cb), gg->statusbar_p}
-  };
+  GtkWidget *menubar = gtk_menu_bar_new ();
+  GtkWidget *file_menu, *options_menu, *tools_menu, *help_menu;
+  GtkWidget *pmode_item, *imode_item;
 
-  GtkActionGroup *actions = gtk_action_group_new ("GGobiActions");
-  gtk_action_group_add_actions (actions, entries, G_N_ELEMENTS (entries), gg);
-  gtk_action_group_add_toggle_actions (actions, t_entries,
-                                       G_N_ELEMENTS (t_entries), gg);
-  gtk_action_group_add_radio_actions (actions, pmode_entries,
-                                      G_N_ELEMENTS (pmode_entries),
-                                      EXTENDED_DISPLAY_PMODE,
-                                      G_CALLBACK (action_radio_pmode_cb), gg);
-  gtk_action_group_add_radio_actions (actions, imode_entries,
-                                      G_N_ELEMENTS (imode_entries),
-                                      DEFAULT_IMODE,
-                                      G_CALLBACK (action_radio_imode_cb), gg);
+  gg->main_accel_group = ggobi_window_add_accel_group (window);
 
-  ggobi_action_group_set_icon_name (actions, "Open", "document-open");
-  ggobi_action_group_set_icon_name (actions, "New", "document-new");
-  ggobi_action_group_set_icon_name (actions, "Save", "document-save");
-  ggobi_action_group_set_icon_name (actions, "StoreSession", "document-save");
-  ggobi_action_group_set_icon_name (actions, "Close", "window-close");
-  ggobi_action_group_set_icon_name (actions, "Quit", "application-exit");
-  ggobi_action_group_set_icon_name (actions, "VariableManipulation",
-                                    "document-properties");
-  ggobi_action_group_set_icon_name (actions, "VariableTransformation",
-                                    "insert-object");
-  ggobi_action_group_set_icon_name (actions, "Sphering", "system-run");
-  ggobi_action_group_set_icon_name (actions, "ColorSchemes",
-                                    "preferences-desktop-theme");
+  file_menu = main_menu_add_named_submenu (menubar, "_File",
+                                           "MAIN:file_topmenu", gg);
+  main_menu_append_item (file_menu, "_Open", "MAIN:file_open", NULL,
+                         "Open a datafile", G_CALLBACK (action_open_cb),
+                         gg, gg);
+  main_menu_append_item (file_menu, "_New", "MAIN:file_new", NULL,
+                         "Create a new GGobi instance",
+                         G_CALLBACK (action_new_cb), gg, gg);
+  main_menu_append_item (file_menu, "_Save", "MAIN:file_save",
+                         "<control>V", "Save some data",
+                         G_CALLBACK (action_save_cb), gg, gg);
+  main_menu_add_named_submenu (file_menu, "Shortc_uts",
+                               "MAIN:file_shortcuts_topmenu", gg);
+#ifdef STORE_SESSION_ENABLED
+  main_menu_append_separator (file_menu);
+  main_menu_append_item (file_menu, "Store Session",
+                         "MAIN:file_store_session", NULL,
+                         "Save this GGobi session",
+                         G_CALLBACK (action_store_session_cb), gg, gg);
+#endif
+  main_menu_append_separator (file_menu);
+  options_menu = main_menu_add_named_submenu (file_menu, "_Options",
+                                              "MAIN:file_options_topmenu", gg);
+  main_menu_append_check_item (options_menu, "Show _Tooltips",
+                               "MAIN:file_show_tooltips", NULL,
+                               "Toggle display of helpful tips like this one",
+                               gg->tips, G_CALLBACK (action_toggle_tooltips_cb),
+                               gg, gg);
+  main_menu_append_check_item (options_menu, "Show _Control Panel",
+                               "MAIN:file_show_control_panel", NULL,
+                               "Toggle display of control panel",
+                               true, G_CALLBACK (action_toggle_cpanel_cb),
+                               gg, gg);
+  main_menu_append_check_item (options_menu, "Show _Statusbar",
+                               "MAIN:file_show_statusbar", NULL,
+                               "Toggle display of statusbar at bottom",
+                               gg->statusbar_p,
+                               G_CALLBACK (action_toggle_statusbar_cb),
+                               gg, gg);
+  main_menu_append_separator (file_menu);
+  main_menu_append_item (file_menu, "_Close", "MAIN:file_close",
+                         "<control>C", "Close this GGobi instance",
+                         G_CALLBACK (action_close_cb), gg, gg);
+  main_menu_append_item (file_menu, "_Quit", "MAIN:file_quit",
+                         "<control>Q", "Quit GGobi",
+                         G_CALLBACK (action_quit_cb), gg, gg);
 
-  g_object_set (G_OBJECT (gtk_action_group_get_action (actions, "Display")),
-                "hide_if_empty", false, NULL);
-  /*g_object_set(G_OBJECT(gtk_action_group_get_action(actions, "Shortcuts")), 
-     "hide_if_empty", false, NULL); */
+  main_menu_add_named_submenu (menubar, "_Display",
+                               "MAIN:display_topmenu", gg);
+  main_menu_add_named_submenu (menubar, "_View",
+                               "MAIN:pmode_topmenu", gg);
+  main_menu_add_named_submenu (menubar, "_Interaction",
+                               "MAIN:imode_topmenu", gg);
 
-  return (actions);
-}
+  tools_menu = main_menu_add_named_submenu (menubar, "_Tools",
+                                            "MAIN:tools_topmenu", gg);
+  main_menu_append_item (tools_menu, "Variable _Manipulation",
+                         "MAIN:tools_manipulate", NULL,
+                         "Open a table of variables for manipulation",
+                         G_CALLBACK (action_manipulate_cb), gg, gg);
+  main_menu_append_item (tools_menu, "Variable _Transformation",
+                         "MAIN:tools_transform", NULL,
+                         "Perform transformations on the dataset's variables",
+                         G_CALLBACK (action_transform_cb), gg, gg);
+  main_menu_append_item (tools_menu, "_Sphering (PCA)",
+                         "MAIN:tools_sphere", NULL,
+                         "Open a panel to perform sphering",
+                         G_CALLBACK (action_sphere_cb), gg, gg);
+  main_menu_append_item (tools_menu, "Variable _Jittering",
+                         "MAIN:tools_jitter", NULL,
+                         "'Jitter' some variables",
+                         G_CALLBACK (action_jitter_cb), gg, gg);
+  main_menu_append_separator (tools_menu);
+  main_menu_append_item (tools_menu, "_Color Schemes",
+                         "MAIN:tools_color_schemes", NULL,
+                         "Configure and pick color schemes",
+                         G_CALLBACK (action_color_schemes_cb), gg, gg);
+  main_menu_append_item (tools_menu, "_Automatic Brushing",
+                         "MAIN:tools_autobrush", NULL,
+                         "Apply color scheme along a variable",
+                         G_CALLBACK (action_autobrush_cb), gg, gg);
+  main_menu_append_item (tools_menu, "Color & _Glyph Groups",
+                         "MAIN:tools_color_glyph_groups", NULL,
+                         "Configure color and glyph groups",
+                         G_CALLBACK (action_color_glyph_groups_cb), gg, gg);
+  main_menu_append_separator (tools_menu);
+  main_menu_append_item (tools_menu, "Case S_ubsetting and Sampling",
+                         "MAIN:tools_subset", NULL,
+                         "Extract and resample subsets of cases",
+                         G_CALLBACK (action_subset_cb), gg, gg);
+#ifdef SMOOTH_IMPLEMENTED
+  main_menu_append_item (tools_menu, "Sm_oothing",
+                         "MAIN:tools_smooth", NULL,
+                         "Smooth the data",
+                         G_CALLBACK (action_smooth_cb), gg, gg);
+#endif
+  main_menu_append_item (tools_menu, "Missing _Values",
+                         "MAIN:tools_missing_values", NULL,
+                         "Impute missing values",
+                         G_CALLBACK (action_impute_cb), gg, gg);
+  main_menu_append_separator (tools_menu);
 
-GtkUIManager *
-ggobi_menu_manager_create (ggobid * gg)
-{
-  GtkUIManager *manager = gtk_ui_manager_new ();
-  GtkActionGroup *actions = ggobi_actions_create (gg);
-  gtk_ui_manager_insert_action_group (manager, actions, 0);
-  gtk_ui_manager_set_add_tearoffs (manager, true);
-  g_object_unref (G_OBJECT (actions));
-  return (manager);
+  help_menu = main_menu_add_named_submenu (menubar, "_Help",
+                                           "MAIN:help_topmenu", gg);
+  main_menu_append_item (help_menu, "About _GGobi", "MAIN:help_about_ggobi",
+                         NULL, "Discover the magic behind GGobi",
+                         G_CALLBACK (action_about_cb), gg, gg);
+  main_menu_append_item (help_menu, "About _Plugins",
+                         "MAIN:help_about_plugins", NULL,
+                         "Current plugin status",
+                         G_CALLBACK (action_plugins_cb), gg, gg);
+
+  pmode_item = widget_find_by_name (menubar, "MAIN:pmode_topmenu");
+  imode_item = widget_find_by_name (menubar, "MAIN:imode_topmenu");
+  if (pmode_item != NULL)
+    gtk_widget_hide (pmode_item);
+  if (imode_item != NULL)
+    gtk_widget_hide (imode_item);
+
+  return menubar;
 }
 
 void
@@ -1143,11 +1220,7 @@ make_ui (ggobid * gg)
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
   gtk_container_add (GTK_CONTAINER (window), vbox);
 
-  gg->main_menu_manager = ggobi_menu_manager_create (gg);
-  gg->main_menubar =
-    create_menu_bar (gg->main_menu_manager, main_ui_str, window);
-  gg->main_accel_group =
-    gtk_ui_manager_get_accel_group (gg->main_menu_manager);
+  gg->main_menubar = main_menu_build (gg, window);
 
   if (sessionOptions->info && sessionOptions->info->numInputs > 0) {
     addPreviousFilesMenu (sessionOptions->info, gg);
@@ -1237,9 +1310,7 @@ const gchar *const *GGOBI (getPModeKeys) (int *n)
   return (GGOBI (PModeKeys));
 }
 
-
-
-void load_previous_file (GtkAction * action, gpointer cbd);
+void load_previous_file (GtkWidget * item, gpointer cbd);
 /*
   Add the previous input sources to the menu.
  */
@@ -1248,33 +1319,27 @@ addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg)
 {
   gint i;
   InputDescription *input;
+  GtkWidget *shortcuts_menu = main_menu_get_submenu (gg,
+                                                     "MAIN:file_shortcuts_topmenu");
+
+  if (shortcuts_menu != NULL)
+    display_menu_clear (shortcuts_menu);
+
   if (info) {
-    GtkUIManager *manager = gg->main_menu_manager;
-    GtkActionGroup *actions = gtk_action_group_new ("Shortcuts");
-    guint merge_id = gtk_ui_manager_new_merge_id (manager);
-    gtk_ui_manager_insert_action_group (manager, actions, -1);
     for (i = 0; i < info->numInputs; i++) {
       input = &(info->descriptions[i].input);
-      if (input && input->fileName) {
-        gchar *action_name = g_strdup_printf ("Shortcut_%d", i);
-        GtkAction *action = gtk_action_new (action_name, input->fileName,
-                                            "Open this shortcut",
-                                            NULL);
-        g_object_set (G_OBJECT (action), "icon-name",
-                      "document-open-recent", NULL);
-        g_signal_connect (G_OBJECT (action), "activate",
+      if (input && input->fileName && shortcuts_menu != NULL) {
+        GtkWidget *item = gtk_menu_item_new_with_label (input->fileName);
+
+        g_signal_connect (G_OBJECT (item), "activate",
                           G_CALLBACK (load_previous_file),
                           info->descriptions + i);
-        g_object_set_data (G_OBJECT (action), "ggobi", gg);
-        gtk_action_group_add_action (actions, action);
-        gtk_ui_manager_add_ui (manager, merge_id, "/menubar/File/Shortcuts",
-                               action_name, action_name,
-                               GTK_UI_MANAGER_MENUITEM, false);
-        g_free (action_name);
-        g_object_unref (action);
-      }
+        g_object_set_data (G_OBJECT (item), "ggobi", gg);
+        GGobi_widget_set (item, gg, true);
+        gtk_menu_shell_append (GTK_MENU_SHELL (shortcuts_menu), item);
+        gtk_widget_show (item);
+      } 
     }
-    g_object_unref (actions);
   }
 }
 
@@ -1282,13 +1347,13 @@ addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg)
 ggobid *create_ggobi (InputDescription * desc);
 
 void
-load_previous_file (GtkAction * action, gpointer cbd)
+load_previous_file (GtkWidget * item, gpointer cbd)
 {
   InputDescription *desc;
   GGobiDescription *gdesc;
   ggobid *gg;
 
-  gg = (ggobid *) g_object_get_data (G_OBJECT (action), "ggobi");
+  gg = (ggobid *) g_object_get_data (G_OBJECT (item), "ggobi");
   gdesc = (GGobiDescription *) cbd;
   desc = &(gdesc->input);
 

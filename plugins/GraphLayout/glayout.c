@@ -12,23 +12,24 @@
 
 void       close_glayout_window(GtkWidget *w, PluginInstance *inst);
 GtkWidget *create_glayout_window(ggobid *gg, PluginInstance *inst);
-void       show_glayout_window (GtkAction *action, PluginInstance *inst);
+void       show_glayout_window (GtkWidget *widget, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  static GtkActionEntry entry = {
-	"GraphLayout", NULL, "Graph _Layout", NULL, "Layout graphs using graphviz", 
-		G_CALLBACK (show_glayout_window)
+  static const GGobiToolActionEntry entry = {
+    "GraphLayout", "Graph _Layout", NULL, "Layout graphs using graphviz",
+    G_CALLBACK (show_glayout_window)
   };  
-  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
+  GGOBI(addToolAction)(&entry, inst, gg);
   return(true);
 }
 
 
 void
-show_glayout_window (GtkAction *action, PluginInstance *inst)
+show_glayout_window (GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
   glayoutd *gl;
 
   if (g_slist_length(inst->gg->d) < 1) {
@@ -113,7 +114,6 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   GtkWidget *hscale, *vb, *opt, *apply_btn, *varnotebook;
   GtkObject *adj;
 #endif
-  GtkTooltips *tips = gtk_tooltips_new ();
   /*-- for lists of datads --*/
   gchar *tree_view_titles[2] = {"node sets", "edge sets"};
   GGobiData *d;
@@ -162,7 +162,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gtk_widget_set_name (GTK_WIDGET(tree_view), "nodeset");
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
   g_signal_connect (G_OBJECT (gg), "datad_added",
-    G_CALLBACK(glayout_tree_view_datad_added_cb), GTK_OBJECT (tree_view));
+    G_CALLBACK(glayout_tree_view_datad_added_cb), tree_view);
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
@@ -191,7 +191,7 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gtk_widget_set_name (GTK_WIDGET(tree_view), "edgeset");
   g_object_set_data(G_OBJECT (tree_view), "datad_swin", swin);
   g_signal_connect (G_OBJECT (gg), "datad_added",
-    G_CALLBACK(glayout_tree_view_datad_added_cb), GTK_OBJECT (tree_view));
+    G_CALLBACK(glayout_tree_view_datad_added_cb), tree_view);
   /*-- --*/
 
   for (l = gg->d; l; l = l->next) {
@@ -232,9 +232,9 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
       (gchar *) g_array_index (gl->dsrc->rowlab, gchar *, 0));
   g_signal_connect (G_OBJECT(gg),
     "sticky_point_added", G_CALLBACK(radial_center_set_cb), inst);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), entry,
-    "To reset the center node, use sticky identification in ggobi", 
-    NULL);
+  gtk_widget_set_tooltip_text (entry, gg->tips ?
+    "To reset the center node, use sticky identification in ggobi"
+    : NULL);
   gtk_box_pack_start (GTK_BOX (hb), entry, true, true, 2);
 
   /*-- checkbox: automatically update the center node when
@@ -245,9 +245,9 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(btn),
     gl->radialAutoUpdate);
   gtk_widget_set_name (btn, "RADIAL:autoupdate");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Automatically update the layout when a new sticky label is assigned in Identify mode, or wait until the apply button is pressed", 
-    NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Automatically update the layout when a new sticky label is assigned in Identify mode, or wait until the apply button is pressed"
+    : NULL);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
   /*-- checkbox: create new datad and display: this has to
@@ -260,9 +260,9 @@ create_glayout_window(ggobid *gg, PluginInstance *inst)
     gl->radialNewData);
   gtk_widget_set_sensitive (btn, false);
   gtk_widget_set_name (btn, "RADIAL:newdata");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Create new data and display when pressing the apply button, or re-use existing resources", 
-    NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Create new data and display when pressing the apply button, or re-use existing resources"
+    : NULL);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);
 
   btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
@@ -354,9 +354,9 @@ Add an option:  Model either 'circuit resistance' or 'shortest path'
   gtk_box_pack_start (GTK_BOX (hbox), vbox, false, false, 0);
 
   btn = gtk_check_button_new_with_mnemonic ("Use _edge length");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (tips), btn,
-    "Have neato use edge length in determining node positions, and use the selected variable as a source of lengths.  Edge lengths must be >= 1.0.",
-    NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Have neato use edge length in determining node positions, and use the selected variable as a source of lengths.  Edge lengths must be >= 1.0."
+    : NULL);
   g_signal_connect (G_OBJECT (btn), "toggled",
     G_CALLBACK (neato_use_edge_length_cb), inst);
   gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 2);

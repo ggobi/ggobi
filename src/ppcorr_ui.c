@@ -27,9 +27,16 @@ static GtkWidget *mbar;
 //static GtkAccelGroup *cpp_accel_group;
 
 static void
-hide_cb (GtkAction * action, GtkWidget * window)
+hide_cb (GtkWidget *w, GtkWidget *window)
 {
   gtk_widget_hide (window);
+}
+
+static gboolean
+hide_wmgr_cb (GtkWidget *w, GdkEvent *event, GtkWidget *window)
+{
+  gtk_widget_hide (window);
+  return TRUE;
 }
 
 static void
@@ -38,39 +45,18 @@ optimize_cb (GtkToggleButton * w)
   g_printerr ("optimize?  %d\n", gtk_toggle_button_get_active (w));
 }
 
-static const gchar *ui_str =
-  "<ui>"
-  "	<menubar>"
-  "		<menu action='File'/>"
-  "			<menuitem action='Close'/>" "		</menu>" "	</menubar>" "</ui>";
-
-static GtkActionEntry entries[] = {
-  {"File", NULL, "_File"},
-  {"Close", NULL, "_Close", "<control>C",
-   "Hide the projection pursuit window", G_CALLBACK (hide_cb)
-   }
-};
-static guint n_entries = G_N_ELEMENTS (entries);
-/*
-static GtkItemFactoryEntry menu_items[] = {
-  { "/_File",         NULL,         NULL, 0, "<Branch>" },
-  { "/File/Close",  
-         "",         (GtkItemFactoryCallback) hide_cb,        0, "<Item>" },
-};*/
-
 void
 ctourpp_window_open (ggobid * gg)
 {
   GtkWidget *hbox, *vbox, *vbc, *frame, *tgl, *entry;
   GtkWidget *da, *label, *hb;
+  GtkWidget *file_menu;
+  GtkAccelGroup *accel_group = NULL;
 
   if (window == NULL) {
-    GtkActionGroup *actions = gtk_action_group_new ("PPActions");
-    GtkUIManager *manager = gtk_ui_manager_new ();
-
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     g_signal_connect (G_OBJECT (window), "delete_event",
-                      G_CALLBACK (hide_cb), (gpointer) NULL);
+                      G_CALLBACK (hide_wmgr_cb), window);
     gtk_window_set_title (GTK_WINDOW (window), "Projection Pursuit");
     //gtk_window_set_policy (GTK_WINDOW (window), true, true, false);
     gtk_container_set_border_width (GTK_CONTAINER (window), 5);
@@ -81,17 +67,11 @@ ctourpp_window_open (ggobid * gg)
     vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
     gtk_container_add (GTK_CONTAINER (window), vbox);
-/*
-    cpp_accel_group = gtk_accel_group_new ();
-    get_main_menu (menu_items, sizeof (menu_items) / sizeof (menu_items[0]),
-                   cpp_accel_group, window, &mbar, (gpointer) window);
-*/
-
-    gtk_action_group_add_actions (actions, entries, n_entries, window);
-    ggobi_action_group_set_icon_name (actions, "Close", "window-close");
-    gtk_ui_manager_insert_action_group (manager, actions, 0);
-    mbar = create_menu_bar (manager, ui_str, window);
-    g_object_unref (G_OBJECT (actions));
+    accel_group = ggobi_window_add_accel_group (window);
+    mbar = gtk_menu_bar_new ();
+    file_menu = ggobi_menu_add_submenu (mbar, "_File");
+    ggobi_menu_append_item (file_menu, "_Close", "<control>C",
+                            accel_group, G_CALLBACK (hide_cb), window);
 
     gtk_box_pack_start (GTK_BOX (vbox), mbar, false, true, 0);
 

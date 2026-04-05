@@ -97,14 +97,13 @@ static void
 symbol_add (GtkWidget *table, gint k, gint row, gint col, 
   PluginInstance *inst)
 {
-  ggvisd *ggv = ggvisFromInst (inst);
   GtkWidget *ebox, *da;
   gint dawidth = 2 * NGLYPHSIZES + 1 + 10;
 
   ebox = gtk_event_box_new();
-  gtk_tooltips_set_tip(GTK_TOOLTIPS(ggv->tips), ebox,
-    "Select to add a cluster to the anchor set, deselect to remove it",
-    NULL);
+  gtk_widget_set_tooltip_text (ebox, inst->gg->tips ?
+    "Select to add a cluster to the anchor set, deselect to remove it"
+    : NULL);
 
   da = gtk_drawing_area_new();
   gtk_container_add(GTK_CONTAINER(ebox), da);
@@ -180,4 +179,3 @@ void clusters_changed_cb (ggobid *gg, GGobiData *d, void *inst)
 {  /* ignore the datad argument and use ggv->dpos or dsrc */
   ggv_anchor_table_build (inst);
 }
-

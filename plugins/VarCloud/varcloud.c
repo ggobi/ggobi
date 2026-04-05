@@ -13,22 +13,24 @@
 void    vcl_window_closed(GtkWidget *w, PluginInstance *inst);
 void    close_vcl_window_cb(GtkWidget *w, PluginInstance *inst);
 void    create_vcl_window(vcld *vcl, PluginInstance *inst);
-void    show_vcl_window (GtkAction *action, PluginInstance *inst);
+void    show_vcl_window (GtkWidget *widget, PluginInstance *inst);
 
 gboolean
 addToToolsMenu(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
-  static GtkActionEntry entry = {
-	"VarCloud", NULL, "Variogram _Cloud", NULL, "Spatial data analysis tool", 
-		G_CALLBACK (show_vcl_window)
+  static const GGobiToolActionEntry entry = {
+    "VarCloud", "Variogram _Cloud", NULL, "Spatial data analysis tool",
+    G_CALLBACK (show_vcl_window)
   };
-  GGOBI(addToolAction)(&entry, (gpointer)inst, gg);
+  GGOBI(addToolAction)(&entry, inst, gg);
   return(true);
 }
 
 void
-show_vcl_window (GtkAction *action, PluginInstance *inst)
+show_vcl_window (GtkWidget *widget, PluginInstance *inst)
 {
+  (void) widget;
+
   if (g_slist_length(inst->gg->d) < 1) {
     g_printerr ("No datasets to show\n");
     return;
@@ -157,8 +159,6 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   vartabled *vt;
   GtkListStore *model;
   GtkTreeIter iter;
-
-  vcl->tips = gtk_tooltips_new ();
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   g_object_set_data(G_OBJECT (window), "vcld", vcl);
@@ -335,24 +335,23 @@ create_vcl_window(vcld *vcl, PluginInstance *inst)
   /*-- run --*/
   btn = gtk_button_new_with_mnemonic ("_Var cloud");
   gtk_widget_set_name (btn, "VarCloud");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
-    "Launch variogram cloud plot, using Variable 1", NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Launch variogram cloud plot, using Variable 1" : NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 2);
   g_signal_connect (G_OBJECT (btn), "clicked",
     G_CALLBACK (launch_varcloud_cb), inst);
 
   btn = gtk_button_new_with_mnemonic ("_Cross-var cloud");
   gtk_widget_set_name (btn, "Cross");
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
-    "Launch cross-variogram cloud plot, using Variables 1 and 2", NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ?
+    "Launch cross-variogram cloud plot, using Variables 1 and 2" : NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 2);
   g_signal_connect (G_OBJECT (btn), "clicked",
     G_CALLBACK (launch_varcloud_cb), inst);
 
 
   btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
-  gtk_tooltips_set_tip (GTK_TOOLTIPS (vcl->tips), btn,
-    "Close this window", NULL);
+  gtk_widget_set_tooltip_text (btn, gg->tips ? "Close this window" : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
 		      G_CALLBACK (close_vcl_window_cb), inst); 
   gtk_box_pack_start (GTK_BOX (main_vbox), btn, false, false, 2);
@@ -385,4 +384,3 @@ void closeWindow(ggobid *gg, GGobiPluginInfo *plugin, PluginInstance *inst)
 {
   freePlugin (gg, inst);
 }
-

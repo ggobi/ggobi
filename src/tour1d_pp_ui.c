@@ -36,7 +36,7 @@ static GtkAdjustment *param_adj;
 */
 
 /*-- called when closed from the close menu item --*/
-static void action_close_cb (GtkAction *action, displayd *dsp) {
+static void action_close_cb (GtkWidget *w, displayd *dsp) {
   gtk_widget_hide (dsp->t1d_window);
   t1d_optimz(0, &dsp->t1d.get_new_target, 
     &dsp->t1d.target_selection_method, dsp);
@@ -64,8 +64,8 @@ close_wmgr_cb (GtkWidget *w, GdkEventButton *event, displayd *dsp) {
 }
 
 static void
-action_show_controls_cb(GtkToggleAction *action, displayd *dsp) {
-      if (gtk_toggle_action_get_active(action))
+action_show_controls_cb(GtkCheckMenuItem *item, displayd *dsp) {
+      if (gtk_check_menu_item_get_active(item))
         gtk_widget_show (dsp->t1d_control_frame);
       else
         gtk_widget_hide (dsp->t1d_control_frame);
@@ -218,46 +218,18 @@ ppda_draw_cb (GtkWidget *w, cairo_t *cr, displayd *dsp)
   return ppda_present (w, cr, dsp);
 }
 
-static const gchar* tour1dpp_ui =
-"<ui>"
-"	<menubar>"
-"		<menu action='File'>"
-"			<menuitem action='Close'/>"
-"		</menu>"
-"		<menu action='Options'>"
-"			<menuitem action='ShowControls'/>"
-"		</menu>"
-"	</menubar>"
-"</ui>";
-
-static GtkActionEntry entries[] = {
-	{ "File", NULL, "_File" },
-	{ "Close", NULL, "_Close", "<control>C",
-		"Hide the projection pursuit window", G_CALLBACK(action_close_cb)
-	},
-	{ "Options", NULL, "_Options" }
-};
-static GtkToggleActionEntry t_entries[] = {
-	{ "ShowControls", NULL, "_Show controls", "<control>S",
-		"Hide the controls on the left so that the graph consumes the entire window",
-		G_CALLBACK(action_show_controls_cb), true
-	}
-};
-
-
 void
 tour1dpp_window_open (ggobid *gg) {
   GtkWidget *hbox, *vbox, *vbc, *vb, *frame, *tgl, *hb, *opt, *sbar, *lbl;
+  GtkWidget *file_menu, *options_menu;
   GtkAdjustment *adj;
+  GtkAccelGroup *accel_group = NULL;
   /*GtkWidget *da, *label, *entry;*/
   displayd *dsp = gg->current_display;  /* ok as long as we only use the gui */
   GGobiData *d = dsp->d;
   /*-- to initialize the checkboxes in the menu --*/
 
   if (dsp->t1d_window == NULL) {
-	GtkUIManager *manager = gtk_ui_manager_new();
-	GtkActionGroup *actions = gtk_action_group_new("Tour1DPPActions");
-	
     dsp->t1d_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (dsp->t1d_window), 
       "Projection Pursuit - 1D");
@@ -275,18 +247,15 @@ tour1dpp_window_open (ggobid *gg) {
     vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 1);
     gtk_container_set_border_width (GTK_CONTAINER (vbox), 1);
     gtk_container_add (GTK_CONTAINER (dsp->t1d_window), vbox);
-
-	gtk_action_group_add_actions(actions, entries, G_N_ELEMENTS(entries), dsp);
-	gtk_action_group_add_toggle_actions(actions, t_entries, G_N_ELEMENTS(t_entries), dsp);
-	ggobi_action_group_set_icon_name (actions, "Close", "window-close");
-	gtk_ui_manager_insert_action_group(manager, actions, 0);
-	g_object_unref(G_OBJECT(actions));
-	dsp->t1d_mbar = create_menu_bar(manager, tour1dpp_ui, dsp->t1d_window);
-    /*dsp->t1d_pp_accel_group = gtk_accel_group_new ();
-    factory = get_main_menu (menu_items,
-      sizeof (menu_items) / sizeof (menu_items[0]),
-      dsp->t1d_pp_accel_group, dsp->t1d_window, &dsp->t1d_mbar,
-      (gpointer) dsp);*/
+    accel_group = ggobi_window_add_accel_group (dsp->t1d_window);
+    dsp->t1d_mbar = gtk_menu_bar_new ();
+    file_menu = ggobi_menu_add_submenu (dsp->t1d_mbar, "_File");
+    ggobi_menu_append_item (file_menu, "_Close", "<control>C",
+                            accel_group, G_CALLBACK (action_close_cb), dsp);
+    options_menu = ggobi_menu_add_submenu (dsp->t1d_mbar, "_Options");
+    ggobi_menu_append_check_item (options_menu, "_Show controls",
+                                  "<control>S", accel_group, true,
+                                  G_CALLBACK (action_show_controls_cb), dsp);
     gtk_box_pack_start (GTK_BOX (vbox), dsp->t1d_mbar, false, true, 0);
 
 /*
