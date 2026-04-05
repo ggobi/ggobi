@@ -36,8 +36,9 @@ display_set_position (windowDisplayd * display, ggobid * gg)
   gtk_widget_realize (display->window);
   if (x == 0 && y == 0) {
                        /*-- can't get any info for the first display --*/
-    posx = gdk_screen_width () / 4;
-    posy = gdk_screen_height () / 4;
+    ggobi_get_primary_monitor_size (&posx, &posy);
+    posx /= 4;
+    posy /= 4;
   }
   else {
     posx = x + (3 * width) / 4;

@@ -68,6 +68,7 @@ void GGobi_addToolAction (GtkActionEntry *entry, gpointer *data, ggobid *gg);
 GtkWidget* GGobi_addToolsMenuItem (gchar *label, ggobid *gg);
 gboolean   GGobi_addToolsMenuWidget(GtkWidget *entry, ggobid *gg);
 void       GGobi_widget_set (GtkWidget *, ggobid *gg, gboolean isWindow);
+void       ggobi_get_primary_monitor_size (gint *, gint *);
 GGobiData*     ValidateDatadRef (GGobiData *d, ggobid *gg, gboolean fatal);
 displayd*  ValidateDisplayRef(displayd *d, ggobid *gg, gboolean fatal);
 ggobid*    ValidateGGobiRef (ggobid *gg, gboolean fatal);

@@ -1188,7 +1188,9 @@ make_ui (ggobid * gg)
                                                  imode_name[gg->imode], gg));
   }
 
-  gtk_box_pack_start (GTK_BOX (hbox), gtk_vseparator_new (), false, false, 2);
+  gtk_box_pack_start (GTK_BOX (hbox),
+                      gtk_separator_new (GTK_ORIENTATION_VERTICAL),
+                      false, false, 2);
 
   /*-- Variable selection panel --*/
   varpanel_make (hbox, gg);

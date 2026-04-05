@@ -242,7 +242,8 @@ manip_select_cb (GtkWidget * w, GdkEvent * event, GGobiData * d)
 {
   GdkWindow *window = gtk_widget_get_window (GTK_WIDGET (d->varpanel_ui.hpane));
 
-  d->vcirc_ui.cursor = gdk_cursor_new (GDK_HAND2);
+  d->vcirc_ui.cursor =
+    gdk_cursor_new_for_display (gdk_window_get_display (window), GDK_HAND2);
   gdk_window_set_cursor (window, d->vcirc_ui.cursor);
   d->vcirc_ui.jcursor = (gint) GDK_HAND2;
 
@@ -378,9 +379,8 @@ varcircles_populate (GGobiData * d, ggobid * gg)
 
   d->vcirc_ui.table = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 
-  gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW
-                                         (d->vcirc_ui.swin),
-                                         d->vcirc_ui.table);
+  gtk_container_add (GTK_CONTAINER (d->vcirc_ui.swin),
+                     d->vcirc_ui.table);
 
   {
     GList *children;

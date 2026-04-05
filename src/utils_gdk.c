@@ -41,6 +41,28 @@ ggobi_flush_display (void)
     gdk_display_flush (display);
 }
 
+void
+ggobi_get_primary_monitor_size (gint *width, gint *height)
+{
+  GdkDisplay *display = gdk_display_get_default ();
+  GdkMonitor *monitor = NULL;
+  GdkRectangle geometry = { 0, 0, 1024, 768 };
+
+  if (display != NULL) {
+    monitor = gdk_display_get_primary_monitor (display);
+    if (monitor == NULL && gdk_display_get_n_monitors (display) > 0)
+      monitor = gdk_display_get_monitor (display, 0);
+  }
+
+  if (monitor != NULL)
+    gdk_monitor_get_geometry (monitor, &geometry);
+
+  if (width != NULL)
+    *width = geometry.width;
+  if (height != NULL)
+    *height = geometry.height;
+}
+
 /*
  * The plotted glyph is actually 2*size + 1 on a side, so the
  * size progression is  5, 7, 9, 11, 13, ...     That's

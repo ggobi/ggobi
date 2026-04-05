@@ -960,6 +960,7 @@ splot_cursor_set (GdkCursorType jcursor, splotd *sp)
   sp->jcursor = jcursor;
   if (sp->cursor != NULL)
     g_object_unref (sp->cursor);
-  sp->cursor = gdk_cursor_new (sp->jcursor);
+  sp->cursor = gdk_cursor_new_for_display (gdk_window_get_display (window),
+                                           sp->jcursor);
   gdk_window_set_cursor (window, sp->cursor);
 }

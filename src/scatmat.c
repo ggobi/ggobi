@@ -122,8 +122,9 @@ scatmat_new (displayd * display, gboolean use_window,
    * make the matrix take up no more than some fraction
    * the screen by default, and make the plots square.
    */
-  scr_width = gdk_screen_width () / 2;
-  scr_height = gdk_screen_height () / 2;
+  ggobi_get_primary_monitor_size (&scr_width, &scr_height);
+  scr_width /= 2;
+  scr_height /= 2;
   width = (WIDTH * scatmat_nvars > scr_width) ?
     (scr_width / scatmat_nvars) : WIDTH;
   height = (HEIGHT * scatmat_nvars > scr_height) ?

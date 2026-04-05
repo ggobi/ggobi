@@ -174,12 +174,12 @@ parcoords_new (displayd *display, gboolean use_window, gboolean missing_p,
   width = WIDTH;
   height = HEIGHT;
   if (arrangement == ARRANGE_ROW) {
-    screenwidth = gdk_screen_width();
+    ggobi_get_primary_monitor_size (&screenwidth, NULL);
     while (nplots * width > screenwidth) {
       width -= 10;
     }
   } else {
-    screenheight = gdk_screen_height();
+    ggobi_get_primary_monitor_size (NULL, &screenheight);
     while (nplots * height > screenheight) {
       height -= 10;
     }

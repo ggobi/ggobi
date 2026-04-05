@@ -567,9 +567,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
     gtk_grid_set_column_spacing (GTK_GRID (d->cluster_table), 10);
     g_object_set_data (G_OBJECT (d->cluster_table), "GGOBI_CLUSTER_TABLE_NROWS",
                        GINT_TO_POINTER (d->nclusters + 1));
-    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW
-                                           (scrolled_window),
-                                           d->cluster_table);
+    gtk_container_add (GTK_CONTAINER (scrolled_window), d->cluster_table);
 
     /*-- add the row of titles --*/
 

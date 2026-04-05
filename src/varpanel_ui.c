@@ -596,7 +596,7 @@ varpanel_populate (GGobiData * d, ggobid * gg)
                               nd > 1);
 
   /*-- create a paned widget --*/
-  d->varpanel_ui.hpane = gtk_hpaned_new ();
+  d->varpanel_ui.hpane = gtk_paned_new (GTK_ORIENTATION_HORIZONTAL);
   /* not possible to set gutter size in GTK2 */
   //gtk_paned_set_gutter_size (GTK_PANED(d->varpanel_ui.hpane), 0);
   /*-- set the handle position all the way to the right --*/
@@ -637,9 +637,8 @@ varpanel_populate (GGobiData * d, ggobid * gg)
                     G_CALLBACK (varpanel_tooltips_set_cb), d);
   /* */
 
-  gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW
-                                         (d->vcbox_ui.swin),
-                                         d->vcbox_ui.vbox);
+  gtk_container_add (GTK_CONTAINER (d->vcbox_ui.swin),
+                     d->vcbox_ui.vbox);
 
   /* Set shadow type for viewport */
   children = gtk_container_get_children (GTK_CONTAINER (d->vcbox_ui.swin));

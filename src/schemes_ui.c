@@ -338,7 +338,7 @@ svis_window_open (ggobid * gg)
     g_signal_connect (G_OBJECT (gg->svis.window),
                       "delete_event", G_CALLBACK (close_wmgr_cb), gg);
 
-    hpane = gtk_hpaned_new ();
+    hpane = gtk_paned_new (GTK_ORIENTATION_HORIZONTAL);
     //gtk_paned_set_position (GTK_PANED(hpane), 150);
     gtk_container_add (GTK_CONTAINER (gg->svis.window), hpane);
 
