@@ -26,12 +26,32 @@ static void redraw_symbol_display (GtkWidget * w, ggobid * gg);
 static void redraw_line_display (GtkWidget * w, ggobid * gg);
 static void redraw_fg (GtkWidget * w, gint k, ggobid * gg);
 static void queue_color_widget_redraw (GtkWidget *w);
+static void gdk_color_to_rgba (const GdkColor *color, GdkRGBA *rgba);
+static void rgba_to_gdk_color (const GdkRGBA *rgba, GdkColor *color);
 
 static void
 queue_color_widget_redraw (GtkWidget *w)
 {
   if (w != NULL)
     gtk_widget_queue_draw (w);
+}
+
+static void
+gdk_color_to_rgba (const GdkColor *color, GdkRGBA *rgba)
+{
+  rgba->red = color->red / 65535.0;
+  rgba->green = color->green / 65535.0;
+  rgba->blue = color->blue / 65535.0;
+  rgba->alpha = 1.0;
+}
+
+static void
+rgba_to_gdk_color (const GdkRGBA *rgba, GdkColor *color)
+{
+  color->red = (guint16) CLAMP (rgba->red * 65535.0, 0.0, 65535.0);
+  color->green = (guint16) CLAMP (rgba->green * 65535.0, 0.0, 65535.0);
+  color->blue = (guint16) CLAMP (rgba->blue * 65535.0, 0.0, 65535.0);
+  color->pixel = 0;
 }
 
 /*------------------------------------------------------------------------*/
@@ -622,16 +642,19 @@ reverse_video_cb (GtkWidget * ok_button, ggobid * gg)
 /*------------------------------------------------------------------------*/
 
 void
-color_changed_cb (GtkWidget * colorsel, ggobid * gg)
+color_changed_cb (GtkColorChooser *chooser, GParamSpec *pspec, ggobid * gg)
 {
   GdkColor gdk_color;
+  GdkRGBA rgba;
   splotd *sp = gg->current_splot;
 
   colorschemed *scheme = gg->activeColorScheme;
 
+  (void) pspec;
+
   /* Get current color */
-  gtk_color_selection_get_current_color (GTK_COLOR_SELECTION (colorsel),
-                                         &gdk_color);
+  gtk_color_chooser_get_rgba (chooser, &rgba);
+  rgba_to_gdk_color (&rgba, &gdk_color);
 
   if (gg->color_ui.current_da == gg->color_ui.bg_da) {
 
@@ -692,6 +715,7 @@ open_colorsel_dialog (GtkWidget * w, ggobid * gg)
 {
   gint handled = FALSE;
   GtkWidget *colorsel;
+  GdkRGBA rgba;
   gint i;
   colorschemed *scheme = gg->activeColorScheme;
 
@@ -702,17 +726,15 @@ open_colorsel_dialog (GtkWidget * w, ggobid * gg)
 
     /* Create color selection dialog */
     gg->color_ui.colorseldlg =
-      gtk_color_selection_dialog_new ("Select color");
-
-    /* Get the ColorSelection widget */
-    colorsel = gtk_color_selection_dialog_get_color_selection
-      (GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg));
+      gtk_color_chooser_dialog_new ("Select color",
+                                    GTK_WINDOW (gg->color_ui.symbol_window));
+    colorsel = gg->color_ui.colorseldlg;
 
     /*
      * Connect to the "color_changed" signal, set the client-data
      * to the colorsel widget
      */
-    g_signal_connect (G_OBJECT (colorsel), "color_changed",
+    g_signal_connect (G_OBJECT (colorsel), "notify::rgba",
                       G_CALLBACK (color_changed_cb), gg);
 
     /*
@@ -731,34 +753,33 @@ open_colorsel_dialog (GtkWidget * w, ggobid * gg)
     */
   }
   else {
-    colorsel = gtk_color_selection_dialog_get_color_selection
-      (GTK_COLOR_SELECTION_DIALOG (gg->color_ui.colorseldlg));
+    colorsel = gg->color_ui.colorseldlg;
   }
 
   if (w == gg->color_ui.bg_da) {
-    gtk_color_selection_set_current_color (GTK_COLOR_SELECTION (colorsel),
-                                           &scheme->rgb_bg);
+    gdk_color_to_rgba (&scheme->rgb_bg, &rgba);
+    gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (colorsel), &rgba);
   }
   else if (w == gg->color_ui.accent_da) {
-    gtk_color_selection_set_current_color (GTK_COLOR_SELECTION (colorsel),
-                                           &scheme->rgb_accent);
+    gdk_color_to_rgba (&scheme->rgb_accent, &rgba);
+    gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (colorsel), &rgba);
   }
   else if (w == gg->color_ui.hidden_da) {
-    gtk_color_selection_set_current_color (GTK_COLOR_SELECTION (colorsel),
-                                           &scheme->rgb_hidden);
+    gdk_color_to_rgba (&scheme->rgb_hidden, &rgba);
+    gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (colorsel), &rgba);
   }
   else {
     for (i = 0; i < MAXNCOLORS; i++) {
       if (w == gg->color_ui.fg_da[i]) {
-        gtk_color_selection_set_current_color (GTK_COLOR_SELECTION (colorsel),
-                                               &gg->activeColorScheme->
-                                               rgb[i]);
+        gdk_color_to_rgba (&gg->activeColorScheme->rgb[i], &rgba);
+        gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (colorsel), &rgba);
       }
     }
   }
 
   /* Show the dialog */
   gtk_widget_show (gg->color_ui.colorseldlg);
+  gtk_window_present (GTK_WINDOW (gg->color_ui.colorseldlg));
 
   return handled;
 }
