@@ -704,7 +704,7 @@ wvis_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 0);
 
     /* Apply button */
-    btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
+    btn = ggobi_button_new_with_icon_name ("_Apply", "emblem-ok");
     g_object_set_data(G_OBJECT (btn), "notebook", notebook);
     gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Apply the color scale") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 1);
@@ -714,7 +714,7 @@ wvis_window_open (ggobid *gg)
 
 
 
-    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+    btn = ggobi_button_new_with_icon_name ("_Close", "window-close");
     gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Close the window") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",

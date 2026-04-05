@@ -1073,7 +1073,7 @@ make_symbol_window (ggobid * gg)
                       G_CALLBACK (reverse_video_cb), (gpointer) gg);
 
     /*-- Close button --*/
-    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+    btn = ggobi_button_new_with_icon_name ("_Close", "window-close");
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, false, 0);
     g_signal_connect (G_OBJECT (btn),
                       "clicked",

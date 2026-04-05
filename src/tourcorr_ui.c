@@ -347,7 +347,7 @@ ctouradv_window_open (void) {
     //gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
     gtk_box_pack_start (GTK_BOX (vbox), frame, false, false, 0);
 
-    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+    btn = ggobi_button_new_with_icon_name ("_Close", "window-close");
     g_signal_connect_swapped (G_OBJECT (btn), "clicked",
                    G_CALLBACK (hide_cb), window);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);

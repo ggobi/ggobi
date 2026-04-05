@@ -260,14 +260,14 @@ add_record_dialog_open (GGobiData * d, GGobiData * e, displayd * dsp,
   }
 
   /*-- ok button --*/
-  w = gtk_button_new_from_stock (GTK_STOCK_APPLY);
+  w = ggobi_button_new_with_icon_name ("_Apply", "emblem-ok");
   gtk_widget_set_tooltip_text ((w), gg->tips ? ("Add the point or edge") : NULL);
   g_signal_connect (G_OBJECT (w), "clicked",
                     G_CALLBACK (add_record_dialog_apply), dsp);
   gtk_container_add (GTK_CONTAINER (add_record_dialog_action_area (dialog)), w);
 
   /*-- cancel button --*/
-  w = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+  w = ggobi_button_new_with_icon_name ("_Close", "window-close");
   g_signal_connect (G_OBJECT (w), "clicked",
                     G_CALLBACK (add_record_dialog_cancel), gg);
   gtk_container_add (GTK_CONTAINER (add_record_dialog_action_area (dialog)), w);

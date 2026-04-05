@@ -270,7 +270,7 @@ writeall_window_open (ggobid *gg) {
 /*
  * Add a button to open a file selection box; see filename_get_w in io.c
 */
-  btn = gtk_button_new_from_stock (GTK_STOCK_SAVE);
+  btn = ggobi_button_new_with_icon_name ("_Save", "document-save");
   gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Open file selection widget") : NULL);
   gtk_box_pack_start (GTK_BOX (vbox), btn,
                       false, false, 3);

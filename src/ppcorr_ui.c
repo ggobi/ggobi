@@ -46,7 +46,7 @@ static const gchar *ui_str =
 
 static GtkActionEntry entries[] = {
   {"File", NULL, "_File"},
-  {"Close", GTK_STOCK_CLOSE, "_Close", "<control>C",
+  {"Close", NULL, "_Close", "<control>C",
    "Hide the projection pursuit window", G_CALLBACK (hide_cb)
    }
 };
@@ -88,6 +88,7 @@ ctourpp_window_open (ggobid * gg)
 */
 
     gtk_action_group_add_actions (actions, entries, n_entries, window);
+    ggobi_action_group_set_icon_name (actions, "Close", "window-close");
     gtk_ui_manager_insert_action_group (manager, actions, 0);
     mbar = create_menu_bar (manager, ui_str, window);
     g_object_unref (G_OBJECT (actions));

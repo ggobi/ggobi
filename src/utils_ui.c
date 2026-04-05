@@ -28,6 +28,35 @@ GtkWidget *CreateMenuItemWithCheck (GtkWidget * menu,
                                     ggobid * gg, GSList * radiogroup,
                                     gboolean check);
 
+GtkWidget *
+ggobi_button_new_with_icon_name (const gchar *mnemonic, const gchar *icon_name)
+{
+  GtkWidget *button = gtk_button_new ();
+  GtkWidget *box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+  GtkWidget *image = gtk_image_new_from_icon_name (icon_name,
+                                                   GTK_ICON_SIZE_BUTTON);
+  GtkWidget *label = gtk_label_new_with_mnemonic (mnemonic);
+
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label), button);
+  gtk_box_pack_start (GTK_BOX (box), image, false, false, 0);
+  gtk_box_pack_start (GTK_BOX (box), label, false, false, 0);
+  gtk_container_add (GTK_CONTAINER (button), box);
+  gtk_widget_show_all (box);
+
+  return button;
+}
+
+void
+ggobi_action_group_set_icon_name (GtkActionGroup *group,
+                                  const gchar *action_name,
+                                  const gchar *icon_name)
+{
+  GtkAction *action = gtk_action_group_get_action (group, action_name);
+
+  if (action != NULL)
+    g_object_set (G_OBJECT (action), "icon-name", icon_name, NULL);
+}
+
 /*
  * Taken from 'Developing Linux Applications with GTK+ and GDK'
  * by Eric Harlow.

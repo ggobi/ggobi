@@ -606,7 +606,7 @@ static void tour1dadv_window_open (ggobid *gg)
     gtk_box_pack_start (GTK_BOX (vb), sbar, false, false, 0);
 
     /*-- Close button --*/
-    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+    btn = ggobi_button_new_with_icon_name ("_Close", "window-close");
     g_signal_connect_swapped (G_OBJECT (btn), "clicked",
       G_CALLBACK (hide_cb), window);
     gtk_box_pack_start (GTK_BOX (vbox), btn, false, true, 2);

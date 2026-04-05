@@ -205,8 +205,8 @@ open_range_set_dialog (GtkWidget *w, ggobid *gg)
   if (!ok)
 	  return;
 
-  dialog = gtk_dialog_new_with_buttons ("Range Dialog", NULL, 0, 
-  			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+  dialog = gtk_dialog_new_with_buttons ("Range Dialog", NULL, 0,
+			"_OK", GTK_RESPONSE_ACCEPT, "_Cancel", GTK_RESPONSE_REJECT, NULL);
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
   /*-- frame for a pair of radio buttons --*/
@@ -393,8 +393,8 @@ open_newvar_dialog (GtkWidget *w, ggobid *gg)
   GtkWidget *radio1, *radio2, *entry;
   GSList *radio_group;
 
-  dialog = gtk_dialog_new_with_buttons ("Add New Variable", NULL, 0, 
-    GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, 
+  dialog = gtk_dialog_new_with_buttons ("Add New Variable", NULL, 0,
+    "_OK", GTK_RESPONSE_ACCEPT, "_Cancel", GTK_RESPONSE_REJECT,
     NULL);
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   frame = gtk_frame_new ("Variable values");
@@ -498,8 +498,8 @@ open_rename_dialog (GtkWidget *w, ggobid *gg)
 	return;
   }
 
-  dialog = gtk_dialog_new_with_buttons ("Rename One Variable", NULL, 0, 
-  			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL);
+  dialog = gtk_dialog_new_with_buttons ("Rename One Variable", NULL, 0,
+			"_OK", GTK_RESPONSE_ACCEPT, "_Cancel", GTK_RESPONSE_REJECT, NULL);
   content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
  
   /*-- label and entry --*/
@@ -625,7 +625,7 @@ vartable_buttonbox_build (ggobid *gg) {
                       G_CALLBACK (open_rename_dialog), gg);
   /*-- --*/
 
-  btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+  btn = ggobi_button_new_with_icon_name ("_Close", "window-close");
   gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Close the window") : NULL);
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, false, 1);
   g_signal_connect (G_OBJECT (btn), "clicked",

@@ -80,8 +80,8 @@ createPrintDialog (displayd * dpy)
   sprintf (title, "%s%s", "Print Options", (dpy ? " for display" : ""));
 
   dialog = gtk_dialog_new_with_buttons (title, NULL, 0,
-                                        GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
-                                        GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                                        "_OK", GTK_RESPONSE_ACCEPT,
+                                        "_Cancel", GTK_RESPONSE_REJECT,
                                         NULL);
   //gtk_window_set_title(GTK_WINDOW(dialog), title);
 

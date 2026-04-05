@@ -57,6 +57,9 @@ void       edgeedit_init (ggobid * gg);
 GtkWidget* CreateMenuCheck (GtkWidget *, gchar *, GCallback, gpointer, gboolean, ggobid *);
 GtkWidget* CreateMenuItem (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GCallback, gpointer, ggobid *) ;
 GtkWidget* CreateMenuItemWithCheck (GtkWidget *, gchar *, gchar *, gchar *, GtkWidget *, GtkAccelGroup *, GCallback, gpointer, ggobid *, GSList *, gboolean check) ;
+GtkWidget* ggobi_button_new_with_icon_name (const gchar *, const gchar *);
+void ggobi_action_group_set_icon_name (GtkActionGroup *, const gchar *,
+                                       const gchar *);
 ggobid*    GGobiFromDisplay (displayd *display);
 ggobid*    GGobiFromSPlot (splotd *sp);
 ggobid*    GGobiFromWidget (GtkWidget *w, gboolean);

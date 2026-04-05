@@ -522,8 +522,8 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
     !gtk_widget_get_realized (gg->cluster_ui.window)) 
   {
     gg->cluster_ui.window = gtk_dialog_new_with_buttons ("Color & Glyph Groups",
-      GTK_WINDOW(gg->main_window), GTK_DIALOG_DESTROY_WITH_PARENT, 
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
+      GTK_WINDOW(gg->main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
+      "_Close", GTK_RESPONSE_CLOSE, NULL);
     g_signal_connect (G_OBJECT (gg->cluster_ui.window), "delete_event",
                       G_CALLBACK (close_wmgr_cb), (gpointer) gg);
     new = true;
@@ -662,7 +662,7 @@ CHECK_EVENT_SIGNATURE (exclusion_notebook_adddata_cb, datad_added_f)
   gtk_box_pack_start (GTK_BOX (hbox), btn, true, true, 0);
 
   /*-- Update button --*/
-  btn = gtk_button_new_from_stock (GTK_STOCK_REFRESH);
+  btn = ggobi_button_new_with_icon_name ("_Refresh", "view-refresh");
   gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Reset plots after brushing so that shadow and excluded status is consistent with this table; reset this table if necessary.") : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (update_cb), (gpointer) gg);

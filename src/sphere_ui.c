@@ -576,7 +576,7 @@ sphere_panel_open (ggobid * gg)
     hb = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
-    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+    btn = ggobi_button_new_with_icon_name ("_Close", "window-close");
     gtk_box_pack_start (GTK_BOX (hb), btn, true, false, 0);
     gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Close the sphering window") : NULL);
     g_signal_connect (G_OBJECT (btn), "clicked",

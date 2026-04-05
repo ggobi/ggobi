@@ -355,7 +355,7 @@ action_toggle_brush_on_cb (GtkToggleAction * action, displayd * display)
 
 static GtkActionEntry disp_action_entries[] = {
   {"File", NULL, "_File"},
-  {"Close", GTK_STOCK_CLOSE, "_Close", "<control>C", "Close this display",
+  {"Close", NULL, "_Close", "<control>C", "Close this display",
    G_CALLBACK (action_close_cb)},
   {"Options", NULL, "_Options", NULL, "Options for this display"},
   /* imode brush specific */
@@ -459,6 +459,7 @@ display_default_actions_create (displayd * display)
   gtk_action_group_add_toggle_actions (actions, disp_t_action_entries,
                                        G_N_ELEMENTS (disp_t_action_entries),
                                        display);
+  ggobi_action_group_set_icon_name (actions, "Close", "window-close");
   return (actions);
 }
 

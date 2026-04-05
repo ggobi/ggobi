@@ -180,8 +180,8 @@ createOutputFileSelectionDialog (const gchar * title)
   GtkWidget *chooser;
   chooser = gtk_file_chooser_dialog_new (title, NULL,
                                          GTK_FILE_CHOOSER_ACTION_SAVE,
-                                         GTK_STOCK_CANCEL,
-                                         GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE,
+                                         "_Cancel",
+                                         GTK_RESPONSE_CANCEL, "_Save",
                                          GTK_RESPONSE_ACCEPT, NULL);
   return (chooser);
 }
@@ -196,8 +196,8 @@ createInputFileSelectionDialog (gchar * title, ggobid * gg)
 
   chooser =
     gtk_file_chooser_dialog_new (title, NULL, GTK_FILE_CHOOSER_ACTION_OPEN,
-                                 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                 GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+                                 "_Cancel", GTK_RESPONSE_CANCEL,
+                                 "_Open", GTK_RESPONSE_ACCEPT, NULL);
 
   hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 5);
 

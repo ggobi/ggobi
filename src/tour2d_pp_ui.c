@@ -252,7 +252,7 @@ static const gchar* tour2dpp_ui =
 
 static GtkActionEntry entries[] = {
 	{ "File", NULL, "_File" },
-	{ "Close", GTK_STOCK_CLOSE, "_Close", "<control>C", 
+	{ "Close", NULL, "_Close", "<control>C",
 		"Hide the projection pursuit window", G_CALLBACK(action_close_cb)
 	},
 	{ "Options", NULL, "_Options" }
@@ -329,6 +329,7 @@ tour2dpp_window_open (ggobid *gg) {
 
 	  gtk_action_group_add_actions(actions, entries, G_N_ELEMENTS(entries), dsp);
 	  gtk_action_group_add_toggle_actions(actions, t_entries, G_N_ELEMENTS(t_entries), dsp);
+	  ggobi_action_group_set_icon_name (actions, "Close", "window-close");
 	  gtk_ui_manager_insert_action_group(manager, actions, 0);
 	  g_object_unref(G_OBJECT(actions));
 	  dsp->t2d_mbar = create_menu_bar(manager, tour2dpp_ui, dsp->t2d_window);

@@ -925,22 +925,22 @@ static const gchar *main_ui_str =
 
 static GtkActionEntry entries[] = {
   {"File", NULL, "_File"},
-  {"Open", GTK_STOCK_OPEN, "_Open", NULL, "Open a datafile",
+  {"Open", NULL, "_Open", NULL, "Open a datafile",
    G_CALLBACK (action_open_cb)},
-  {"New", GTK_STOCK_NEW, "_New", NULL, "Create a new GGobi instance",
+  {"New", NULL, "_New", NULL, "Create a new GGobi instance",
    G_CALLBACK (action_new_cb)},
-  {"Save", GTK_STOCK_SAVE, "_Save", "<control>V", "Save some data",
+  {"Save", NULL, "_Save", "<control>V", "Save some data",
    G_CALLBACK (action_save_cb)},
   {"Shortcuts", NULL, "Shortc_uts"},
 #ifdef STORE_SESSION_ENABLED
-  {"StoreSession", GTK_STOCK_GOTO_BOTTOM, "Store Session", NULL,
+  {"StoreSession", NULL, "Store Session", NULL,
    "Save this GGobi session",
    G_CALLBACK (action_store_session_cb)
    },
 #endif
-  {"Close", GTK_STOCK_CLOSE, "_Close", "<control>C",
+  {"Close", NULL, "_Close", "<control>C",
    "Close this GGobi instance", G_CALLBACK (action_close_cb)},
-  {"Quit", GTK_STOCK_QUIT, "_Quit", "<control>Q", "Quit GGobi",
+  {"Quit", NULL, "_Quit", "<control>Q", "Quit GGobi",
    G_CALLBACK (action_quit_cb)},
 
   {"Display", NULL, "_Display"},
@@ -949,28 +949,28 @@ static GtkActionEntry entries[] = {
   {"Options", NULL, "_Options"},
 
   {"Tools", NULL, "_Tools"},
-  {"VariableManipulation", GTK_STOCK_INDEX, "Variable _Manipulation", NULL,
+  {"VariableManipulation", NULL, "Variable _Manipulation", NULL,
    "Open a table of variables for manipulation",
    G_CALLBACK (action_manipulate_cb)
    },
-  {"VariableTransformation", GTK_STOCK_CONVERT, "Variable _Transformation",
+  {"VariableTransformation", NULL, "Variable _Transformation",
    NULL,
    "Perform transformations on the dataset's variables",
    G_CALLBACK (action_transform_cb)
    },
-  {"Sphering", GTK_STOCK_JUMP_TO, "_Sphering (PCA)", NULL,
+  {"Sphering", NULL, "_Sphering (PCA)", NULL,
    "Open a panel to perform sphering",
    G_CALLBACK (action_sphere_cb)
    },
 #ifdef INFERENCE_IMPLEMENTED    /* to do */
-  {"Inference", GTK_STOCK_EXECUTE, "_Inference", NULL, "Perform inference",
+  {"Inference", NULL, "_Inference", NULL, "Perform inference",
    NULL},
 #endif
   {"VariableJittering", NULL, "Variable _Jittering", NULL,
    "'Jitter' some variables",
    G_CALLBACK (action_jitter_cb)
    },
-  {"ColorSchemes", GTK_STOCK_SELECT_COLOR, "_Color Schemes", NULL,
+  {"ColorSchemes", NULL, "_Color Schemes", NULL,
    "Configure and pick color schemes",
    G_CALLBACK (action_color_schemes_cb)
    },
@@ -1068,6 +1068,20 @@ ggobi_actions_create (ggobid * gg)
                                       G_N_ELEMENTS (imode_entries),
                                       DEFAULT_IMODE,
                                       G_CALLBACK (action_radio_imode_cb), gg);
+
+  ggobi_action_group_set_icon_name (actions, "Open", "document-open");
+  ggobi_action_group_set_icon_name (actions, "New", "document-new");
+  ggobi_action_group_set_icon_name (actions, "Save", "document-save");
+  ggobi_action_group_set_icon_name (actions, "StoreSession", "document-save");
+  ggobi_action_group_set_icon_name (actions, "Close", "window-close");
+  ggobi_action_group_set_icon_name (actions, "Quit", "application-exit");
+  ggobi_action_group_set_icon_name (actions, "VariableManipulation",
+                                    "document-properties");
+  ggobi_action_group_set_icon_name (actions, "VariableTransformation",
+                                    "insert-object");
+  ggobi_action_group_set_icon_name (actions, "Sphering", "system-run");
+  ggobi_action_group_set_icon_name (actions, "ColorSchemes",
+                                    "preferences-desktop-theme");
 
   g_object_set (G_OBJECT (gtk_action_group_get_action (actions, "Display")),
                 "hide_if_empty", false, NULL);
@@ -1243,7 +1257,9 @@ addPreviousFilesMenu (GGobiInitInfo * info, ggobid * gg)
         gchar *action_name = g_strdup_printf ("Shortcut_%d", i);
         GtkAction *action = gtk_action_new (action_name, input->fileName,
                                             "Open this shortcut",
-                                            GTK_STOCK_FILE);
+                                            NULL);
+        g_object_set (G_OBJECT (action), "icon-name",
+                      "document-open-recent", NULL);
         g_signal_connect (G_OBJECT (action), "activate",
                           G_CALLBACK (load_previous_file),
                           info->descriptions + i);
@@ -1375,8 +1391,8 @@ store_session (ggobid * gg)
     dlg =
       gtk_file_chooser_dialog_new ("Save ggobi session", NULL,
                                    GTK_FILE_CHOOSER_ACTION_SAVE,
-                                   GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
-                                   GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                                   "_Save", GTK_RESPONSE_ACCEPT,
+                                   "_Cancel", GTK_RESPONSE_REJECT,
                                    NULL);
     g_object_set_data (G_OBJECT (dlg), "ggobi", (gpointer) gg);
     gtk_file_chooser_set_filename (GTK_FILE_CHOOSER (dlg), buf);

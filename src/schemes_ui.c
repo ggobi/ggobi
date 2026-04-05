@@ -414,13 +414,13 @@ svis_window_open (ggobid * gg)
     gtk_box_pack_start (GTK_BOX (vbox), hb, false, false, 1);
 
     /* Apply button */
-    btn = gtk_button_new_from_stock (GTK_STOCK_APPLY);
+    btn = ggobi_button_new_with_icon_name ("_Apply", "emblem-ok");
     gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Make this the current color scheme for brushing in ggobi") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",
                       G_CALLBACK (scale_set_cb), gg);
 
-    btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+    btn = ggobi_button_new_with_icon_name ("_Close", "window-close");
     gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Close the window") : NULL);
     gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 2);
     g_signal_connect (G_OBJECT (btn), "clicked",

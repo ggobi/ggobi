@@ -226,7 +226,7 @@ cpanel_movepts_make (ggobid * gg)
                     G_CALLBACK (reset_all_cb), (gpointer) gg);
   gtk_box_pack_start (GTK_BOX (box), btn, false, false, 1);
 
-  btn = gtk_button_new_from_stock (GTK_STOCK_UNDO);
+  btn = ggobi_button_new_with_icon_name ("_Undo", "edit-undo");
   gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Undo the previous move") : NULL);
   g_signal_connect (G_OBJECT (btn), "clicked",
                     G_CALLBACK (undo_last_cb), (gpointer) gg);

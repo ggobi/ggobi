@@ -564,7 +564,7 @@ subset_window_open (ggobid *gg) {
       close_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
       gtk_box_pack_start (GTK_BOX (vbox), close_hbox, false, false, 1);
 
-      btn = gtk_button_new_from_stock (GTK_STOCK_CLOSE);
+      btn = ggobi_button_new_with_icon_name ("_Close", "window-close");
       g_signal_connect (G_OBJECT (btn), "clicked",
                           G_CALLBACK (close_btn_cb), (ggobid *) gg);
       gtk_box_pack_start (GTK_BOX (close_hbox), btn, true, false, 0);

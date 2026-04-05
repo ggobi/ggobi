@@ -494,7 +494,7 @@ cpanel_brush_make (ggobid * gg)
   /* initialize transient */
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check_btn), false);
 
-  btn = gtk_button_new_from_stock (GTK_STOCK_UNDO);
+  btn = ggobi_button_new_with_icon_name ("_Undo", "edit-undo");
   gtk_widget_set_tooltip_text ((btn), gg->tips ? ("Undo the most recent persistent brushing changes") : NULL);
   gtk_box_pack_start (GTK_BOX (hb), btn, true, true, 0);
   g_signal_connect (G_OBJECT (btn), "clicked", G_CALLBACK (brush_undo_cb),
